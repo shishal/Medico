@@ -1,0 +1,453 @@
+# Database Schema (Supabase / Postgres)
+
+Run these in the Supabase SQL editor in order. Each block is idempotent-ish (uses `if not exists` where sensible) but review before running against a live project.
+
+## 1. Enums
+
+```sql
+create type plan_tier as enum ('free', 'pro', 'elite');
+create type test_type as enum ('mini', 'subject', 'mock', 'grand');
+create type attempt_status as enum ('in_progress', 'submitted', 'abandoned');
+create type question_difficulty as enum ('easy', 'medium', 'hard');
+```
+
+## 2. Core tables
+
+```sql
+create table profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text,
+  phone text,
+  plan plan_tier not null default 'free',
+  plan_started_at timestamptz,
+  plan_expires_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table subjects (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  display_order int not null default 0
+);
+
+create table topics (
+  id uuid primary key default gen_random_uuid(),
+  subject_id uuid not null references subjects(id) on delete cascade,
+  name text not null,
+  display_order int not null default 0
+);
+create index idx_topics_subject on topics(subject_id);
+
+create table questions (
+  id uuid primary key default gen_random_uuid(),
+  topic_id uuid not null references topics(id) on delete restrict,
+  question_text text not null,
+  option_a text not null,
+  option_b text not null,
+  option_c text not null,
+  option_d text not null,
+  correct_option char(1) not null check (correct_option in ('A','B','C','D')),
+  explanation_text text,
+  explanation_video_url text,
+  image_url text,
+  difficulty question_difficulty not null default 'medium',
+  source text,                    -- e.g. 'PYQ 2024', 'Custom'
+  required_plan plan_tier not null default 'free',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+create index idx_questions_topic on questions(topic_id);
+create index idx_questions_active on questions(is_active) where is_active;
+
+create table tests (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  test_type test_type not null,
+  subject_id uuid references subjects(id),          -- null for mixed-subject tests
+  required_plan plan_tier not null default 'free',
+  is_sectional boolean not null default false,
+  section_count int not null default 1,
+  questions_per_section int,
+  section_duration_minutes int,
+  total_duration_minutes int not null,
+  total_questions int not null,
+  correct_marks numeric not null default 4,
+  incorrect_marks numeric not null default -1,
+  unattempted_marks numeric not null default 0,
+  is_live boolean not null default false,             -- pan-India timed "live" test
+  live_start_at timestamptz,
+  live_end_at timestamptz,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table test_questions (
+  test_id uuid not null references tests(id) on delete cascade,
+  question_id uuid not null references questions(id) on delete restrict,
+  section_number int not null default 1,
+  order_index int not null,
+  primary key (test_id, question_id)
+);
+create index idx_test_questions_test on test_questions(test_id);
+
+create table attempts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  test_id uuid not null references tests(id) on delete restrict,
+  status attempt_status not null default 'in_progress',
+  started_at timestamptz not null default now(),
+  submitted_at timestamptz,
+  total_score numeric,
+  correct_count int,
+  incorrect_count int,
+  unattempted_count int,
+  percentile numeric,
+  created_at timestamptz not null default now()
+);
+create index idx_attempts_user on attempts(user_id);
+create index idx_attempts_test on attempts(test_id);
+
+create table attempt_answers (
+  id uuid primary key default gen_random_uuid(),
+  attempt_id uuid not null references attempts(id) on delete cascade,
+  question_id uuid not null references questions(id) on delete restrict,
+  selected_option char(1) check (selected_option in ('A','B','C','D')),
+  is_marked_for_review boolean not null default false,
+  time_spent_seconds int not null default 0,
+  answered_at timestamptz,
+  unique (attempt_id, question_id)
+);
+create index idx_attempt_answers_attempt on attempt_answers(attempt_id);
+
+create table bookmarks (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  question_id uuid not null references questions(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, question_id)
+);
+```
+
+## 3. New-user trigger (auto-create a profile row on signup)
+
+```sql
+create function handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, plan)
+  values (new.id, 'free');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure handle_new_user();
+```
+
+## 4. Plan-comparison helper (used by RLS)
+
+```sql
+create function plan_rank(p plan_tier) returns int
+language sql immutable as $$
+  select case p when 'free' then 0 when 'pro' then 1 when 'elite' then 2 end;
+$$;
+
+-- Returns the user's *effective* plan, falling back to 'free' if their paid plan expired
+create function current_plan(p_user_id uuid) returns plan_tier
+language sql stable as $$
+  select case
+    when plan_expires_at is not null and plan_expires_at < now() then 'free'::plan_tier
+    else plan
+  end
+  from profiles where id = p_user_id;
+$$;
+```
+
+**Validation for this step**: after running, manually set a test profile's `plan_expires_at` to yesterday and confirm `select current_plan('<that-user-id>')` returns `'free'` even though the `plan` column still says `'pro'`. This is the exact bug class that causes "I cancelled and I'm still being charged/still have access" support tickets — test it now, not after launch.
+
+## 5. Row-Level Security
+
+```sql
+alter table profiles enable row level security;
+alter table subjects enable row level security;
+alter table topics enable row level security;
+alter table questions enable row level security;
+alter table tests enable row level security;
+alter table test_questions enable row level security;
+alter table attempts enable row level security;
+alter table attempt_answers enable row level security;
+alter table bookmarks enable row level security;
+
+-- profiles: users see/edit only their own row
+create policy "own profile select" on profiles for select using (auth.uid() = id);
+create policy "own profile update" on profiles for update using (auth.uid() = id);
+
+-- subjects/topics: readable by any authenticated user (not plan-gated at this level)
+create policy "subjects readable" on subjects for select using (auth.role() = 'authenticated');
+create policy "topics readable" on topics for select using (auth.role() = 'authenticated');
+
+-- questions: only visible if the user's current plan meets the question's required plan
+create policy "questions plan-gated select" on questions for select using (
+  is_active
+  and plan_rank(current_plan(auth.uid())) >= plan_rank(required_plan)
+);
+
+-- tests: same pattern
+create policy "tests plan-gated select" on tests for select using (
+  is_active
+  and plan_rank(current_plan(auth.uid())) >= plan_rank(required_plan)
+);
+
+-- test_questions: visible if the parent test is visible (join through)
+create policy "test_questions via test" on test_questions for select using (
+  exists (
+    select 1 from tests t
+    where t.id = test_questions.test_id
+    and t.is_active
+    and plan_rank(current_plan(auth.uid())) >= plan_rank(t.required_plan)
+  )
+);
+
+-- attempts: users only see/create/update their own
+create policy "own attempts select" on attempts for select using (auth.uid() = user_id);
+create policy "own attempts insert" on attempts for insert with check (auth.uid() = user_id);
+create policy "own attempts update" on attempts for update using (auth.uid() = user_id);
+
+-- attempt_answers: users only touch answers belonging to their own attempts
+create policy "own answers select" on attempt_answers for select using (
+  exists (select 1 from attempts a where a.id = attempt_answers.attempt_id and a.user_id = auth.uid())
+);
+create policy "own answers insert" on attempt_answers for insert with check (
+  exists (select 1 from attempts a where a.id = attempt_answers.attempt_id and a.user_id = auth.uid())
+);
+create policy "own answers update" on attempt_answers for update using (
+  exists (select 1 from attempts a where a.id = attempt_answers.attempt_id and a.user_id = auth.uid())
+);
+
+-- bookmarks: fully own-user
+create policy "own bookmarks all" on bookmarks for all using (auth.uid() = user_id);
+```
+
+**Important note for the AI agent doing this task**: `questions.explanation_text` and `explanation_video_url` are covered by the same plan-gated SELECT policy as the rest of the row — do not create a separate, looser policy for "just the explanation," even if a future task asks for a "preview the solution" feature. If you need a genuine free preview of a paid question, that should be a deliberate, separate `is_preview` boolean column with its own narrow policy, not a loosened blanket policy.
+
+## 6. Percentile calculation (simple version for Phase 1)
+
+```sql
+create function calculate_percentile(p_test_id uuid, p_score numeric) returns numeric
+language sql stable as $$
+  select round(
+    100.0 * (select count(*) from attempts
+              where test_id = p_test_id and status = 'submitted' and total_score <= p_score)
+    / nullif((select count(*) from attempts where test_id = p_test_id and status = 'submitted'), 0)
+  , 1);
+$$;
+```
+
+Call this right after an attempt is marked `submitted`, store the result on `attempts.percentile`. This is a live, keeps-shifting percentile (recalculating it for *everyone* who took the test as more people submit is a Phase 2 nice-to-have, not required for launch — the score users see the moment they finish is what matters most).
+
+## 7. Practice Mode additions
+
+Practice Mode is **not** a separate system — a practice session is an ephemeral, personally-owned row in the existing `tests` table, generated on demand from a student's filters, then run through the exact same attempt/timer/scoring flow as a catalog test (with a few behavioral flags different — see `05_PRACTICE_MODE_SPEC.md`). This section adds what's needed to support that: a tagging system, per-plan limits stored as data, and a server-side generator function.
+
+### 7.1 Tags
+
+```sql
+create table tags (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique          -- e.g. 'PYQ', 'HighYield', 'RecentUpdate', 'OneLiner', 'ClinicalVignette'
+);
+
+create table question_tags (
+  question_id uuid not null references questions(id) on delete cascade,
+  tag_id uuid not null references tags(id) on delete cascade,
+  primary key (question_id, tag_id)
+);
+create index idx_question_tags_tag on question_tags(tag_id);
+```
+
+Add a `Tags` tab to the Google Sheet (comma-separated tag names per question row) so content entry can assign tags the same way it assigns subjects/topics — extend the Phase 2 sync script to handle this, creating any new tag by name automatically.
+
+### 7.2 Plan limits (data-driven, not hardcoded)
+
+```sql
+create table plan_limits (
+  plan plan_tier primary key,
+  max_practice_session_questions int not null,
+  daily_practice_question_quota int,              -- null = unlimited
+  allow_full_explanation boolean not null default true,
+  allow_timer_toggle boolean not null default true,
+  allow_tag_filter boolean not null default true,
+  allow_difficulty_filter boolean not null default true,
+  allow_negative_marking_toggle boolean not null default true
+);
+
+-- Starting defaults — a product decision, not an engineering one. Change any time by
+-- updating this table; no app rebuild needed since the generator function reads it live.
+insert into plan_limits (plan, max_practice_session_questions, daily_practice_question_quota, allow_full_explanation, allow_timer_toggle, allow_tag_filter, allow_difficulty_filter, allow_negative_marking_toggle) values
+  ('free',  10,  20,   false, false, false, true,  false),
+  ('pro',   50,  null, true,  true,  true,  true,  true),
+  ('elite', 100, null, true,  true,  true,  true,  true);
+```
+
+Suggested rationale for these defaults, adjust freely: free users get a small taste (10 questions/session, 20/day, answer-only feedback, no tag/timer control — enough to evaluate the product, not enough to fully self-study for free). Pro and Elite differ mainly in session size and daily ceiling, since the meaningful feature gate (full explanations, tag filtering) is the same for both — differentiate Elite further later with things like audio explanations or unlimited resets once you have those.
+
+### 7.3 Daily usage tracking
+
+```sql
+create table daily_practice_usage (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  usage_date date not null default current_date,
+  questions_used int not null default 0,
+  primary key (user_id, usage_date)
+);
+```
+
+### 7.4 Extend `tests` for ephemeral practice sessions
+
+```sql
+alter table tests
+  add column owner_user_id uuid references auth.users(id),      -- null for shared catalog tests
+  add column is_ephemeral_practice boolean not null default false,
+  add column feedback_timing text not null default 'on_submit' check (feedback_timing in ('immediate','on_submit')),
+  add column show_explanation_level text not null default 'full' check (show_explanation_level in ('none','answer_only','full')),
+  add column timer_enabled boolean not null default true,
+  add column practice_filter_criteria jsonb;                    -- stores the filters used, for a "redo similar" feature later
+```
+
+### 7.5 RLS updates (tests/test_questions must also allow the owner to see their own practice session)
+
+```sql
+drop policy "tests plan-gated select" on tests;
+create policy "tests select" on tests for select using (
+  (is_active and plan_rank(current_plan(auth.uid())) >= plan_rank(required_plan))
+  or owner_user_id = auth.uid()
+);
+
+drop policy "test_questions via test" on test_questions;
+create policy "test_questions select" on test_questions for select using (
+  exists (
+    select 1 from tests t
+    where t.id = test_questions.test_id
+    and (
+      (t.is_active and plan_rank(current_plan(auth.uid())) >= plan_rank(t.required_plan))
+      or t.owner_user_id = auth.uid()
+    )
+  )
+);
+```
+
+Note there's deliberately no direct client INSERT policy on `tests`/`test_questions` for practice sessions — creation only happens through the function below, so tier limits can't be bypassed by a modified client sending its own rows.
+
+### 7.6 Practice session generator function
+
+This is the one piece of SQL in the whole schema worth a second, careful read before you trust it — it's the thing standing between a free user and unlimited paid content if it has a bug.
+
+```sql
+create or replace function create_practice_session(
+  p_topic_ids uuid[],
+  p_tag_ids uuid[],
+  p_difficulties question_difficulty[],
+  p_source_filter text,        -- 'unattempted' | 'incorrect' | 'bookmarked' | 'all'
+  p_question_count int,
+  p_feedback_timing text,      -- 'immediate' | 'on_submit'
+  p_explanation_level text,    -- 'none' | 'answer_only' | 'full'
+  p_timer_minutes int,         -- null if the student turned the timer off
+  p_negative_marking boolean
+) returns uuid
+language plpgsql security definer as $$
+declare
+  v_plan plan_tier;
+  v_limits plan_limits%rowtype;
+  v_test_id uuid;
+  v_effective_count int;
+  v_effective_explanation text;
+  v_used_today int;
+begin
+  v_plan := current_plan(auth.uid());
+  select * into v_limits from plan_limits where plan = v_plan;
+
+  v_effective_count := least(p_question_count, v_limits.max_practice_session_questions);
+
+  v_effective_explanation := case
+    when p_explanation_level = 'full' and not v_limits.allow_full_explanation then 'answer_only'
+    else p_explanation_level
+  end;
+
+  if v_limits.daily_practice_question_quota is not null then
+    select coalesce(questions_used, 0) into v_used_today
+    from daily_practice_usage where user_id = auth.uid() and usage_date = current_date;
+
+    if coalesce(v_used_today, 0) + v_effective_count > v_limits.daily_practice_question_quota then
+      v_effective_count := greatest(v_limits.daily_practice_question_quota - coalesce(v_used_today, 0), 0);
+    end if;
+
+    if v_effective_count <= 0 then
+      raise exception 'DAILY_PRACTICE_QUOTA_EXCEEDED';
+    end if;
+  end if;
+
+  insert into tests (
+    title, test_type, required_plan, total_duration_minutes, total_questions,
+    correct_marks, incorrect_marks, unattempted_marks, is_active,
+    owner_user_id, is_ephemeral_practice, feedback_timing, show_explanation_level,
+    timer_enabled, practice_filter_criteria
+  ) values (
+    'Practice Session', 'mini', 'free',
+    coalesce(p_timer_minutes, 0), v_effective_count,
+    case when p_negative_marking then 4 else 1 end,
+    case when p_negative_marking then -1 else 0 end,
+    0, false,
+    auth.uid(), true, p_feedback_timing, v_effective_explanation,
+    p_timer_minutes is not null,
+    jsonb_build_object('topic_ids', p_topic_ids, 'tag_ids', p_tag_ids, 'difficulties', p_difficulties, 'source_filter', p_source_filter)
+  ) returning id into v_test_id;
+
+  insert into test_questions (test_id, question_id, section_number, order_index)
+  select v_test_id, q.id, 1, row_number() over (order by random())
+  from questions q
+  where q.is_active
+    and plan_rank(v_plan) >= plan_rank(q.required_plan)          -- re-check plan gating manually: security definer bypasses RLS
+    and (p_topic_ids is null or q.topic_id = any(p_topic_ids))
+    and (p_difficulties is null or q.difficulty = any(p_difficulties))
+    and (p_tag_ids is null or exists (
+          select 1 from question_tags qt where qt.question_id = q.id and qt.tag_id = any(p_tag_ids)))
+    and (
+      p_source_filter = 'all'
+      or (p_source_filter = 'bookmarked' and exists (
+            select 1 from bookmarks b where b.question_id = q.id and b.user_id = auth.uid()))
+      or (p_source_filter = 'incorrect' and exists (
+            select 1 from attempt_answers aa join attempts a on a.id = aa.attempt_id
+            where a.user_id = auth.uid() and aa.question_id = q.id
+            and aa.selected_option is distinct from q.correct_option))
+      or (p_source_filter = 'unattempted' and not exists (
+            select 1 from attempt_answers aa join attempts a on a.id = aa.attempt_id
+            where a.user_id = auth.uid() and aa.question_id = q.id and aa.selected_option is not null))
+    )
+  order by random()
+  limit v_effective_count;
+
+  insert into daily_practice_usage (user_id, usage_date, questions_used)
+  values (auth.uid(), current_date, v_effective_count)
+  on conflict (user_id, usage_date) do update
+    set questions_used = daily_practice_usage.questions_used + v_effective_count;
+
+  return v_test_id;
+end;
+$$;
+```
+
+**Validation for this function specifically**: as a free-tier test user, call it requesting `p_question_count = 999` and `p_explanation_level = 'full'` — confirm the returned session has at most 10 questions (the free-tier `max_practice_session_questions`) and that `show_explanation_level` was silently downgraded to `'answer_only'` on the created row, not honored as `'full'`. This is the single most important test in this whole addition: it's proving the limit can't be bypassed by just asking for more.
+
+## Seed data strategy (placeholder content for testing)
+
+Since you don't have real content yet, write a one-off SQL script (or a small Dart/Python script) that:
+
+1. Inserts 5–6 `subjects` (e.g. Medicine, Surgery, OBGYN, Pediatrics, Pharmacology, Pathology) matching real NEET-PG subject names — even placeholder tests should use real subject names so the UI you're building looks right.
+2. Inserts 3–4 `topics` per subject.
+3. Generates ~200 dummy `questions` with obviously-fake but structurally valid text (e.g. "Sample question 14 about Cardiology — option A", correct_option rotated deterministically) spread across topics and difficulty levels, ~80% `required_plan = 'free'` and the rest split pro/elite so you can actually test the plan-gating UI.
+4. Creates one test of each `test_type`, including one `is_sectional = true` "grand test" with 5 sections × 36 questions (matching the real NEET-PG 2026 format: 180 questions, +4/-1 marking, 42-minute sections) so you're validating against the actual exam shape from day one, not an arbitrary placeholder shape.
+5. Inserts a handful of `tags` (`PYQ`, `HighYield`, `RecentUpdate`, `OneLiner`, `ClinicalVignette`) and assigns 1–2 to each dummy question randomly, so Practice Mode's tag filter has something real to filter against.
+6. Confirms `plan_limits` has its three seed rows from §7.2 — this table is populated by that section's `insert` statement directly, not by your seed script, but double-check it landed correctly before testing Practice Mode.
+
+**Validation for this step**: after seeding, manually query as an anonymous/free-tier test user and confirm you get back only `free`-tier questions and tests — this is your first real end-to-end proof the RLS policies work, before any Flutter code exists.

@@ -46,3 +46,15 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Script tooling (local venvs for one-off DB validators)
+scripts/.venv/
+
+# Supabase local dev artifacts
+supabase/.branches
+supabase/.temp

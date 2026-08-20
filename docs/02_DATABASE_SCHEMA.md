@@ -168,6 +168,12 @@ $$;
 
 ## 5. Row-Level Security
 
+RLS policies decide *which rows* a role can see. Postgres also needs
+**table GRANTs** so `authenticated` / `service_role` can touch the tables at
+all — without them, PostgREST returns `permission denied` before any policy
+runs. Apply the grants below (or the `phase1_4_grants` migration) after the
+policies.
+
 ```sql
 alter table profiles enable row level security;
 alter table subjects enable row level security;
@@ -178,6 +184,21 @@ alter table test_questions enable row level security;
 alter table attempts enable row level security;
 alter table attempt_answers enable row level security;
 alter table bookmarks enable row level security;
+
+-- Privileges for API roles (RLS still filters rows)
+grant usage on schema public to anon, authenticated, service_role;
+grant select, update on table profiles to authenticated;
+grant select on table subjects to authenticated;
+grant select on table topics to authenticated;
+grant select on table questions to authenticated;
+grant select on table tests to authenticated;
+grant select on table test_questions to authenticated;
+grant select, insert, update on table attempts to authenticated;
+grant select, insert, update on table attempt_answers to authenticated;
+grant select, insert, update, delete on table bookmarks to authenticated;
+grant all on all tables in schema public to service_role;
+grant execute on function plan_rank(plan_tier) to authenticated, service_role;
+grant execute on function current_plan(uuid) to authenticated, service_role;
 
 -- profiles: users see/edit only their own row
 create policy "own profile select" on profiles for select using (auth.uid() = id);

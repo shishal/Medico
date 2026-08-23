@@ -34,12 +34,14 @@ create table topics (
   id uuid primary key default gen_random_uuid(),
   subject_id uuid not null references subjects(id) on delete cascade,
   name text not null,
-  display_order int not null default 0
+  display_order int not null default 0,
+  unique (subject_id, name)       -- Phase 2.2 sheet upsert key
 );
 create index idx_topics_subject on topics(subject_id);
 
 create table questions (
   id uuid primary key default gen_random_uuid(),
+  external_id text unique,        -- Phase 2.2 Google Sheet stable id (e.g. Q-MED-CARD-001)
   topic_id uuid not null references topics(id) on delete restrict,
   question_text text not null,
   option_a text not null,
@@ -61,7 +63,7 @@ create index idx_questions_active on questions(is_active) where is_active;
 
 create table tests (
   id uuid primary key default gen_random_uuid(),
-  title text not null,
+  title text not null unique,     -- Phase 2.2 sheet upsert key (revisit if Phase 4B practice sessions need partial unique)
   description text,
   test_type test_type not null,
   subject_id uuid references subjects(id),          -- null for mixed-subject tests

@@ -38,7 +38,7 @@ Human-friendly lookup columns replace UUID foreign keys. Names match the DB wher
 
 | Column | Required | Allowed / notes |
 |---|---|---|
-| `subject_name` | yes | Must match a `Subjects.name` row (case-sensitive for Phase 2.2). |
+| `subject_name` | yes | Must match a `Subjects.name` row (sync matches trim + case-insensitive). |
 | `name` | yes | Topic title. Natural key with `subject_name`. |
 | `display_order` | yes | Integer within that subject. |
 
@@ -48,8 +48,8 @@ Human-friendly lookup columns replace UUID foreign keys. Names match the DB wher
 
 | Column | Required | Allowed / notes |
 |---|---|---|
-| `external_id` | yes | Stable ID you invent (e.g. `Q-MED-CARD-001`). Natural upsert key for Phase 2.2; referenced by `TestQuestions`. Not a DB column today — sync stores the mapping. |
-| `topic_name` | yes | Must match a `Topics.name` (Phase 2.2 fails loudly on miss). |
+| `external_id` | yes | Stable ID you invent (e.g. `Q-MED-CARD-001`). Natural upsert key; stored on `questions.external_id` (Phase 2.2 migration). Referenced by `TestQuestions`. |
+| `topic_name` | yes | Must match a `Topics.name` (trim + case-insensitive; sync fails loudly with row number on miss). |
 | `question_text` | yes | Stem / vignette. |
 | `option_a` … `option_d` | yes | All four non-empty. |
 | `correct_option` | yes | Exactly `A`, `B`, `C`, or `D`. |
@@ -99,13 +99,16 @@ Human-friendly lookup columns replace UUID foreign keys. Names match the DB wher
 2. Never invent UUIDs; the sync script resolves names / `external_id`s.
 3. Booleans: `TRUE` / `FALSE` (Google Sheets checkbox format is fine).
 4. Enums must match the allowed values above exactly (lowercase for plans/types/difficulty; uppercase A–D for answers).
-5. Do not leave trailing spaces in name / id cells — Phase 2.2 will treat `"Cardiology "` as a miss.
+5. Prefer no trailing spaces in name / id cells; sync trims and matches case-insensitively, but canonical casing still comes from the Subjects/Topics tabs.
 6. Empty optional cells stay blank; do not write `null` or `N/A`.
 
-## Deferred (not in Phase 2.1)
+## Phase 2.2 — Sync
+
+Install and run instructions: [`apps_script/README.md`](apps_script/README.md).
+
+## Deferred
 
 - **`Tags` / comma-separated tags on Questions** — schema §7 / Practice Mode (Phase 4B). Add when that phase starts; do not invent a Tags tab yet.
-- **Apps Script “Sync to App”** — Phase 2.2.
 
 ## Validation checklist (you, not the agent)
 

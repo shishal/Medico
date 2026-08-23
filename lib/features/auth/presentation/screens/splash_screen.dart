@@ -6,7 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../providers/auth_session_provider.dart';
 
-/// Brief branded splash; navigates to login or home based on stub auth state.
+/// Brief branded splash; navigates to login or home based on auth session.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 

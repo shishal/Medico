@@ -1,15 +1,26 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../data/auth_repository.dart';
+
 part 'auth_session_provider.g.dart';
 
-/// Stub session flag for Phase 3.1 navigation. Phase 3.2 replaces this with
-/// real Supabase Auth state.
+/// Whether a Supabase session is active. Listens to auth state changes so the
+/// router and splash screen stay in sync after login, logout, or app restart.
 @Riverpod(keepAlive: true)
 class AuthSession extends _$AuthSession {
   @override
-  bool build() => false;
+  bool build() {
+    final repository = ref.watch(authRepositoryProvider);
 
-  void signIn() => state = true;
+    final subscription = repository.authStateChanges.listen((event) {
+      state = event.session != null;
+    });
+    ref.onDispose(subscription.cancel);
 
-  void signOut() => state = false;
+    return repository.isSignedIn;
+  }
+
+  Future<void> signOut() async {
+    await ref.read(authRepositoryProvider).signOut();
+  }
 }

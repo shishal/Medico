@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/presentation/providers/auth_session_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
@@ -11,15 +12,23 @@ import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import 'app_routes.dart';
+import 'go_router_refresh_stream.dart';
 
 part 'app_router.g.dart';
 
 @Riverpod(keepAlive: true)
 GoRouter goRouter(Ref ref) {
   final isAuthenticated = ref.watch(authSessionProvider);
+  final authRepository = ref.watch(authRepositoryProvider);
+
+  final refreshListenable = GoRouterRefreshStream(
+    authRepository.authStateChanges,
+  );
+  ref.onDispose(refreshListenable.dispose);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
+    refreshListenable: refreshListenable,
     redirect: (context, state) {
       final location = state.matchedLocation;
       final onSplash = location == AppRoutes.splash;

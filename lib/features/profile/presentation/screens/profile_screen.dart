@@ -4,15 +4,41 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/result.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
-import '../../../auth/presentation/providers/auth_session_provider.dart';
+import '../../../auth/data/auth_repository.dart';
 
-/// Placeholder profile screen — real profile data arrives later.
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  bool _isSigningOut = false;
+
+  Future<void> _signOut() async {
+    setState(() => _isSigningOut = true);
+
+    final result = await ref.read(authRepositoryProvider).signOut();
+
+    if (!mounted) return;
+
+    setState(() => _isSigningOut = false);
+
+    switch (result) {
+      case Success():
+        context.go(AppRoutes.login);
+      case Failure(:final message):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -25,18 +51,21 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
           Text(
-            'Profile (placeholder)',
+            'Profile',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: Spacing.lg),
           const ThemeModeToggleButton(),
           const SizedBox(height: Spacing.md),
           TextButton(
-            onPressed: () {
-              ref.read(authSessionProvider.notifier).signOut();
-              context.go(AppRoutes.login);
-            },
-            child: const Text('Sign out (stub)'),
+            onPressed: _isSigningOut ? null : _signOut,
+            child: _isSigningOut
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Sign out'),
           ),
         ],
       ),

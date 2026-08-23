@@ -8,17 +8,17 @@ part of 'auth_session_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Stub session flag for Phase 3.1 navigation. Phase 3.2 replaces this with
-/// real Supabase Auth state.
+/// Whether a Supabase session is active. Listens to auth state changes so the
+/// router and splash screen stay in sync after login, logout, or app restart.
 
 @ProviderFor(AuthSession)
 final authSessionProvider = AuthSessionProvider._();
 
-/// Stub session flag for Phase 3.1 navigation. Phase 3.2 replaces this with
-/// real Supabase Auth state.
+/// Whether a Supabase session is active. Listens to auth state changes so the
+/// router and splash screen stay in sync after login, logout, or app restart.
 final class AuthSessionProvider extends $NotifierProvider<AuthSession, bool> {
-  /// Stub session flag for Phase 3.1 navigation. Phase 3.2 replaces this with
-  /// real Supabase Auth state.
+  /// Whether a Supabase session is active. Listens to auth state changes so the
+  /// router and splash screen stay in sync after login, logout, or app restart.
   AuthSessionProvider._()
     : super(
         from: null,
@@ -46,10 +46,10 @@ final class AuthSessionProvider extends $NotifierProvider<AuthSession, bool> {
   }
 }
 
-String _$authSessionHash() => r'de0d4b1a0847905a1f1b4ef724f2bd2daca00a9c';
+String _$authSessionHash() => r'd05f5cf9fc4dd4ca4c211eae1e05033192c7785c';
 
-/// Stub session flag for Phase 3.1 navigation. Phase 3.2 replaces this with
-/// real Supabase Auth state.
+/// Whether a Supabase session is active. Listens to auth state changes so the
+/// router and splash screen stay in sync after login, logout, or app restart.
 
 abstract class _$AuthSession extends $Notifier<bool> {
   bool build();

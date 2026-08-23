@@ -1,30 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_mode_provider.dart';
 
-class MedicoApp extends StatelessWidget {
+class MedicoApp extends ConsumerWidget {
   const MedicoApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(goRouterProvider);
+    final themeMode = ref.watch(themeModeProvider);
+
+    return MaterialApp.router(
       title: 'Medico',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      // Follows the device light/dark setting automatically.
-      themeMode: ThemeMode.system,
-      home: Scaffold(
-        body: Builder(
-          builder: (context) {
-            return Center(
-              child: Text(
-                'Hello',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            );
-          },
-        ),
-      ),
+      themeMode: themeMode,
+      routerConfig: router,
     );
   }
 }

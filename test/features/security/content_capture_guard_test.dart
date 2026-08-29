@@ -8,7 +8,9 @@ import 'package:medico/core/supabase/tables.dart';
 import 'package:medico/features/security/data/screenshot_events_repository.dart';
 import 'package:medico/features/security/data/screenshot_protection.dart';
 import 'package:medico/features/security/domain/capture_event.dart';
+import 'package:medico/features/security/presentation/providers/watermark_label_provider.dart';
 import 'package:medico/features/security/presentation/widgets/content_capture_guard.dart';
+import 'package:medico/features/security/presentation/widgets/content_watermark.dart';
 
 class _FakeProtection implements ScreenshotProtection {
   final controller = StreamController<CaptureEvent>.broadcast();
@@ -51,17 +53,22 @@ void main() {
     await protection.controller.close();
   });
 
-  Future<void> pumpGuard(WidgetTester tester) async {
+  Future<void> pumpGuard(
+    WidgetTester tester, {
+    String watermark = 'Ada Lovelace · ada@example.com',
+    Widget? child,
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           screenshotProtectionProvider.overrideWithValue(protection),
           screenshotEventsRepositoryProvider.overrideWithValue(events),
+          watermarkLabelProvider.overrideWithValue(watermark),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
           home: ContentCaptureGuard(
             screen: ContentScreens.testPlayer,
-            child: Scaffold(body: Text('question')),
+            child: child ?? const Scaffold(body: Text('question')),
           ),
         ),
       ),
@@ -118,5 +125,36 @@ void main() {
 
     expect(find.text(ContentCaptureGuard.recordingWarning), findsNothing);
     expect(events.logs, hasLength(1));
+  });
+
+  testWidgets('tiles the identity watermark over question content', (
+    tester,
+  ) async {
+    await pumpGuard(tester);
+    final watermark = tester.widget<ContentWatermark>(
+      find.byType(ContentWatermark),
+    );
+    expect(watermark.text, 'Ada Lovelace · ada@example.com');
+  });
+
+  testWidgets('hides the watermark when identity is empty', (tester) async {
+    await pumpGuard(tester, watermark: '');
+    expect(find.byType(ContentWatermark), findsNothing);
+  });
+
+  testWidgets('watermark does not block taps on the question', (tester) async {
+    var tapped = false;
+    await pumpGuard(
+      tester,
+      child: Scaffold(
+        body: TextButton(
+          onPressed: () => tapped = true,
+          child: const Text('option A'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('option A'));
+    expect(tapped, isTrue);
   });
 }

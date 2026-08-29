@@ -8,9 +8,11 @@ import '../../../../core/theme/spacing.dart';
 import '../../data/screenshot_events_repository.dart';
 import '../../data/screenshot_protection.dart';
 import '../../domain/capture_event.dart';
+import '../providers/watermark_label_provider.dart';
+import 'content_watermark.dart';
 
 /// Blocks screenshots/recording while mounted, warns on iOS detection,
-/// and logs the event for repeat-offender review.
+/// logs the event, and tiles a faint identity watermark (Phase 8.2).
 ///
 /// Wrap only screens that show question content — not marketing, auth,
 /// or the home catalog.
@@ -118,11 +120,20 @@ class _ContentCaptureGuardState extends ConsumerState<ContentCaptureGuard> {
   Widget build(BuildContext context) {
     // Keep the singleton alive while this screen is showing.
     ref.watch(screenshotProtectionProvider);
+    final watermarkText = ref.watch(watermarkLabelProvider);
 
     return Column(
       children: [
         if (_isRecording) const _RecordingBanner(),
-        Expanded(child: widget.child),
+        Expanded(
+          child: Stack(
+            children: [
+              widget.child,
+              if (watermarkText.isNotEmpty)
+                Positioned.fill(child: ContentWatermark(text: watermarkText)),
+            ],
+          ),
+        ),
       ],
     );
   }

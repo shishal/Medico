@@ -13,6 +13,7 @@ abstract final class Tables {
   static const attempts = 'attempts';
   static const attemptAnswers = 'attempt_answers';
   static const bookmarks = 'bookmarks';
+  static const screenshotEvents = 'screenshot_events';
 
   /// Safe metadata only (title/type/counts) — all authenticated users.
   /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
@@ -149,6 +150,19 @@ abstract final class BookmarkColumns {
 
   /// PostgREST embed alias: `question:questions(...)`.
   static const questionEmbed = 'question';
+}
+
+abstract final class ScreenshotEventColumns {
+  static const id = 'id';
+  static const userId = 'user_id';
+  static const screen = 'screen';
+  static const eventType = 'event_type';
+  static const createdAt = 'created_at';
+}
+
+abstract final class ScreenshotEventTypes {
+  static const screenshot = 'screenshot';
+  static const screenRecording = 'screen_recording';
 }
 
 abstract final class AttemptAnswerColumns {

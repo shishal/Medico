@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +11,8 @@ import 'package:medico/features/results/domain/attempt_review.dart';
 import 'package:medico/features/results/presentation/providers/attempt_review_provider.dart';
 import 'package:medico/features/results/presentation/screens/solution_review_screen.dart';
 import 'package:medico/features/results/presentation/widgets/review_question_view.dart';
+import 'package:medico/features/security/data/screenshot_protection.dart';
+import 'package:medico/features/security/domain/capture_event.dart';
 import 'package:medico/features/tests/domain/player_question.dart';
 import 'package:medico/features/tests/domain/question_option.dart';
 
@@ -137,6 +141,7 @@ void main() {
         overrides: [
           attemptReviewProvider.overrideWith((ref, id) => review),
           bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
+          screenshotProtectionProvider.overrideWithValue(_NoOpProtection()),
         ],
         child: const MaterialApp(home: SolutionReviewScreen(attemptId: 'a1')),
       ),
@@ -179,6 +184,7 @@ void main() {
         overrides: [
           attemptReviewProvider.overrideWith((ref, id) => review),
           bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
+          screenshotProtectionProvider.overrideWithValue(_NoOpProtection()),
         ],
         child: const MaterialApp(home: SolutionReviewScreen(attemptId: 'a1')),
       ),
@@ -205,4 +211,15 @@ class _StubBookmarkedIds extends BookmarkedIds {
     state = AsyncData(current);
     return const Success(null);
   }
+}
+
+class _NoOpProtection implements ScreenshotProtection {
+  @override
+  Stream<CaptureEvent> get events => const Stream.empty();
+
+  @override
+  Future<void> acquire() async {}
+
+  @override
+  Future<void> release() async {}
 }

@@ -41,6 +41,7 @@ dependencies:
   path_provider: ^2.1.6
   flutter_dotenv: ^5.2.1
   url_launcher: ^6.3.2
+  no_screenshot: ^2.0.1
 
 dev_dependencies:
   flutter_test:

@@ -604,6 +604,29 @@ Idempotency: Razorpay retries. The unique `razorpay_payment_id` means a second d
 
 **Validation**: complete a Test Mode payment, watch `profiles.plan` change in Table Editor, then `POST` the same Edge Function URL with no `X-Razorpay-Signature` header and confirm HTTP 400. Script: `python3 scripts/validate_phase7_3_webhook.py`.
 
+## 9. Screenshot events (Phase 8.1)
+
+iOS cannot prevent screenshots. The question player and solution review still detect the attempt, warn the student, and insert a row here so repeat capture can be reviewed. Android blocks the capture via `FLAG_SECURE` (`no_screenshot`); detected attempts are logged the same way.
+
+```sql
+create table screenshot_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  screen text not null,          -- 'test_player' | 'solution_review'
+  event_type text not null check (event_type in ('screenshot', 'screen_recording')),
+  created_at timestamptz not null default now()
+);
+
+alter table screenshot_events enable row level security;
+create policy "own screenshot events insert" on screenshot_events
+  for insert with check (auth.uid() = user_id);
+
+grant insert on table screenshot_events to authenticated;
+-- no SELECT/UPDATE/DELETE for authenticated — audit log only
+```
+
+The Flutter client never reads this table. Logging is best-effort: a failed insert must not interrupt the test.
+
 ## Seed data strategy (placeholder content for testing)
 
 Since you don't have real content yet, write a one-off SQL script (or a small Dart/Python script) that:

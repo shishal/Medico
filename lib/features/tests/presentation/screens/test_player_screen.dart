@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../profile/domain/plan_tier.dart';
+import '../../../security/domain/capture_event.dart';
+import '../../../security/presentation/widgets/content_capture_guard.dart';
 import '../../domain/player_session_state.dart';
 import '../providers/player_session_provider.dart';
 import '../widgets/test_player_view.dart';
@@ -99,64 +101,72 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
       }
     });
 
-    return sessionAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, _) {
-        final message = error.toString().replaceFirst('Exception: ', '');
-        return Scaffold(
-          appBar: AppBar(title: const Text('Test')),
-          body: _ErrorBody(
-            message: message,
-            planLocked: message == TestPlayerScreen._planLockedMessage,
-            onRetry: () => ref.invalidate(playerSessionProvider(testId)),
-            onUpgrade: () => context.go(AppRoutes.upgradePath(PlanTier.pro)),
-            onBack: () => _exit(context, isPractice: false),
-          ),
-        );
-      },
-      data: (session) {
-        if (session.isSubmitComplete) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _goToResults(session);
-          });
-          return const _SubmittingBody();
-        }
+    return ContentCaptureGuard(
+      screen: ContentScreens.testPlayer,
+      child: sessionAsync.when(
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) {
+          final message = error.toString().replaceFirst('Exception: ', '');
+          return Scaffold(
+            appBar: AppBar(title: const Text('Test')),
+            body: _ErrorBody(
+              message: message,
+              planLocked: message == TestPlayerScreen._planLockedMessage,
+              onRetry: () => ref.invalidate(playerSessionProvider(testId)),
+              onUpgrade: () => context.go(AppRoutes.upgradePath(PlanTier.pro)),
+              onBack: () => _exit(context, isPractice: false),
+            ),
+          );
+        },
+        data: (session) {
+          if (session.isSubmitComplete) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _goToResults(session);
+            });
+            return const _SubmittingBody();
+          }
 
-        if (session.isPendingSubmit) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(playerSessionProvider(testId).notifier).ensureSubmitting();
-          });
-          return _SubmittingBody(errorMessage: session.submitError);
-        }
+          if (session.isPendingSubmit) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ref
+                  .read(playerSessionProvider(testId).notifier)
+                  .ensureSubmitting();
+            });
+            return _SubmittingBody(errorMessage: session.submitError);
+          }
 
-        return TestPlayerView(
-          session: session,
-          now: () => ref.read(playerSessionProvider(testId).notifier).now(),
-          onSelectOption: (option) => ref
-              .read(playerSessionProvider(testId).notifier)
-              .selectOption(option),
-          onGoTo: (index) =>
-              ref.read(playerSessionProvider(testId).notifier).goTo(index),
-          onClear: () =>
-              ref.read(playerSessionProvider(testId).notifier).clearResponse(),
-          onToggleMark: () =>
-              ref.read(playerSessionProvider(testId).notifier).toggleMark(),
-          onMarkAndNext: () => ref
-              .read(playerSessionProvider(testId).notifier)
-              .markForReviewAndNext(),
-          onPrevious: () =>
-              ref.read(playerSessionProvider(testId).notifier).previous(),
-          onSaveAndNext: () =>
-              ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
-          onSubmitSection: () =>
-              ref.read(playerSessionProvider(testId).notifier).submitSection(),
-          onFinish: () => ref
-              .read(playerSessionProvider(testId).notifier)
-              .finishAndSubmit(),
-          onExit: () => _exit(context, isPractice: session.isEphemeralPractice),
-        );
-      },
+          return TestPlayerView(
+            session: session,
+            now: () => ref.read(playerSessionProvider(testId).notifier).now(),
+            onSelectOption: (option) => ref
+                .read(playerSessionProvider(testId).notifier)
+                .selectOption(option),
+            onGoTo: (index) =>
+                ref.read(playerSessionProvider(testId).notifier).goTo(index),
+            onClear: () => ref
+                .read(playerSessionProvider(testId).notifier)
+                .clearResponse(),
+            onToggleMark: () =>
+                ref.read(playerSessionProvider(testId).notifier).toggleMark(),
+            onMarkAndNext: () => ref
+                .read(playerSessionProvider(testId).notifier)
+                .markForReviewAndNext(),
+            onPrevious: () =>
+                ref.read(playerSessionProvider(testId).notifier).previous(),
+            onSaveAndNext: () =>
+                ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
+            onSubmitSection: () => ref
+                .read(playerSessionProvider(testId).notifier)
+                .submitSection(),
+            onFinish: () => ref
+                .read(playerSessionProvider(testId).notifier)
+                .finishAndSubmit(),
+            onExit: () =>
+                _exit(context, isPractice: session.isEphemeralPractice),
+          );
+        },
+      ),
     );
   }
 

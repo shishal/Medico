@@ -116,3 +116,57 @@ class PaletteCell {
     return 'Question $questionNumber, $status$review';
   }
 }
+
+/// Counts for the palette summary chips. Exam Mode uses
+/// [notAnswered]/[answered]; Tutor Mode uses [correct]/[incorrect]
+/// (skipped lands in [notAnswered]).
+class PaletteTally {
+  const PaletteTally({
+    required this.notVisited,
+    required this.notAnswered,
+    required this.answered,
+    required this.correct,
+    required this.incorrect,
+    required this.marked,
+  });
+
+  final int notVisited;
+  final int notAnswered;
+  final int answered;
+  final int correct;
+  final int incorrect;
+  final int marked;
+
+  factory PaletteTally.fromCells(Iterable<PaletteCell> cells) {
+    var notVisited = 0;
+    var notAnswered = 0;
+    var answered = 0;
+    var correct = 0;
+    var incorrect = 0;
+    var marked = 0;
+    for (final cell in cells) {
+      if (cell.markedForReview) marked++;
+      switch (cell.kind) {
+        case PaletteKind.notVisited:
+          notVisited++;
+        case PaletteKind.notAnswered:
+        case PaletteKind.skipped:
+          notAnswered++;
+        case PaletteKind.answered:
+          answered++;
+        case PaletteKind.correct:
+          correct++;
+        case PaletteKind.incorrect:
+          incorrect++;
+      }
+    }
+    return PaletteTally(
+      notVisited: notVisited,
+      notAnswered: notAnswered,
+      answered: answered,
+      correct: correct,
+      incorrect: incorrect,
+      marked: marked,
+    );
+  }
+}

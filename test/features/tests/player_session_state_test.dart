@@ -100,6 +100,79 @@ void main() {
       session = session.clearResponse();
       expect(session.currentAnswer.selectedOption, isNull);
       expect(session.paletteAt(0).kind, PaletteKind.notAnswered);
+      expect(session.paletteAt(0).fill, PaletteFill.red);
+    });
+
+    test(
+      'opening a question without answering turns it red (not answered)',
+      () {
+        final session = _session(timing: FeedbackTiming.onSubmit);
+        expect(session.paletteAt(0).kind, PaletteKind.notAnswered);
+        expect(session.paletteAt(0).fill, PaletteFill.red);
+        expect(session.paletteAt(1).kind, PaletteKind.notVisited);
+        expect(session.paletteAt(1).fill, PaletteFill.grey);
+      },
+    );
+
+    test('marked unanswered is purple with no green check', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session.toggleMark();
+
+      expect(session.paletteAt(0).kind, PaletteKind.notAnswered);
+      expect(session.paletteAt(0).fill, PaletteFill.purple);
+      expect(session.paletteAt(0).showGreenCheck, isFalse);
+      expect(session.paletteAt(0).markedForReview, isTrue);
+    });
+
+    test('answered and marked is purple with a green check', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session.selectOption(QuestionOption.a).toggleMark();
+
+      expect(session.paletteAt(0).kind, PaletteKind.answered);
+      expect(session.paletteAt(0).fill, PaletteFill.purple);
+      expect(session.paletteAt(0).showGreenCheck, isTrue);
+    });
+
+    test('clear on marked answered reverts to marked unanswered (purple)', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session
+          .selectOption(QuestionOption.a)
+          .toggleMark()
+          .clearResponse();
+
+      expect(session.currentAnswer.selectedOption, isNull);
+      expect(session.currentAnswer.markedForReview, isTrue);
+      expect(session.paletteAt(0).fill, PaletteFill.purple);
+      expect(session.paletteAt(0).showGreenCheck, isFalse);
+    });
+
+    test('Mark for Review & Next keeps the answer and advances', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session.selectOption(QuestionOption.a).markForReviewAndNext();
+
+      expect(session.currentIndex, 1);
+      expect(session.paletteAt(0).fill, PaletteFill.purple);
+      expect(session.paletteAt(0).showGreenCheck, isTrue);
+      expect(session.paletteAt(1).kind, PaletteKind.notAnswered);
+    });
+
+    test('Save & Next and Previous only change the current question', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session.selectOption(QuestionOption.a).saveAndNext();
+      expect(session.currentIndex, 1);
+      expect(session.paletteAt(0).kind, PaletteKind.answered);
+
+      session = session.previous();
+      expect(session.currentIndex, 0);
+      expect(session.currentAnswer.selectedOption, QuestionOption.a);
+    });
+
+    test('palette tap visits the target without visiting ones in between', () {
+      var session = _session(timing: FeedbackTiming.onSubmit);
+      session = session.goTo(1);
+
+      expect(session.paletteAt(0).kind, PaletteKind.notAnswered);
+      expect(session.paletteAt(1).kind, PaletteKind.notAnswered);
     });
   });
 

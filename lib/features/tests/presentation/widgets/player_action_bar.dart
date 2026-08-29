@@ -9,12 +9,14 @@ class PlayerActionBar extends StatelessWidget {
     required this.session,
     required this.onClear,
     required this.onMarkAndNext,
+    required this.onPrevious,
     required this.onSaveAndNext,
   });
 
   final PlayerSessionState session;
   final VoidCallback onClear;
   final VoidCallback onMarkAndNext;
+  final VoidCallback onPrevious;
   final VoidCallback onSaveAndNext;
 
   @override
@@ -34,6 +36,7 @@ class PlayerActionBar extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
+                  key: const Key('player-clear'),
                   onPressed: session.isCurrentAnswerLocked ? null : onClear,
                   child: const Text('Clear Response'),
                 ),
@@ -41,6 +44,7 @@ class PlayerActionBar extends StatelessWidget {
               const SizedBox(width: Spacing.sm),
               Expanded(
                 child: OutlinedButton(
+                  key: const Key('player-mark-next'),
                   onPressed: onMarkAndNext,
                   child: const Text(
                     'Mark for Review & Next',
@@ -52,9 +56,24 @@ class PlayerActionBar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: Spacing.sm),
-          FilledButton(
-            onPressed: session.isLastQuestion ? null : onSaveAndNext,
-            child: const Text('Save & Next'),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  key: const Key('player-previous'),
+                  onPressed: session.isFirstQuestion ? null : onPrevious,
+                  child: const Text('Previous'),
+                ),
+              ),
+              const SizedBox(width: Spacing.sm),
+              Expanded(
+                child: FilledButton(
+                  key: const Key('player-save-next'),
+                  onPressed: session.isLastQuestion ? null : onSaveAndNext,
+                  child: const Text('Save & Next'),
+                ),
+              ),
+            ],
           ),
         ],
       ),

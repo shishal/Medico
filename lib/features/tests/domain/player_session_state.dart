@@ -119,7 +119,13 @@ class PlayerSessionState {
 
   QuestionAnswer get currentAnswer => answerFor(currentQuestion);
 
+  bool get isFirstQuestion => currentIndex <= 0;
+
   bool get isLastQuestion => currentIndex >= questions.length - 1;
+
+  PaletteTally get paletteTally => PaletteTally.fromCells([
+    for (var i = 0; i < questions.length; i++) paletteAt(i),
+  ]);
 
   /// Tutor Mode locks the option the moment it is chosen.
   bool get isCurrentAnswerLocked =>
@@ -209,6 +215,8 @@ class PlayerSessionState {
   }
 
   PlayerSessionState saveAndNext() => goTo(currentIndex + 1);
+
+  PlayerSessionState previous() => goTo(currentIndex - 1);
 
   PlayerSessionState goTo(int index) {
     if (index < 0 || index >= questions.length) return this;

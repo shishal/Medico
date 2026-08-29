@@ -70,6 +70,7 @@ Future<void> _pump(
             onClear: () => session.value = value.clearResponse(),
             onToggleMark: () => session.value = value.toggleMark(),
             onMarkAndNext: () => session.value = value.markForReviewAndNext(),
+            onPrevious: () => session.value = value.previous(),
             onSaveAndNext: () => session.value = value.saveAndNext(),
             onFinish: () {},
             onExit: () {},
@@ -137,6 +138,80 @@ void main() {
     await tester.pump();
 
     expect(session.value.paletteAt(0).kind, PaletteKind.correct);
+
+    await tester.tap(find.byKey(const Key('question-palette-button')));
+    await tester.pumpAndSettle();
+
     expect(find.bySemanticsLabel('Question 1, correct'), findsOneWidget);
+  });
+
+  testWidgets('Exam Mode palette walks every spec state', (tester) async {
+    final session = ValueNotifier(_session(FeedbackTiming.onSubmit));
+    addTearDown(session.dispose);
+    await _pump(tester, session);
+
+    expect(session.value.paletteAt(0).kind, PaletteKind.notAnswered);
+    expect(session.value.paletteAt(1).kind, PaletteKind.notVisited);
+
+    await tester.tap(find.byKey(const Key('option-A')));
+    await tester.pump();
+    expect(session.value.paletteAt(0).kind, PaletteKind.answered);
+    expect(session.value.paletteAt(0).fill, PaletteFill.green);
+
+    await tester.tap(find.byKey(const Key('player-mark-next')));
+    await tester.pump();
+    expect(session.value.currentIndex, 1);
+    expect(session.value.paletteAt(0).fill, PaletteFill.purple);
+    expect(session.value.paletteAt(0).showGreenCheck, isTrue);
+
+    await tester.tap(find.byKey(const Key('player-previous')));
+    await tester.pump();
+    expect(session.value.currentIndex, 0);
+
+    await tester.tap(find.byKey(const Key('player-clear')));
+    await tester.pump();
+    expect(session.value.paletteAt(0).kind, PaletteKind.notAnswered);
+    expect(session.value.paletteAt(0).fill, PaletteFill.purple);
+    expect(session.value.paletteAt(0).showGreenCheck, isFalse);
+
+    await tester.tap(find.byKey(const Key('question-palette-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Not Visited'), findsOneWidget);
+    expect(find.text('Not Answered'), findsWidgets);
+    expect(find.text('Answered'), findsWidgets);
+    expect(find.text('Marked for Review'), findsOneWidget);
+    expect(find.text('Answered & Marked'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('Question 1, not answered, marked for review'),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel('Question 2, not answered'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('palette-2')));
+    await tester.pumpAndSettle();
+    expect(session.value.currentIndex, 1);
+    expect(find.text('Second question'), findsOneWidget);
+  });
+
+  testWidgets('Exam Mode Save & Next then Previous restores the answer', (
+    tester,
+  ) async {
+    final session = ValueNotifier(_session(FeedbackTiming.onSubmit));
+    addTearDown(session.dispose);
+    await _pump(tester, session);
+
+    await tester.tap(find.byKey(const Key('option-B')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('player-save-next')));
+    await tester.pump();
+    expect(session.value.currentIndex, 1);
+
+    await tester.tap(find.byKey(const Key('player-previous')));
+    await tester.pump();
+    expect(session.value.currentIndex, 0);
+    expect(session.value.currentAnswer.selectedOption, QuestionOption.b);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text(_explanation), findsNothing);
   });
 }

@@ -5,8 +5,9 @@ import '../../../../core/theme/spacing.dart';
 import '../../domain/player_session_state.dart';
 import '../../domain/question_option.dart';
 import 'option_list.dart';
+import 'palette_summary_bar.dart';
 import 'player_action_bar.dart';
-import 'question_palette.dart';
+import 'question_palette_sheet.dart';
 import 'tutor_feedback_panel.dart';
 
 /// Shared question player. Tutor vs Exam is a state branch, not a second screen.
@@ -19,6 +20,7 @@ class TestPlayerView extends StatelessWidget {
     required this.onClear,
     required this.onToggleMark,
     required this.onMarkAndNext,
+    required this.onPrevious,
     required this.onSaveAndNext,
     required this.onFinish,
     required this.onExit,
@@ -30,6 +32,7 @@ class TestPlayerView extends StatelessWidget {
   final VoidCallback onClear;
   final VoidCallback onToggleMark;
   final VoidCallback onMarkAndNext;
+  final VoidCallback onPrevious;
   final VoidCallback onSaveAndNext;
   final VoidCallback onFinish;
   final VoidCallback onExit;
@@ -56,34 +59,42 @@ class TestPlayerView extends StatelessWidget {
                   : Icons.flag_outlined,
             ),
           ),
+          TextButton(
+            style: session.isTutorMode
+                ? null
+                : TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).urgentAccent,
+                  ),
+            onPressed: onFinish,
+            child: Text(finishLabel),
+          ),
         ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              Spacing.md,
-              Spacing.sm,
-              Spacing.md,
-              0,
-            ),
-            child: Text(
-              'Question ${session.currentIndex + 1} of ${session.questions.length}'
-              '${session.isTutorMode ? ' · Tutor Mode' : ''}',
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          QuestionPalette(
-            cells: [
-              for (var i = 0; i < session.questions.length; i++)
-                session.paletteAt(i),
-            ],
+          PaletteSummaryBar(
+            tally: session.paletteTally,
+            isTutorMode: session.isTutorMode,
             currentIndex: session.currentIndex,
-            onSelect: onGoTo,
+            total: session.questions.length,
+            onOpenPalette: () => _openPalette(context),
           ),
-          const SizedBox(height: Spacing.md),
+          if (session.isTutorMode)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Spacing.md,
+                Spacing.xs,
+                Spacing.md,
+                0,
+              ),
+              child: Text(
+                'Tutor Mode',
+                style: Theme.of(context).textTheme.labelMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.primary),
+              ),
+            ),
+          const SizedBox(height: Spacing.sm),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
@@ -101,27 +112,30 @@ class TestPlayerView extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
-            child: FilledButton(
-              style: session.isTutorMode
-                  ? null
-                  : FilledButton.styleFrom(
-                      backgroundColor: Theme.of(context).urgentAccent,
-                      foregroundColor: Colors.white,
-                    ),
-              onPressed: onFinish,
-              child: Text(finishLabel),
-            ),
-          ),
           PlayerActionBar(
             session: session,
             onClear: onClear,
             onMarkAndNext: onMarkAndNext,
+            onPrevious: onPrevious,
             onSaveAndNext: onSaveAndNext,
           ),
         ],
       ),
+    );
+  }
+
+  void _openPalette(BuildContext context) {
+    QuestionPaletteSheet.show(
+      context: context,
+      cells: [
+        for (var i = 0; i < session.questions.length; i++) session.paletteAt(i),
+      ],
+      currentIndex: session.currentIndex,
+      isTutorMode: session.isTutorMode,
+      sectionNumbers: [
+        for (final question in session.questions) question.sectionNumber,
+      ],
+      onSelect: onGoTo,
     );
   }
 }

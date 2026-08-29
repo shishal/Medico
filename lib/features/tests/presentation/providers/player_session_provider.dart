@@ -99,6 +99,8 @@ class PlayerSession extends _$PlayerSession {
 
   void saveAndNext() => _update((session) => session.saveAndNext());
 
+  void previous() => _update((session) => session.previous());
+
   void goTo(int index) => _update((session) => session.goTo(index));
 
   /// Write immediately (leaving the player, app backgrounded, force-quit window).

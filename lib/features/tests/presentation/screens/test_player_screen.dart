@@ -93,6 +93,8 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
         onMarkAndNext: () => ref
             .read(playerSessionProvider(testId).notifier)
             .markForReviewAndNext(),
+        onPrevious: () =>
+            ref.read(playerSessionProvider(testId).notifier).previous(),
         onSaveAndNext: () =>
             ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
         onFinish: () {

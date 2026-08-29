@@ -19,8 +19,8 @@ enum AttemptStatus {
   };
 }
 
-/// Local file status. [pendingSubmit] is written in Phase 6.1; 5.1 only
-/// uses [inProgress]. Kept here so the snapshot schema does not change later.
+/// Local file status. [pendingSubmit] is set when the timer hits zero (Phase
+/// 5.3) or when a submit request is waiting for the network (Phase 6.1).
 enum LocalAttemptStatus {
   inProgress,
   pendingSubmit;

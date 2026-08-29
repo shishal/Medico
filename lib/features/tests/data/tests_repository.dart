@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/wall_clock.dart';
 import '../domain/attempt.dart';
 import '../domain/attempt_status.dart';
 import '../domain/catalog_test.dart';
@@ -29,7 +30,8 @@ class TestsRepository {
       '${AttemptColumns.userId},'
       '${AttemptColumns.testId},'
       '${AttemptColumns.status},'
-      '${AttemptColumns.startedAt}';
+      '${AttemptColumns.startedAt},'
+      '${AttemptColumns.sectionStartedAt}';
 
   static const _attemptListSelect =
       '$_attemptColumns,'
@@ -132,7 +134,13 @@ class TestsRepository {
             '${TestColumns.title},'
             '${TestColumns.feedbackTiming},'
             '${TestColumns.showExplanationLevel},'
-            '${TestColumns.isEphemeralPractice}',
+            '${TestColumns.isEphemeralPractice},'
+            '${TestColumns.isSectional},'
+            '${TestColumns.sectionCount},'
+            '${TestColumns.questionsPerSection},'
+            '${TestColumns.sectionDurationMinutes},'
+            '${TestColumns.totalDurationMinutes},'
+            '${TestColumns.timerEnabled}',
           )
           .eq(TestColumns.id, testId)
           .limit(1);
@@ -305,6 +313,49 @@ class TestsRepository {
       return const Failure('Could not start this test. Please try again.');
     } catch (_) {
       return const Failure('Could not start this test. Please try again.');
+    }
+  }
+
+  /// Best-effort write of section enter timestamps. Failures are ignored by
+  /// the caller — local JSON is the offline source of truth.
+  Future<Result<bool>> saveSectionStartedAt({
+    required String attemptId,
+    required Map<int, DateTime> sectionStartedAt,
+  }) async {
+    if (currentUserId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      await _client
+          .from(Tables.attempts)
+          .update({
+            AttemptColumns.sectionStartedAt: encodeSectionStartedAt(
+              sectionStartedAt,
+            ),
+          })
+          .eq(AttemptColumns.id, attemptId);
+      return const Success(true);
+    } on PostgrestException catch (_) {
+      return const Failure('Could not sync section timer.');
+    } catch (_) {
+      return const Failure('Could not sync section timer.');
+    }
+  }
+
+  /// Postgres `now()` — used to correct a skewed device clock (spec §3).
+  Future<Result<DateTime>> fetchServerNow() async {
+    try {
+      final raw = await _client.rpc(RpcFunctions.serverNow);
+      final parsed = DateTime.tryParse(raw.toString());
+      if (parsed == null) {
+        return const Failure('Could not read server time.');
+      }
+      return Success(parsed);
+    } on PostgrestException catch (_) {
+      return const Failure('Could not read server time.');
+    } catch (_) {
+      return const Failure('Could not read server time.');
     }
   }
 }

@@ -1,4 +1,5 @@
 import '../../../core/supabase/tables.dart';
+import '../../../core/utils/wall_clock.dart';
 import 'attempt_status.dart';
 
 /// Row from `attempts`, with optional title from an embedded `tests` row.
@@ -9,6 +10,7 @@ class Attempt {
     required this.testId,
     required this.status,
     required this.startedAt,
+    this.sectionStartedAt = const {},
     this.title = 'Test',
     this.isEphemeralPractice = false,
   });
@@ -18,6 +20,7 @@ class Attempt {
   final String testId;
   final AttemptStatus status;
   final DateTime startedAt;
+  final Map<int, DateTime> sectionStartedAt;
   final String title;
   final bool isEphemeralPractice;
 
@@ -33,6 +36,9 @@ class Attempt {
         json[AttemptColumns.status] as String? ?? 'in_progress',
       ),
       startedAt: _parseDate(json[AttemptColumns.startedAt]) ?? DateTime.now(),
+      sectionStartedAt: parseSectionStartedAt(
+        json[AttemptColumns.sectionStartedAt],
+      ),
       title: test?[TestColumns.title] as String? ?? 'Test',
       isEphemeralPractice:
           test?[TestColumns.isEphemeralPractice] as bool? ?? false,

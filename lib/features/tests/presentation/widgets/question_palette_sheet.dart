@@ -14,6 +14,7 @@ class QuestionPaletteSheet extends StatelessWidget {
     required this.isTutorMode,
     required this.onSelect,
     this.sectionNumbers,
+    this.isReachable,
     this.scrollController,
   });
 
@@ -22,6 +23,7 @@ class QuestionPaletteSheet extends StatelessWidget {
   final bool isTutorMode;
   final ValueChanged<int> onSelect;
   final List<int>? sectionNumbers;
+  final bool Function(int index)? isReachable;
   final ScrollController? scrollController;
 
   /// Bottom sheet sized with [DraggableScrollableSheet] so a 180-question
@@ -33,6 +35,7 @@ class QuestionPaletteSheet extends StatelessWidget {
     required bool isTutorMode,
     required ValueChanged<int> onSelect,
     List<int>? sectionNumbers,
+    bool Function(int index)? isReachable,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -50,6 +53,7 @@ class QuestionPaletteSheet extends StatelessWidget {
               currentIndex: currentIndex,
               isTutorMode: isTutorMode,
               sectionNumbers: sectionNumbers,
+              isReachable: isReachable,
               scrollController: scrollController,
               onSelect: (index) {
                 Navigator.of(sheetContext).pop();
@@ -109,6 +113,7 @@ class QuestionPaletteSheet extends StatelessWidget {
                   cells: cells,
                   currentIndex: currentIndex,
                   sectionNumbers: sectionNumbers,
+                  isReachable: isReachable,
                   onSelect: onSelect,
                 ),
               ],

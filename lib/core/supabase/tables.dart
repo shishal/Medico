@@ -122,6 +122,7 @@ abstract final class AttemptColumns {
   static const testId = 'test_id';
   static const status = 'status';
   static const startedAt = 'started_at';
+  static const sectionStartedAt = 'section_started_at';
   static const submittedAt = 'submitted_at';
   static const createdAt = 'created_at';
 
@@ -133,6 +134,7 @@ abstract final class AttemptColumns {
 abstract final class RpcFunctions {
   static const currentPlan = 'current_plan';
   static const createPracticeSession = 'create_practice_session';
+  static const serverNow = 'server_now';
 }
 
 /// Named parameters for [RpcFunctions.currentPlan].

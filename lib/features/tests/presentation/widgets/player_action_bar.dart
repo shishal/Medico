@@ -11,6 +11,7 @@ class PlayerActionBar extends StatelessWidget {
     required this.onMarkAndNext,
     required this.onPrevious,
     required this.onSaveAndNext,
+    this.onSubmitSection,
   });
 
   final PlayerSessionState session;
@@ -18,6 +19,7 @@ class PlayerActionBar extends StatelessWidget {
   final VoidCallback onMarkAndNext;
   final VoidCallback onPrevious;
   final VoidCallback onSaveAndNext;
+  final VoidCallback? onSubmitSection;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +63,7 @@ class PlayerActionBar extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   key: const Key('player-previous'),
-                  onPressed: session.isFirstQuestion ? null : onPrevious,
+                  onPressed: session.canGoPrevious ? onPrevious : null,
                   child: const Text('Previous'),
                 ),
               ),
@@ -69,12 +71,20 @@ class PlayerActionBar extends StatelessWidget {
               Expanded(
                 child: FilledButton(
                   key: const Key('player-save-next'),
-                  onPressed: session.isLastQuestion ? null : onSaveAndNext,
+                  onPressed: session.canGoNext ? onSaveAndNext : null,
                   child: const Text('Save & Next'),
                 ),
               ),
             ],
           ),
+          if (session.canSubmitSection && onSubmitSection != null) ...[
+            const SizedBox(height: Spacing.sm),
+            FilledButton.tonal(
+              key: const Key('player-submit-section'),
+              onPressed: onSubmitSection,
+              child: const Text('Submit Section & Continue'),
+            ),
+          ],
         ],
       ),
     );

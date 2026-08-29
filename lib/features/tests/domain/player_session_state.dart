@@ -33,8 +33,8 @@ enum OptionVisual {
 
 /// In-memory player session. Mutations return a new instance (immutable).
 ///
-/// Answers live here and in a local JSON snapshot (Phase 5.1). Timers and
-/// server-side scoring arrive in 5.3 / 6.1.
+/// Answers live here and in a local JSON snapshot. Remaining time is always
+/// computed from wall-clock elapsed time (spec §3), never stored as a countdown.
 class PlayerSessionState {
   const PlayerSessionState({
     required this.attemptId,
@@ -49,6 +49,12 @@ class PlayerSessionState {
     required this.startedAt,
     required this.sectionStartedAt,
     this.localStatus = LocalAttemptStatus.inProgress,
+    this.isSectional = false,
+    this.sectionCount = 1,
+    this.questionsPerSection,
+    this.sectionDurationMinutes,
+    this.totalDurationMinutes = 0,
+    this.timerEnabled = true,
   });
 
   factory PlayerSessionState.fromBundle(
@@ -71,6 +77,12 @@ class PlayerSessionState {
       currentIndex: 0,
       startedAt: start,
       sectionStartedAt: {firstSection: start},
+      isSectional: bundle.isSectional,
+      sectionCount: bundle.sectionCount,
+      questionsPerSection: bundle.questionsPerSection,
+      sectionDurationMinutes: bundle.sectionDurationMinutes,
+      totalDurationMinutes: bundle.totalDurationMinutes,
+      timerEnabled: bundle.timerEnabled,
     );
   }
 
@@ -97,6 +109,12 @@ class PlayerSessionState {
       startedAt: snapshot.startedAt,
       sectionStartedAt: snapshot.sectionStartedAt,
       localStatus: snapshot.localStatus,
+      isSectional: snapshot.isSectional,
+      sectionCount: snapshot.sectionCount,
+      questionsPerSection: snapshot.questionsPerSection,
+      sectionDurationMinutes: snapshot.sectionDurationMinutes,
+      totalDurationMinutes: snapshot.totalDurationMinutes,
+      timerEnabled: snapshot.timerEnabled,
     );
   }
 
@@ -112,6 +130,12 @@ class PlayerSessionState {
   final DateTime startedAt;
   final Map<int, DateTime> sectionStartedAt;
   final LocalAttemptStatus localStatus;
+  final bool isSectional;
+  final int sectionCount;
+  final int? questionsPerSection;
+  final int? sectionDurationMinutes;
+  final int totalDurationMinutes;
+  final bool timerEnabled;
 
   bool get isTutorMode => feedbackTiming == FeedbackTiming.immediate;
 
@@ -122,6 +146,30 @@ class PlayerSessionState {
   bool get isFirstQuestion => currentIndex <= 0;
 
   bool get isLastQuestion => currentIndex >= questions.length - 1;
+
+  int get currentSection => currentQuestion.sectionNumber;
+
+  bool get isLastSection {
+    if (questions.isEmpty) return true;
+    return !questions.any((q) => q.sectionNumber > currentSection);
+  }
+
+  /// Countdown UI + auto-submit. Practice with the timer off is excluded;
+  /// duration 0 is treated as untimed so old snapshots don't instantly expire.
+  bool get showsTimer => timerEnabled && _activeDurationSeconds > 0;
+
+  bool get isPendingSubmit => localStatus == LocalAttemptStatus.pendingSubmit;
+
+  /// Previous is blocked at the start of a locked-behind section.
+  bool get canGoPrevious =>
+      currentIndex > 0 && isIndexReachable(currentIndex - 1);
+
+  /// Save & Next does not cross a section boundary — that's [submitSection].
+  bool get canGoNext =>
+      currentIndex < questions.length - 1 && isIndexReachable(currentIndex + 1);
+
+  bool get canSubmitSection =>
+      isSectional && !isPendingSubmit && !isLastSection;
 
   PaletteTally get paletteTally => PaletteTally.fromCells([
     for (var i = 0; i < questions.length; i++) paletteAt(i),
@@ -220,6 +268,7 @@ class PlayerSessionState {
 
   PlayerSessionState goTo(int index) {
     if (index < 0 || index >= questions.length) return this;
+    if (!isIndexReachable(index)) return this;
     final target = questions[index];
     return copyWith(
       answers: {
@@ -228,6 +277,143 @@ class PlayerSessionState {
       },
       currentIndex: index,
     );
+  }
+
+  /// Spec §3: only the current (unlocked) section is reachable. Exited
+  /// sections stay locked; later sections are not open until this one is
+  /// submitted or its timer hits zero.
+  bool isIndexReachable(int index) {
+    if (index < 0 || index >= questions.length) return false;
+    if (isPendingSubmit) return false;
+    if (!isSectional) return true;
+    return questions[index].sectionNumber == currentSection;
+  }
+
+  int unansweredInCurrentSection() {
+    var count = 0;
+    for (final question in questions) {
+      if (question.sectionNumber != currentSection) continue;
+      if (answerFor(question).selectedOption == null) count++;
+    }
+    return count;
+  }
+
+  /// Remaining countdown at [now]. Null when this session has no timer.
+  ///
+  /// Never reads a stored "seconds left" — always `duration - (now - start)`.
+  Duration? remainingAt(DateTime now) {
+    if (!showsTimer || isPendingSubmit) return null;
+    final start = _timerStart();
+    final elapsed = now.difference(start);
+    final left = Duration(seconds: _activeDurationSeconds) - elapsed;
+    return left.isNegative ? Duration.zero : left;
+  }
+
+  bool isTimerUrgentAt(DateTime now) {
+    final left = remainingAt(now);
+    if (left == null) return false;
+    return left <= const Duration(minutes: 5);
+  }
+
+  /// If the current test/section should already have ended at [now], lock
+  /// and auto-advance (or auto-submit). Safe to call repeatedly — fires the
+  /// terminal transition at most once.
+  PlayerSessionState applyTimerExpiry(DateTime now) {
+    if (!showsTimer || isPendingSubmit) return this;
+    if (!isSectional) {
+      return _isExpiredAt(now) ? _markPendingSubmit() : this;
+    }
+
+    var session = this;
+    var hops = 0;
+    // Only the *entered* section can expire. Advancing starts the next
+    // section's clock at [now], so we do not skip ahead through unentered
+    // sections while the app was closed (spec: countdown starts on enter).
+    while (session.showsTimer &&
+        !session.isPendingSubmit &&
+        session._isExpiredAt(now)) {
+      if (++hops > session.questions.length) break;
+      session = session._advanceFromExpiredSection(now);
+    }
+    return session;
+  }
+
+  /// Explicit "Submit Section & Continue". Last section submits the test.
+  PlayerSessionState submitSection(DateTime now) {
+    if (isPendingSubmit) return this;
+    if (!isSectional || isLastSection) return _markPendingSubmit();
+    final next = _nextSectionAfter(currentSection);
+    if (next == null) return _markPendingSubmit();
+    return _enterSection(next, now);
+  }
+
+  PlayerSessionState _advanceFromExpiredSection(DateTime now) {
+    if (isLastSection) return _markPendingSubmit();
+    final next = _nextSectionAfter(currentSection);
+    if (next == null) return _markPendingSubmit();
+    return _enterSection(next, now);
+  }
+
+  PlayerSessionState _enterSection(int section, DateTime now) {
+    final index = _firstIndexInSection(section);
+    if (index == null) return _markPendingSubmit();
+    final target = questions[index];
+    final starts = Map<int, DateTime>.from(sectionStartedAt);
+    starts.putIfAbsent(section, () => now);
+    return copyWith(
+      currentIndex: index,
+      sectionStartedAt: starts,
+      answers: {
+        ...answers,
+        target.id: answerFor(target).copyWith(visited: true),
+      },
+    );
+  }
+
+  PlayerSessionState _markPendingSubmit() =>
+      copyWith(localStatus: LocalAttemptStatus.pendingSubmit);
+
+  int? _firstIndexInSection(int section) {
+    for (var i = 0; i < questions.length; i++) {
+      if (questions[i].sectionNumber == section) return i;
+    }
+    return null;
+  }
+
+  int? _nextSectionAfter(int section) {
+    var next = -1;
+    for (final question in questions) {
+      if (question.sectionNumber <= section) continue;
+      if (next < 0 || question.sectionNumber < next) {
+        next = question.sectionNumber;
+      }
+    }
+    return next < 0 ? null : next;
+  }
+
+  DateTime _timerStart() {
+    if (isSectional) {
+      return sectionStartedAt[currentSection] ?? startedAt;
+    }
+    return startedAt;
+  }
+
+  bool _isExpiredAt(DateTime now) {
+    final left = remainingAt(now);
+    return left != null && left <= Duration.zero;
+  }
+
+  int get _activeDurationSeconds {
+    if (!timerEnabled) return 0;
+    if (isSectional) {
+      final minutes =
+          sectionDurationMinutes ??
+          (sectionCount > 0
+              ? totalDurationMinutes ~/ sectionCount
+              : totalDurationMinutes);
+      return minutes * 60;
+    }
+    return totalDurationMinutes * 60;
   }
 
   PlayerSessionState addTimeToCurrent(int seconds) {
@@ -270,6 +456,12 @@ class PlayerSessionState {
       isEphemeralPractice: isEphemeralPractice,
       answers: answers,
       questions: questions,
+      isSectional: isSectional,
+      sectionCount: sectionCount,
+      questionsPerSection: questionsPerSection,
+      sectionDurationMinutes: sectionDurationMinutes,
+      totalDurationMinutes: totalDurationMinutes,
+      timerEnabled: timerEnabled,
     );
   }
 
@@ -286,6 +478,12 @@ class PlayerSessionState {
     DateTime? startedAt,
     Map<int, DateTime>? sectionStartedAt,
     LocalAttemptStatus? localStatus,
+    bool? isSectional,
+    int? sectionCount,
+    int? questionsPerSection,
+    int? sectionDurationMinutes,
+    int? totalDurationMinutes,
+    bool? timerEnabled,
   }) {
     return PlayerSessionState(
       attemptId: attemptId ?? this.attemptId,
@@ -300,6 +498,13 @@ class PlayerSessionState {
       startedAt: startedAt ?? this.startedAt,
       sectionStartedAt: sectionStartedAt ?? this.sectionStartedAt,
       localStatus: localStatus ?? this.localStatus,
+      isSectional: isSectional ?? this.isSectional,
+      sectionCount: sectionCount ?? this.sectionCount,
+      questionsPerSection: questionsPerSection ?? this.questionsPerSection,
+      sectionDurationMinutes:
+          sectionDurationMinutes ?? this.sectionDurationMinutes,
+      totalDurationMinutes: totalDurationMinutes ?? this.totalDurationMinutes,
+      timerEnabled: timerEnabled ?? this.timerEnabled,
     );
   }
 

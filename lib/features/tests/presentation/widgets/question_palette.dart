@@ -12,6 +12,7 @@ class QuestionPalette extends StatelessWidget {
     required this.currentIndex,
     required this.onSelect,
     this.sectionNumbers,
+    this.isReachable,
   });
 
   final List<PaletteCell> cells;
@@ -21,6 +22,9 @@ class QuestionPalette extends StatelessWidget {
   /// Parallel to [cells]. When more than one section is present, a header
   /// is shown per group (so Phase 5.3 can lock a section without a rewrite).
   final List<int>? sectionNumbers;
+
+  /// When false, the cell is visible but not tappable (locked section).
+  final bool Function(int index)? isReachable;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +50,7 @@ class QuestionPalette extends StatelessWidget {
                 PaletteCellView(
                   cell: cells[index],
                   selected: index == currentIndex,
+                  locked: isReachable != null && !isReachable!(index),
                   onTap: () => onSelect(index),
                 ),
             ],

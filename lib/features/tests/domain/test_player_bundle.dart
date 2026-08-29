@@ -14,6 +14,12 @@ class TestPlayerBundle {
     required this.explanationLevel,
     required this.isEphemeralPractice,
     required this.questions,
+    this.isSectional = false,
+    this.sectionCount = 1,
+    this.questionsPerSection,
+    this.sectionDurationMinutes,
+    this.totalDurationMinutes = 0,
+    this.timerEnabled = true,
   });
 
   final String testId;
@@ -22,6 +28,12 @@ class TestPlayerBundle {
   final ExplanationLevel explanationLevel;
   final bool isEphemeralPractice;
   final List<PlayerQuestion> questions;
+  final bool isSectional;
+  final int sectionCount;
+  final int? questionsPerSection;
+  final int? sectionDurationMinutes;
+  final int totalDurationMinutes;
+  final bool timerEnabled;
 
   factory TestPlayerBundle.fromParts({
     required Map<String, dynamic> testRow,
@@ -39,6 +51,29 @@ class TestPlayerBundle {
       isEphemeralPractice:
           testRow[TestColumns.isEphemeralPractice] as bool? ?? false,
       questions: questions,
+      isSectional: testRow[TestColumns.isSectional] as bool? ?? false,
+      sectionCount: _asInt(testRow[TestColumns.sectionCount] ?? 1),
+      questionsPerSection: _asNullableInt(
+        testRow[TestColumns.questionsPerSection],
+      ),
+      sectionDurationMinutes: _asNullableInt(
+        testRow[TestColumns.sectionDurationMinutes],
+      ),
+      totalDurationMinutes: _asInt(
+        testRow[TestColumns.totalDurationMinutes] ?? 0,
+      ),
+      timerEnabled: testRow[TestColumns.timerEnabled] as bool? ?? true,
     );
+  }
+
+  static int _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.parse(value.toString());
+  }
+
+  static int? _asNullableInt(Object? value) {
+    if (value == null) return null;
+    return _asInt(value);
   }
 }

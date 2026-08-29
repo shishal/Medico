@@ -74,6 +74,8 @@ Future<void> _pump(
             onSaveAndNext: () => session.value = value.saveAndNext(),
             onFinish: () {},
             onExit: () {},
+            onSubmitSection: () =>
+                session.value = value.submitSection(DateTime.now()),
           );
         },
       ),
@@ -213,5 +215,159 @@ void main() {
     expect(session.value.currentAnswer.selectedOption, QuestionOption.b);
     expect(find.text('Correct'), findsNothing);
     expect(find.text(_explanation), findsNothing);
+  });
+
+  testWidgets('timed session shows a countdown; untimed practice does not', (
+    tester,
+  ) async {
+    final start = DateTime.utc(2026, 8, 29, 12);
+    final timed = ValueNotifier(
+      PlayerSessionState.fromBundle(
+        TestPlayerBundle(
+          testId: 't1',
+          title: 'Mini',
+          feedbackTiming: FeedbackTiming.onSubmit,
+          explanationLevel: ExplanationLevel.full,
+          isEphemeralPractice: false,
+          totalDurationMinutes: 10,
+          questions: [
+            const PlayerQuestion(
+              id: 'q1',
+              orderIndex: 1,
+              sectionNumber: 1,
+              questionText: 'Which organelle produces ATP?',
+              optionA: 'Mitochondria',
+              optionB: 'Ribosome',
+              optionC: 'Golgi',
+              optionD: 'Nucleus',
+              correctOption: QuestionOption.a,
+            ),
+          ],
+        ),
+        startedAt: start,
+      ),
+    );
+    addTearDown(timed.dispose);
+
+    tester.view.physicalSize = const Size(800, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: TestPlayerView(
+          session: timed.value,
+          now: () => start.add(const Duration(minutes: 2)),
+          onSelectOption: (_) {},
+          onGoTo: (_) {},
+          onClear: () {},
+          onToggleMark: () {},
+          onMarkAndNext: () {},
+          onPrevious: () {},
+          onSaveAndNext: () {},
+          onFinish: () {},
+          onExit: () {},
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('session-timer')), findsOneWidget);
+    expect(find.textContaining('08:00'), findsOneWidget);
+
+    final untimed = ValueNotifier(_session(FeedbackTiming.onSubmit));
+    addTearDown(untimed.dispose);
+    await _pump(tester, untimed);
+    expect(find.byKey(const Key('session-timer')), findsNothing);
+  });
+
+  testWidgets('sectional submit locks the previous section in the palette', (
+    tester,
+  ) async {
+    final start = DateTime.utc(2026, 8, 29, 12);
+    final session = ValueNotifier(
+      PlayerSessionState.fromBundle(
+        TestPlayerBundle(
+          testId: 'grand',
+          title: 'Grand',
+          feedbackTiming: FeedbackTiming.onSubmit,
+          explanationLevel: ExplanationLevel.full,
+          isEphemeralPractice: false,
+          isSectional: true,
+          sectionCount: 2,
+          questionsPerSection: 2,
+          sectionDurationMinutes: 42,
+          totalDurationMinutes: 84,
+          questions: [
+            const PlayerQuestion(
+              id: 'q1',
+              orderIndex: 1,
+              sectionNumber: 1,
+              questionText: 'Section 1 Q1',
+              optionA: 'A1',
+              optionB: 'B1',
+              optionC: 'C1',
+              optionD: 'D1',
+              correctOption: QuestionOption.a,
+            ),
+            const PlayerQuestion(
+              id: 'q2',
+              orderIndex: 2,
+              sectionNumber: 1,
+              questionText: 'Section 1 Q2',
+              optionA: 'A2',
+              optionB: 'B2',
+              optionC: 'C2',
+              optionD: 'D2',
+              correctOption: QuestionOption.a,
+            ),
+            const PlayerQuestion(
+              id: 'q3',
+              orderIndex: 3,
+              sectionNumber: 2,
+              questionText: 'Section 2 Q1',
+              optionA: 'A3',
+              optionB: 'B3',
+              optionC: 'C3',
+              optionD: 'D3',
+              correctOption: QuestionOption.a,
+            ),
+            const PlayerQuestion(
+              id: 'q4',
+              orderIndex: 4,
+              sectionNumber: 2,
+              questionText: 'Section 2 Q2',
+              optionA: 'A4',
+              optionB: 'B4',
+              optionC: 'C4',
+              optionD: 'D4',
+              correctOption: QuestionOption.a,
+            ),
+          ],
+        ),
+        startedAt: start,
+      ),
+    );
+    addTearDown(session.dispose);
+    await _pump(tester, session);
+
+    expect(find.byKey(const Key('player-submit-section')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('player-submit-section')));
+    await tester.pumpAndSettle();
+    expect(find.text('Submit this section?'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('confirm-submit-section')));
+    await tester.pumpAndSettle();
+
+    expect(session.value.currentSection, 2);
+    expect(find.text('Section 2 Q1'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('question-palette-button')));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel('Question 1, locked'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('palette-1')));
+    await tester.pumpAndSettle();
+    expect(session.value.currentIndex, 2);
+    expect(find.text('Section 2 Q1'), findsOneWidget);
   });
 }

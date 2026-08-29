@@ -8,6 +8,7 @@ import 'option_list.dart';
 import 'palette_summary_bar.dart';
 import 'player_action_bar.dart';
 import 'question_palette_sheet.dart';
+import 'session_timer_banner.dart';
 import 'tutor_feedback_panel.dart';
 
 /// Shared question player. Tutor vs Exam is a state branch, not a second screen.
@@ -24,6 +25,8 @@ class TestPlayerView extends StatelessWidget {
     required this.onSaveAndNext,
     required this.onFinish,
     required this.onExit,
+    this.onSubmitSection,
+    this.now,
   });
 
   final PlayerSessionState session;
@@ -36,6 +39,8 @@ class TestPlayerView extends StatelessWidget {
   final VoidCallback onSaveAndNext;
   final VoidCallback onFinish;
   final VoidCallback onExit;
+  final VoidCallback? onSubmitSection;
+  final DateTime Function()? now;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +78,11 @@ class TestPlayerView extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (session.showsTimer)
+            Align(
+              alignment: Alignment.centerRight,
+              child: SessionTimerBanner(session: session, now: now),
+            ),
           PaletteSummaryBar(
             tally: session.paletteTally,
             isTutorMode: session.isTutorMode,
@@ -118,6 +128,9 @@ class TestPlayerView extends StatelessWidget {
             onMarkAndNext: onMarkAndNext,
             onPrevious: onPrevious,
             onSaveAndNext: onSaveAndNext,
+            onSubmitSection: onSubmitSection == null
+                ? null
+                : () => _confirmSubmitSection(context),
           ),
         ],
       ),
@@ -135,7 +148,38 @@ class TestPlayerView extends StatelessWidget {
       sectionNumbers: [
         for (final question in session.questions) question.sectionNumber,
       ],
+      isReachable: session.isIndexReachable,
       onSelect: onGoTo,
     );
+  }
+
+  Future<void> _confirmSubmitSection(BuildContext context) async {
+    final unanswered = session.unansweredInCurrentSection();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Submit this section?'),
+          content: Text(
+            unanswered == 0
+                ? 'You cannot return to this section once you continue.'
+                : '$unanswered ${unanswered == 1 ? 'question is' : 'questions are'} '
+                      'still unanswered in this section. You cannot return once you continue.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              key: const Key('confirm-submit-section'),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Submit section'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed == true) onSubmitSection?.call();
   }
 }

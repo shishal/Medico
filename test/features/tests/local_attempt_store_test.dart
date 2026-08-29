@@ -93,4 +93,41 @@ void main() {
       expect(forA?.attemptId, 'att-a');
     },
   );
+
+  test(
+    'readOpenForTest returns pending_submit so expiry still auto-submits',
+    () async {
+      final pending = snapshot(
+        attemptId: 'att-p',
+        testId: 't1',
+        userId: 'user-a',
+      );
+      await store.write(
+        LocalAttemptSnapshot(
+          attemptId: pending.attemptId,
+          testId: pending.testId,
+          userId: pending.userId,
+          title: pending.title,
+          startedAt: pending.startedAt,
+          sectionStartedAt: pending.sectionStartedAt,
+          currentIndex: pending.currentIndex,
+          localStatus: LocalAttemptStatus.pendingSubmit,
+          feedbackTiming: pending.feedbackTiming,
+          explanationLevel: pending.explanationLevel,
+          isEphemeralPractice: pending.isEphemeralPractice,
+          answers: pending.answers,
+          questions: pending.questions,
+        ),
+      );
+
+      final inProgress = await store.readInProgressForTest(
+        testId: 't1',
+        userId: 'user-a',
+      );
+      expect(inProgress, isNull);
+
+      final open = await store.readOpenForTest(testId: 't1', userId: 'user-a');
+      expect(open?.localStatus, LocalAttemptStatus.pendingSubmit);
+    },
+  );
 }

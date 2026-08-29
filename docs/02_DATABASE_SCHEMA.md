@@ -99,6 +99,9 @@ create table attempts (
   test_id uuid not null references tests(id) on delete restrict,
   status attempt_status not null default 'in_progress',
   started_at timestamptz not null default now(),
+  -- Phase 5.3: section_number → timestamptz. Timer remaining is always
+  -- duration - (now - this timestamp), never a saved countdown.
+  section_started_at jsonb not null default '{}'::jsonb,
   submitted_at timestamptz,
   total_score numeric,
   correct_count int,
@@ -169,6 +172,11 @@ language sql stable as $$
   end
   from profiles where id = p_user_id;
 $$;
+
+-- Phase 5.3: remaining time is duration - (server_now() - started_at).
+-- The client uses this when the device clock disagrees by more than ~2 minutes.
+create function server_now() returns timestamptz
+language sql stable as $$ select now(); $$;
 ```
 
 **Validation for this step**: after running, manually set a test profile's `plan_expires_at` to yesterday and confirm `select current_plan('<that-user-id>')` returns `'free'` even though the `plan` column still says `'pro'`. This is the exact bug class that causes "I cancelled and I'm still being charged/still have access" support tickets — test it now, not after launch.
@@ -206,6 +214,7 @@ grant select, insert, update, delete on table bookmarks to authenticated;
 grant all on all tables in schema public to service_role;
 grant execute on function plan_rank(plan_tier) to authenticated, service_role;
 grant execute on function current_plan(uuid) to authenticated, service_role;
+grant execute on function server_now() to authenticated;
 
 -- profiles: users see/edit only their own row
 create policy "own profile select" on profiles for select using (auth.uid() = id);

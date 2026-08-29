@@ -40,6 +40,8 @@ void main() {
       feedbackTiming: FeedbackTiming.onSubmit,
       explanationLevel: ExplanationLevel.full,
       isEphemeralPractice: false,
+      totalDurationMinutes: 10,
+      timerEnabled: true,
       answers: {
         'q1': const QuestionAnswer(
           visited: true,
@@ -64,6 +66,9 @@ void main() {
     expect(restored.questions.map((q) => q.id), ['q1', 'q2']);
     expect(restored.questions.first.explanationText, 'Why');
     expect(restored.sectionStartedAt[1], started);
+    expect(restored.totalDurationMinutes, 10);
+    expect(restored.timerEnabled, isTrue);
+    expect(restored.isSectional, isFalse);
   });
 
   test('fromSnapshot restores the current index and visited flag', () {

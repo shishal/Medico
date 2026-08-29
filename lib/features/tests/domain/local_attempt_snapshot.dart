@@ -1,3 +1,4 @@
+import '../../../core/utils/wall_clock.dart';
 import '../../practice/domain/practice_enums.dart';
 import 'attempt_status.dart';
 import 'player_question.dart';
@@ -16,6 +17,12 @@ abstract final class LocalAttemptKeys {
   static const feedbackTiming = 'feedback_timing';
   static const explanationLevel = 'show_explanation_level';
   static const isEphemeralPractice = 'is_ephemeral_practice';
+  static const isSectional = 'is_sectional';
+  static const sectionCount = 'section_count';
+  static const questionsPerSection = 'questions_per_section';
+  static const sectionDurationMinutes = 'section_duration_minutes';
+  static const totalDurationMinutes = 'total_duration_minutes';
+  static const timerEnabled = 'timer_enabled';
   static const answers = 'answers';
   static const questions = 'questions';
 }
@@ -34,6 +41,12 @@ class LocalAttemptSnapshot {
     required this.feedbackTiming,
     required this.explanationLevel,
     required this.isEphemeralPractice,
+    this.isSectional = false,
+    this.sectionCount = 1,
+    this.questionsPerSection,
+    this.sectionDurationMinutes,
+    this.totalDurationMinutes = 0,
+    this.timerEnabled = true,
     required this.answers,
     required this.questions,
   });
@@ -49,21 +62,19 @@ class LocalAttemptSnapshot {
   final FeedbackTiming feedbackTiming;
   final ExplanationLevel explanationLevel;
   final bool isEphemeralPractice;
+  final bool isSectional;
+  final int sectionCount;
+  final int? questionsPerSection;
+  final int? sectionDurationMinutes;
+  final int totalDurationMinutes;
+  final bool timerEnabled;
   final Map<String, QuestionAnswer> answers;
   final List<PlayerQuestion> questions;
 
   factory LocalAttemptSnapshot.fromJson(Map<String, dynamic> json) {
-    final sectionRaw = json[LocalAttemptKeys.sectionStartedAt];
-    final sectionMap = <int, DateTime>{};
-    if (sectionRaw is Map) {
-      for (final entry in sectionRaw.entries) {
-        final key = int.tryParse(entry.key.toString());
-        final value = DateTime.tryParse(entry.value.toString());
-        if (key != null && value != null) {
-          sectionMap[key] = value;
-        }
-      }
-    }
+    final sectionMap = parseSectionStartedAt(
+      json[LocalAttemptKeys.sectionStartedAt],
+    );
 
     final answersRaw = json[LocalAttemptKeys.answers];
     final answers = <String, QuestionAnswer>{};
@@ -117,6 +128,16 @@ class LocalAttemptSnapshot {
       ),
       isEphemeralPractice:
           json[LocalAttemptKeys.isEphemeralPractice] as bool? ?? false,
+      isSectional: json[LocalAttemptKeys.isSectional] as bool? ?? false,
+      sectionCount: _asInt(json[LocalAttemptKeys.sectionCount], fallback: 1),
+      questionsPerSection: _asNullableInt(
+        json[LocalAttemptKeys.questionsPerSection],
+      ),
+      sectionDurationMinutes: _asNullableInt(
+        json[LocalAttemptKeys.sectionDurationMinutes],
+      ),
+      totalDurationMinutes: _asInt(json[LocalAttemptKeys.totalDurationMinutes]),
+      timerEnabled: json[LocalAttemptKeys.timerEnabled] as bool? ?? true,
       answers: answers,
       questions: questions,
     );
@@ -129,15 +150,20 @@ class LocalAttemptSnapshot {
       LocalAttemptKeys.userId: userId,
       LocalAttemptKeys.title: title,
       LocalAttemptKeys.startedAt: startedAt.toUtc().toIso8601String(),
-      LocalAttemptKeys.sectionStartedAt: {
-        for (final entry in sectionStartedAt.entries)
-          entry.key.toString(): entry.value.toUtc().toIso8601String(),
-      },
+      LocalAttemptKeys.sectionStartedAt: encodeSectionStartedAt(
+        sectionStartedAt,
+      ),
       LocalAttemptKeys.currentIndex: currentIndex,
       LocalAttemptKeys.localStatus: localStatus.jsonValue,
       LocalAttemptKeys.feedbackTiming: feedbackTiming.dbValue,
       LocalAttemptKeys.explanationLevel: explanationLevel.dbValue,
       LocalAttemptKeys.isEphemeralPractice: isEphemeralPractice,
+      LocalAttemptKeys.isSectional: isSectional,
+      LocalAttemptKeys.sectionCount: sectionCount,
+      LocalAttemptKeys.questionsPerSection: questionsPerSection,
+      LocalAttemptKeys.sectionDurationMinutes: sectionDurationMinutes,
+      LocalAttemptKeys.totalDurationMinutes: totalDurationMinutes,
+      LocalAttemptKeys.timerEnabled: timerEnabled,
       LocalAttemptKeys.answers: {
         for (final entry in answers.entries) entry.key: entry.value.toJson(),
       },
@@ -147,10 +173,15 @@ class LocalAttemptSnapshot {
     };
   }
 
-  static int _asInt(Object? value) {
+  static int _asInt(Object? value, {int fallback = 0}) {
     if (value is int) return value;
     if (value is num) return value.toInt();
-    if (value == null) return 0;
-    return int.tryParse(value.toString()) ?? 0;
+    if (value == null) return fallback;
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+
+  static int? _asNullableInt(Object? value) {
+    if (value == null) return null;
+    return _asInt(value);
   }
 }

@@ -38,6 +38,22 @@ class LocalAttemptStore {
     }
   }
 
+  /// Newest in-progress or pending-submit snapshot for this user+test, or null.
+  ///
+  /// pending_submit is included so a timer that already hit zero still
+  /// auto-submits on resume instead of opening a dead countdown.
+  Future<LocalAttemptSnapshot?> readOpenForTest({
+    required String testId,
+    required String userId,
+  }) async {
+    final matches = (await listForUser(userId))
+        .where((s) => s.testId == testId)
+        .toList();
+    if (matches.isEmpty) return null;
+    matches.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+    return matches.first;
+  }
+
   /// Newest in-progress snapshot for this user+test, or null.
   Future<LocalAttemptSnapshot?> readInProgressForTest({
     required String testId,

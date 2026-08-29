@@ -11,12 +11,14 @@ class PaletteCellView extends StatelessWidget {
     required this.cell,
     required this.selected,
     required this.onTap,
+    this.locked = false,
     this.size = 36,
   });
 
   final PaletteCell cell;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool locked;
   final double size;
 
   @override
@@ -28,64 +30,82 @@ class PaletteCellView extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: cell.semanticsLabel,
+      enabled: !locked,
+      label: locked
+          ? 'Question ${cell.questionNumber}, locked'
+          : cell.semanticsLabel,
       excludeSemantics: true,
       child: InkWell(
         key: Key('palette-${cell.questionNumber}'),
-        onTap: onTap,
+        onTap: locked ? null : onTap,
         customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: size,
-                height: size,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: fill,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected
-                        ? colorScheme.primary
-                        : (outline ??
-                              (fill == null
-                                  ? colorScheme.outline
-                                  : Colors.transparent)),
-                    width: selected || outline != null ? 2.5 : 1,
+        child: Opacity(
+          opacity: locked ? 0.45 : 1,
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: size,
+                  height: size,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: fill,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: selected
+                          ? colorScheme.primary
+                          : (outline ??
+                                (fill == null
+                                    ? colorScheme.outline
+                                    : Colors.transparent)),
+                      width: selected || outline != null ? 2.5 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    '${cell.questionNumber}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: fill == null
+                          ? colorScheme.onSurface
+                          : Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                child: Text(
-                  '${cell.questionNumber}',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: fill == null ? colorScheme.onSurface : Colors.white,
-                    fontWeight: FontWeight.w700,
+                if (cell.showGreenCheck)
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: _CornerBadge(
+                      color: PlayerColors.correct,
+                      icon: Icons.check,
+                      surface: colorScheme.surface,
+                    ),
                   ),
-                ),
-              ),
-              if (cell.showGreenCheck)
-                Positioned(
-                  right: -2,
-                  bottom: -2,
-                  child: _CornerBadge(
-                    color: PlayerColors.correct,
-                    icon: Icons.check,
-                    surface: colorScheme.surface,
+                if (cell.showReviewDot)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: _CornerBadge(
+                      color: PlayerColors.review,
+                      surface: colorScheme.surface,
+                    ),
                   ),
-                ),
-              if (cell.showReviewDot)
-                Positioned(
-                  right: -2,
-                  top: -2,
-                  child: _CornerBadge(
-                    color: PlayerColors.review,
-                    surface: colorScheme.surface,
+                if (locked)
+                  Align(
+                    child: Icon(
+                      Icons.lock,
+                      size: 12,
+                      color: fill == null
+                          ? colorScheme.onSurface
+                          : Colors.white,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

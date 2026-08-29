@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../profile/domain/plan_tier.dart';
+import '../../domain/attempt_status.dart';
+import '../../domain/player_session_state.dart';
 import '../providers/player_session_provider.dart';
 import '../widgets/test_player_view.dart';
 
@@ -26,6 +28,8 @@ class TestPlayerScreen extends ConsumerStatefulWidget {
 
 class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     with WidgetsBindingObserver {
+  bool _finishStarted = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +50,10 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(playerSessionProvider(widget.testId).notifier).onAppResumed();
+      return;
+    }
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
@@ -58,10 +66,34 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     ref.read(playerSessionProvider(widget.testId).notifier).flushSave();
   }
 
+  void _complete(PlayerSessionState session) {
+    if (_finishStarted || !mounted) return;
+    _finishStarted = true;
+    ref.read(playerSessionProvider(widget.testId).notifier).beginSubmit();
+    _flush();
+    ref.invalidate(playerSessionProvider(widget.testId));
+    context.go(
+      AppRoutes.resultsPath(
+        session.attemptId,
+        testId: widget.testId,
+        isPractice: session.isEphemeralPractice,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final testId = widget.testId;
     final sessionAsync = ref.watch(playerSessionProvider(testId));
+
+    ref.listen(playerSessionProvider(testId), (previous, next) {
+      final session = next.asData?.value;
+      if (session != null && session.isPendingSubmit) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _complete(session);
+        });
+      }
+    });
 
     return sessionAsync.when(
       loading: () =>
@@ -79,37 +111,50 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
           ),
         );
       },
-      data: (session) => TestPlayerView(
-        session: session,
-        onSelectOption: (option) => ref
-            .read(playerSessionProvider(testId).notifier)
-            .selectOption(option),
-        onGoTo: (index) =>
-            ref.read(playerSessionProvider(testId).notifier).goTo(index),
-        onClear: () =>
-            ref.read(playerSessionProvider(testId).notifier).clearResponse(),
-        onToggleMark: () =>
-            ref.read(playerSessionProvider(testId).notifier).toggleMark(),
-        onMarkAndNext: () => ref
-            .read(playerSessionProvider(testId).notifier)
-            .markForReviewAndNext(),
-        onPrevious: () =>
-            ref.read(playerSessionProvider(testId).notifier).previous(),
-        onSaveAndNext: () =>
-            ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
-        onFinish: () {
-          _flush();
-          ref.invalidate(playerSessionProvider(testId));
-          context.go(
-            AppRoutes.resultsPath(
-              session.attemptId,
-              testId: testId,
-              isPractice: session.isEphemeralPractice,
+      data: (session) {
+        if (session.localStatus == LocalAttemptStatus.pendingSubmit) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _complete(session);
+          });
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: Spacing.md),
+                  Text('Submitting…'),
+                ],
+              ),
             ),
           );
-        },
-        onExit: () => _exit(context, isPractice: session.isEphemeralPractice),
-      ),
+        }
+
+        return TestPlayerView(
+          session: session,
+          now: () => ref.read(playerSessionProvider(testId).notifier).now(),
+          onSelectOption: (option) => ref
+              .read(playerSessionProvider(testId).notifier)
+              .selectOption(option),
+          onGoTo: (index) =>
+              ref.read(playerSessionProvider(testId).notifier).goTo(index),
+          onClear: () =>
+              ref.read(playerSessionProvider(testId).notifier).clearResponse(),
+          onToggleMark: () =>
+              ref.read(playerSessionProvider(testId).notifier).toggleMark(),
+          onMarkAndNext: () => ref
+              .read(playerSessionProvider(testId).notifier)
+              .markForReviewAndNext(),
+          onPrevious: () =>
+              ref.read(playerSessionProvider(testId).notifier).previous(),
+          onSaveAndNext: () =>
+              ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
+          onSubmitSection: () =>
+              ref.read(playerSessionProvider(testId).notifier).submitSection(),
+          onFinish: () => _complete(session),
+          onExit: () => _exit(context, isPractice: session.isEphemeralPractice),
+        );
+      },
     );
   }
 

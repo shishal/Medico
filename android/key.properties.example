@@ -1,0 +1,7 @@
+# Copy to android/key.properties (gitignored) for local signed release builds.
+# Codemagic does not read this file — upload the same keystore in the UI.
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=upload
+# Path is relative to android/app/ (this file lives in android/).
+storeFile=../upload-keystore.jks

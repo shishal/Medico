@@ -1,0 +1,124 @@
+# Signed Android + iOS builds. Start a workflow from the Codemagic UI
+# (one click). Setup steps: docs/08_CODEMAGIC.md
+#
+# Names that must match the Codemagic UI:
+#   android_signing: medico
+#   integrations.app_store_connect: medico
+#   environment.groups: medico_app  (SUPABASE_URL, SUPABASE_ANON_KEY, CHECKOUT_URL)
+
+definitions:
+  env_versions: &env_versions
+    flutter: stable
+    java: 17
+
+  scripts:
+    - &write_dotenv
+      name: Write .env from Codemagic secrets
+      script: |
+        set -euo pipefail
+        : "${SUPABASE_URL:?Add SUPABASE_URL to the medico_app env group}"
+        : "${SUPABASE_ANON_KEY:?Add SUPABASE_ANON_KEY to the medico_app env group}"
+        : "${CHECKOUT_URL:?Add CHECKOUT_URL to the medico_app env group}"
+        # Only Flutter-safe values. Never put service_role in this group —
+        # .env is bundled into the binary as an asset.
+        printf 'SUPABASE_URL=%s\nSUPABASE_ANON_KEY=%s\nCHECKOUT_URL=%s\n' \
+          "$SUPABASE_URL" "$SUPABASE_ANON_KEY" "$CHECKOUT_URL" \
+          > "$CM_BUILD_DIR/.env"
+    - &flutter_pub_get
+      name: Get Flutter packages
+      script: flutter pub get
+    - &flutter_analyze
+      name: Analyze
+      script: flutter analyze
+    - &flutter_test
+      name: Unit and widget tests
+      script: flutter test
+
+workflows:
+  android-release:
+    name: Android signed release
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      <<: *env_versions
+      android_signing:
+        - medico
+      groups:
+        - medico_app
+      vars:
+        PACKAGE_NAME: com.shishal.medico
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+    scripts:
+      - *write_dotenv
+      - name: Set up local.properties
+        script: |
+          set -euo pipefail
+          FLUTTER_SDK="$(dirname "$(dirname "$(which flutter)")")"
+          {
+            echo "flutter.sdk=$FLUTTER_SDK"
+            echo "sdk.dir=$ANDROID_SDK_ROOT"
+          } > "$CM_BUILD_DIR/android/local.properties"
+      - *flutter_pub_get
+      - *flutter_analyze
+      - *flutter_test
+      - name: Build signed APK and App Bundle
+        script: |
+          set -euo pipefail
+          flutter build apk --release --build-number="$BUILD_NUMBER"
+          flutter build appbundle --release --build-number="$BUILD_NUMBER"
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+      - build/app/outputs/bundle/**/*.aab
+
+  ios-release:
+    name: iOS signed release
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    integrations:
+      app_store_connect: medico
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.shishal.medico
+      groups:
+        - medico_app
+      vars:
+        BUNDLE_ID: com.shishal.medico
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+    scripts:
+      - *write_dotenv
+      - *flutter_pub_get
+      - *flutter_analyze
+      - *flutter_test
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Install CocoaPods dependencies
+        script: |
+          # No-op if the project uses Swift Package Manager (no Podfile).
+          find . -name Podfile -execdir pod install \;
+      - name: Build signed IPA
+        script: |
+          set -euo pipefail
+          flutter build ipa --release \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      # Upload the IPA to App Store Connect so it can be installed from
+      # TestFlight without a local Mac. Does not submit for App Store
+      # review — that is Phase 9.4.
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false

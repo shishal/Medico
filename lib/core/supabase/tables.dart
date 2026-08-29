@@ -4,6 +4,8 @@ abstract final class Tables {
   static const subjects = 'subjects';
   static const topics = 'topics';
   static const tests = 'tests';
+  static const questions = 'questions';
+  static const testQuestions = 'test_questions';
   static const tags = 'tags';
   static const questionTags = 'question_tags';
   static const planLimits = 'plan_limits';
@@ -48,6 +50,33 @@ abstract final class TestColumns {
   static const showExplanationLevel = 'show_explanation_level';
   static const timerEnabled = 'timer_enabled';
   static const practiceFilterCriteria = 'practice_filter_criteria';
+}
+
+abstract final class QuestionColumns {
+  static const id = 'id';
+  static const topicId = 'topic_id';
+  static const questionText = 'question_text';
+  static const optionA = 'option_a';
+  static const optionB = 'option_b';
+  static const optionC = 'option_c';
+  static const optionD = 'option_d';
+  static const correctOption = 'correct_option';
+  static const explanationText = 'explanation_text';
+  static const explanationVideoUrl = 'explanation_video_url';
+  static const imageUrl = 'image_url';
+  static const difficulty = 'difficulty';
+  static const requiredPlan = 'required_plan';
+  static const isActive = 'is_active';
+}
+
+abstract final class TestQuestionColumns {
+  static const testId = 'test_id';
+  static const questionId = 'question_id';
+  static const sectionNumber = 'section_number';
+  static const orderIndex = 'order_index';
+
+  /// PostgREST embed alias: `question:questions(...)`.
+  static const questionEmbed = 'question';
 }
 
 abstract final class SubjectColumns {

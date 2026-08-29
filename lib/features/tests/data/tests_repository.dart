@@ -5,7 +5,9 @@ import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
 import '../domain/catalog_test.dart';
+import '../domain/player_question.dart';
 import '../domain/test_detail.dart';
+import '../domain/test_player_bundle.dart';
 
 part 'tests_repository.g.dart';
 
@@ -94,6 +96,74 @@ class TestsRepository {
       return const Failure('Could not load test details. Please try again.');
     } catch (_) {
       return const Failure('Could not load test details. Please try again.');
+    }
+  }
+
+  /// Questions + session flags for the player. Same RLS path as catalog tests
+  /// (`tests` / `test_questions` / `questions`) — no separate ungated fetch.
+  Future<Result<TestPlayerBundle>> fetchPlayerBundle(String testId) async {
+    if (_client.auth.currentUser == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final testRows = await _client
+          .from(Tables.tests)
+          .select(
+            '${TestColumns.id},'
+            '${TestColumns.title},'
+            '${TestColumns.feedbackTiming},'
+            '${TestColumns.showExplanationLevel},'
+            '${TestColumns.isEphemeralPractice}',
+          )
+          .eq(TestColumns.id, testId)
+          .limit(1);
+
+      final tests = (testRows as List<dynamic>).cast<Map<String, dynamic>>();
+      if (tests.isEmpty) {
+        return const Failure(
+          'This test is not available on your current plan.',
+        );
+      }
+
+      final questionRows = await _client
+          .from(Tables.testQuestions)
+          .select(
+            '${TestQuestionColumns.orderIndex},'
+            '${TestQuestionColumns.sectionNumber},'
+            '${TestQuestionColumns.questionEmbed}:${Tables.questions}('
+            '${QuestionColumns.id},'
+            '${QuestionColumns.questionText},'
+            '${QuestionColumns.optionA},'
+            '${QuestionColumns.optionB},'
+            '${QuestionColumns.optionC},'
+            '${QuestionColumns.optionD},'
+            '${QuestionColumns.correctOption},'
+            '${QuestionColumns.explanationText},'
+            '${QuestionColumns.explanationVideoUrl},'
+            '${QuestionColumns.imageUrl}'
+            ')',
+          )
+          .eq(TestQuestionColumns.testId, testId)
+          .order(TestQuestionColumns.orderIndex);
+
+      final questions = (questionRows as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .where((row) => row[TestQuestionColumns.questionEmbed] != null)
+          .map(PlayerQuestion.fromJoinJson)
+          .toList();
+
+      if (questions.isEmpty) {
+        return const Failure('Could not load questions for this test.');
+      }
+
+      return Success(
+        TestPlayerBundle.fromParts(testRow: tests.first, questions: questions),
+      );
+    } on PostgrestException catch (_) {
+      return const Failure('Could not load this test. Please try again.');
+    } catch (_) {
+      return const Failure('Could not load this test. Please try again.');
     }
   }
 }

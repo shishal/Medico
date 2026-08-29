@@ -1,0 +1,10 @@
+import 'package:flutter/material.dart';
+
+/// Palette / option colors that are not on [ColorScheme] (correct green,
+/// review purple). Keep these in one place so Exam and Tutor Mode match.
+abstract final class PlayerColors {
+  static const Color correct = Color(0xFF2E7D32);
+  static const Color incorrect = Color(0xFFC62828);
+  static const Color review = Color(0xFF6A1B9A);
+  static const Color notVisited = Color(0xFF9E9E9E);
+}

@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
+import '../../../profile/presentation/providers/current_plan_provider.dart';
 
 /// Landing screen after authentication (placeholder until Phase 4).
 class HomeScreen extends ConsumerWidget {
@@ -13,6 +14,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final planAsync = ref.watch(currentPlanProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -30,6 +33,27 @@ class HomeScreen extends ConsumerWidget {
           Text(
             'Home',
             style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: Spacing.sm),
+          planAsync.when(
+            data: (plan) => Text(
+              plan == null ? 'Plan: —' : 'Your plan: ${plan.label}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            loading: () => const Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (_, _) => Text(
+              'Plan unavailable',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+            ),
           ),
           const SizedBox(height: Spacing.sm),
           Text(

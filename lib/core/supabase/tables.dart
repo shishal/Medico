@@ -12,3 +12,13 @@ abstract final class ProfileColumns {
   static const planExpiresAt = 'plan_expires_at';
   static const createdAt = 'created_at';
 }
+
+/// Postgres RPC function names (see `docs/02_DATABASE_SCHEMA.md`).
+abstract final class RpcFunctions {
+  static const currentPlan = 'current_plan';
+}
+
+/// Named parameters for [RpcFunctions.currentPlan].
+abstract final class CurrentPlanParams {
+  static const userId = 'p_user_id';
+}

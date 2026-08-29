@@ -218,6 +218,7 @@ grant execute on function plan_rank(plan_tier) to authenticated, service_role;
 grant execute on function current_plan(uuid) to authenticated, service_role;
 grant execute on function server_now() to authenticated;
 grant execute on function submit_attempt(uuid, jsonb) to authenticated;
+grant execute on function get_attempt_results(uuid) to authenticated;
 -- calculate_percentile is not granted to authenticated — see §6.1.
 
 -- profiles: users see/edit only their own row
@@ -344,6 +345,23 @@ $$;
 ```
 
 `p_answers` is a JSON array of `{question_id, selected_option, is_marked_for_review, time_spent_seconds}`. `selected_option` is `A`/`B`/`C`/`D` or null. The Flutter client must not send `total_score`.
+
+### 6.2 Results summary (Phase 6.2)
+
+The results screen reads stored `total_score` / counts / `percentile` — it does not re-score. Subject-wise correct/incorrect/unattempted uses the same classification as §5 of the test-engine spec, grouped by `questions → topics → subjects`. Time spent is wall-clock `submitted_at - started_at`.
+
+`get_attempt_results` is `security definer` so a student can still open their own submitted results if their plan later drops below a question's `required_plan` (a client-side join through `questions` would be blocked by that RLS policy).
+
+```sql
+create or replace function get_attempt_results(p_attempt_id uuid)
+returns jsonb
+language plpgsql stable security definer
+set search_path = public as $$
+-- reject if not authenticated / not owned / not submitted
+-- return stored score fields + test title/marking + duration_seconds
+-- + subjects[] of {subject_id, subject_name, correct/incorrect/unattempted_count}
+$$;
+```
 
 ## 7. Practice Mode additions
 

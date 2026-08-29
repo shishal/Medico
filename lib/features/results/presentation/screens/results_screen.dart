@@ -6,8 +6,10 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../practice/data/practice_repository.dart';
+import '../providers/attempt_results_provider.dart';
+import '../widgets/results_summary.dart';
 
-/// Placeholder results screen — real scoring arrives in Phase 6.
+/// Score / accuracy / percentile / subject breakdown after submit.
 class ResultsScreen extends ConsumerStatefulWidget {
   const ResultsScreen({
     super.key,
@@ -27,14 +29,12 @@ class ResultsScreen extends ConsumerStatefulWidget {
 class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   bool _similarBusy = false;
 
-  Future<void> _practiceSimilarAgain() async {
-    final testId = widget.testId;
-    if (testId == null) return;
-
+  Future<void> _practiceSimilarAgain(String testId) async {
     setState(() => _similarBusy = true);
 
-    final result =
-        await ref.read(practiceRepositoryProvider).fetchSimilarDraft(testId);
+    final result = await ref
+        .read(practiceRepositoryProvider)
+        .fetchSimilarDraft(testId);
 
     if (!mounted) return;
     setState(() => _similarBusy = false);
@@ -52,35 +52,83 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
+
+  void _goHome() => context.go(AppRoutes.home);
 
   @override
   Widget build(BuildContext context) {
+    final resultsAsync = ref.watch(attemptResultsProvider(widget.attemptId));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Results'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: _goHome,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
+      body: resultsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) {
+          final message = error.toString().replaceFirst('Exception: ', '');
+          return _ErrorBody(
+            message: message,
+            onRetry: () =>
+                ref.invalidate(attemptResultsProvider(widget.attemptId)),
+            onBack: _goHome,
+          );
+        },
+        data: (results) => Column(
+          children: [
+            Expanded(child: ResultsSummary(results: results)),
+            _ResultsActions(
+              showPracticeSimilar:
+                  results.isEphemeralPractice || widget.isPractice,
+              similarBusy: _similarBusy,
+              onPracticeSimilar: () =>
+                  _practiceSimilarAgain(widget.testId ?? results.testId),
+              onHome: _goHome,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ResultsActions extends StatelessWidget {
+  const _ResultsActions({
+    required this.showPracticeSimilar,
+    required this.similarBusy,
+    required this.onPracticeSimilar,
+    required this.onHome,
+  });
+
+  final bool showPracticeSimilar;
+  final bool similarBusy;
+  final VoidCallback onPracticeSimilar;
+  final VoidCallback onHome;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          Spacing.lg,
+          Spacing.sm,
+          Spacing.lg,
+          Spacing.lg,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Results (placeholder)',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: Spacing.md),
-            Text('Attempt: ${widget.attemptId}'),
-            const SizedBox(height: Spacing.lg),
-            if (widget.isPractice && widget.testId != null) ...[
+            if (showPracticeSimilar) ...[
               FilledButton.tonal(
-                onPressed: _similarBusy ? null : _practiceSimilarAgain,
-                child: _similarBusy
+                onPressed: similarBusy ? null : onPracticeSimilar,
+                child: similarBusy
                     ? SizedBox(
                         height: 20,
                         width: 20,
@@ -95,10 +143,37 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
               ),
               const SizedBox(height: Spacing.md),
             ],
-            FilledButton(
-              onPressed: () => context.go(AppRoutes.home),
-              child: const Text('Back to home'),
-            ),
+            FilledButton(onPressed: onHome, child: const Text('Back to home')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorBody extends StatelessWidget {
+  const _ErrorBody({
+    required this.message,
+    required this.onRetry,
+    required this.onBack,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: Spacing.md),
+            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+            TextButton(onPressed: onBack, child: const Text('Back to home')),
           ],
         ),
       ),

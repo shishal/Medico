@@ -151,6 +151,7 @@ abstract final class RpcFunctions {
   static const createPracticeSession = 'create_practice_session';
   static const serverNow = 'server_now';
   static const submitAttempt = 'submit_attempt';
+  static const getAttemptResults = 'get_attempt_results';
 }
 
 /// Named parameters for [RpcFunctions.currentPlan].
@@ -162,6 +163,21 @@ abstract final class CurrentPlanParams {
 abstract final class SubmitAttemptParams {
   static const attemptId = 'p_attempt_id';
   static const answers = 'p_answers';
+}
+
+/// Named parameters for [RpcFunctions.getAttemptResults].
+abstract final class GetAttemptResultsParams {
+  static const attemptId = 'p_attempt_id';
+}
+
+/// Extra keys on the `get_attempt_results` JSON (not `attempts` columns).
+abstract final class AttemptResultsJson {
+  static const testTitle = 'test_title';
+  static const durationSeconds = 'duration_seconds';
+  static const questionTimeSeconds = 'question_time_seconds';
+  static const subjects = 'subjects';
+  static const subjectId = 'subject_id';
+  static const subjectName = 'subject_name';
 }
 
 /// Named parameters for [RpcFunctions.createPracticeSession].

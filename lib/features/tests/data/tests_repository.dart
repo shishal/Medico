@@ -6,7 +6,9 @@ import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/wall_clock.dart';
 import '../domain/attempt.dart';
+import '../domain/attempt_score.dart';
 import '../domain/attempt_status.dart';
+import '../domain/attempt_submit_request.dart';
 import '../domain/catalog_test.dart';
 import '../domain/player_question.dart';
 import '../domain/test_detail.dart';
@@ -357,6 +359,55 @@ class TestsRepository {
     } catch (_) {
       return const Failure('Could not read server time.');
     }
+  }
+
+  /// Syncs local answers and asks Postgres to score. Never sends a score.
+  Future<Result<AttemptScore>> submitAttempt(
+    AttemptSubmitRequest request,
+  ) async {
+    if (currentUserId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final raw = await _client.rpc(
+        RpcFunctions.submitAttempt,
+        params: request.toRpcParams(),
+      );
+
+      final map = _asJsonMap(raw);
+      if (map == null) {
+        return const Failure(
+          'Could not submit. Check your connection and try again.',
+        );
+      }
+      return Success(AttemptScore.fromJson(map));
+    } on PostgrestException catch (e) {
+      return Failure(_mapSubmitError(e));
+    } catch (_) {
+      return const Failure(
+        'Could not submit. Check your connection and try again.',
+      );
+    }
+  }
+
+  static Map<String, dynamic>? _asJsonMap(Object? raw) {
+    if (raw is Map<String, dynamic>) return raw;
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
+
+  static String _mapSubmitError(PostgrestException e) {
+    final haystack = '${e.message} ${e.details} ${e.hint}';
+    if (haystack.contains('NOT_AUTHENTICATED')) {
+      return 'Not signed in.';
+    }
+    if (haystack.contains('ATTEMPT_NOT_FOUND') ||
+        haystack.contains('ATTEMPT_NOT_OWNED') ||
+        haystack.contains('ATTEMPT_NOT_IN_PROGRESS')) {
+      return 'This attempt can no longer be submitted.';
+    }
+    return 'Could not submit. Check your connection and try again.';
   }
 }
 

@@ -124,10 +124,25 @@ abstract final class AttemptColumns {
   static const startedAt = 'started_at';
   static const sectionStartedAt = 'section_started_at';
   static const submittedAt = 'submitted_at';
+  static const totalScore = 'total_score';
+  static const correctCount = 'correct_count';
+  static const incorrectCount = 'incorrect_count';
+  static const unattemptedCount = 'unattempted_count';
+  static const percentile = 'percentile';
   static const createdAt = 'created_at';
 
   /// PostgREST embed alias: `test:tests(...)`.
   static const testEmbed = 'test';
+}
+
+abstract final class AttemptAnswerColumns {
+  static const id = 'id';
+  static const attemptId = 'attempt_id';
+  static const questionId = 'question_id';
+  static const selectedOption = 'selected_option';
+  static const isMarkedForReview = 'is_marked_for_review';
+  static const timeSpentSeconds = 'time_spent_seconds';
+  static const answeredAt = 'answered_at';
 }
 
 /// Postgres RPC function names (see `docs/02_DATABASE_SCHEMA.md`).
@@ -135,11 +150,18 @@ abstract final class RpcFunctions {
   static const currentPlan = 'current_plan';
   static const createPracticeSession = 'create_practice_session';
   static const serverNow = 'server_now';
+  static const submitAttempt = 'submit_attempt';
 }
 
 /// Named parameters for [RpcFunctions.currentPlan].
 abstract final class CurrentPlanParams {
   static const userId = 'p_user_id';
+}
+
+/// Named parameters for [RpcFunctions.submitAttempt].
+abstract final class SubmitAttemptParams {
+  static const attemptId = 'p_attempt_id';
+  static const answers = 'p_answers';
 }
 
 /// Named parameters for [RpcFunctions.createPracticeSession].

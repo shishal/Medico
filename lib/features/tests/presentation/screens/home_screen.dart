@@ -8,6 +8,7 @@ import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../providers/in_progress_attempts_provider.dart';
+import '../providers/pending_submit_sync_provider.dart';
 
 /// Landing screen after authentication (placeholder until Phase 4).
 class HomeScreen extends ConsumerWidget {
@@ -16,6 +17,8 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final planAsync = ref.watch(currentPlanProvider);
+    // Completes pending_submit files after a force-quit or dropped connection.
+    ref.watch(pendingSubmitSyncProvider);
 
     return Scaffold(
       appBar: AppBar(

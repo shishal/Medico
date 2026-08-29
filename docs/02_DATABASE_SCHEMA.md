@@ -208,6 +208,8 @@ grant select on table topics to authenticated;
 grant select on table questions to authenticated;
 grant select on table tests to authenticated;
 grant select on table test_questions to authenticated;
+-- attempts insert/update is column-restricted in Phase 6.1 so the client
+-- cannot write total_score. See §6.1.
 grant select, insert, update on table attempts to authenticated;
 grant select, insert, update on table attempt_answers to authenticated;
 grant select, insert, update, delete on table bookmarks to authenticated;
@@ -215,6 +217,8 @@ grant all on all tables in schema public to service_role;
 grant execute on function plan_rank(plan_tier) to authenticated, service_role;
 grant execute on function current_plan(uuid) to authenticated, service_role;
 grant execute on function server_now() to authenticated;
+grant execute on function submit_attempt(uuid, jsonb) to authenticated;
+-- calculate_percentile is not granted to authenticated — see §6.1.
 
 -- profiles: users see/edit only their own row
 create policy "own profile select" on profiles for select using (auth.uid() = id);
@@ -318,6 +322,28 @@ $$;
 ```
 
 Call this right after an attempt is marked `submitted`, store the result on `attempts.percentile`. This is a live, keeps-shifting percentile (recalculating it for *everyone* who took the test as more people submit is a Phase 2 nice-to-have, not required for launch — the score users see the moment they finish is what matters most).
+
+`calculate_percentile` must run as `security definer` (and must **not** be granted to `authenticated`). RLS on `attempts` is "own rows only" — if this ran as the student, their percentile would be computed against a 1-row set (themselves) and always come back as `100`. `submit_attempt` is the only caller.
+
+### 6.1 Submit and score (Phase 6.1)
+
+The client sends answers only. Scoring uses the test row's `correct_marks` / `incorrect_marks` / `unattempted_marks` and the spec in `04_TEST_ENGINE_SPEC.md` §5. Missing `attempt_answers` rows and `selected_option is null` both count as unattempted. A retry against an already-`submitted` attempt returns the stored scores and ignores new answers.
+
+Column-level GRANTs on `attempts` block the client from writing `total_score` / counts / `percentile` / `status` after insert. Answer INSERT/UPDATE policies require `attempts.status = 'in_progress'` so scores cannot be changed after submit. `submit_attempt` is `security definer` so it can still write those rows.
+
+```sql
+create or replace function submit_attempt(p_attempt_id uuid, p_answers jsonb)
+returns jsonb
+language plpgsql security definer
+set search_path = public as $$
+-- lock attempt; reject if not owned / not in_progress (unless already submitted)
+-- upsert p_answers into attempt_answers (only question_ids on this test)
+-- score every test_questions row; write status, counts, total_score, submitted_at
+-- percentile := calculate_percentile(test_id, total_score); return the scored row
+$$;
+```
+
+`p_answers` is a JSON array of `{question_id, selected_option, is_marked_for_review, time_spent_seconds}`. `selected_option` is `A`/`B`/`C`/`D` or null. The Flutter client must not send `total_score`.
 
 ## 7. Practice Mode additions
 

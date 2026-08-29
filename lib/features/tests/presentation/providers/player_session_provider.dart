@@ -8,8 +8,11 @@ import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../data/local_attempt_store.dart';
 import '../../data/tests_repository.dart';
 import '../../domain/attempt_status.dart';
+import '../../domain/attempt_submit_request.dart';
 import '../../domain/player_session_state.dart';
 import '../../domain/question_option.dart';
+import '../../domain/submit_backoff.dart';
+import 'in_progress_attempts_provider.dart';
 
 part 'player_session_provider.g.dart';
 
@@ -28,13 +31,20 @@ class PlayerSession extends _$PlayerSession {
   String? _userId;
   LocalAttemptStore? _store;
   WallClock _clock = WallClock();
+  var _alive = true;
+  var _submitLoopStarted = false;
 
   /// Clock used by the countdown UI — includes server skew correction.
   DateTime now() => _clock.now();
 
   @override
   Future<PlayerSessionState> build(String testId) async {
-    ref.onDispose(_tearDown);
+    _alive = true;
+    _submitLoopStarted = false;
+    ref.onDispose(() {
+      _alive = false;
+      _tearDown();
+    });
 
     final signedIn = ref.watch(authSessionProvider);
     final repo = ref.read(testsRepositoryProvider);
@@ -57,7 +67,17 @@ class PlayerSession extends _$PlayerSession {
         Success(:final value) when value == null => false,
         Success(:final value) => value!.status == AttemptStatus.inProgress,
       };
+      final submittedOnServer = switch (remote) {
+        Success(:final value) => value?.status == AttemptStatus.submitted,
+        _ => false,
+      };
+
       if (!stillOpen) {
+        // Idempotent RPC returns stored scores — don't start a retake.
+        if (submittedOnServer &&
+            local.localStatus == LocalAttemptStatus.pendingSubmit) {
+          return PlayerSessionState.fromSnapshot(local);
+        }
         await store.delete(local.attemptId);
       } else {
         var session = PlayerSessionState.fromSnapshot(local);
@@ -148,13 +168,30 @@ class PlayerSession extends _$PlayerSession {
     if (session != null) unawaited(_syncSectionStarts(session));
   }
 
-  /// Marks the local file so a force-quit cannot resume a finished attempt.
-  void beginSubmit() {
-    _update(
-      (session) =>
-          session.copyWith(localStatus: LocalAttemptStatus.pendingSubmit),
-      persistImmediately: true,
-    );
+  /// Manual "Submit test" / "Finish session". Timer expiry uses the same loop.
+  void finishAndSubmit() {
+    final current = state.value;
+    if (current == null || current.isSubmitComplete) return;
+    if (!current.isPendingSubmit) {
+      _update(
+        (session) =>
+            session.copyWith(localStatus: LocalAttemptStatus.pendingSubmit),
+        persistImmediately: true,
+      );
+    }
+    unawaited(ensureSubmitting());
+  }
+
+  /// Starts the RPC + backoff loop once. Safe to call from the UI repeatedly.
+  Future<void> ensureSubmitting() async {
+    if (_submitLoopStarted) return;
+    final session = state.value;
+    if (session == null || session.isSubmitComplete) return;
+    if (!session.isPendingSubmit) return;
+    _submitLoopStarted = true;
+    _tickTimer?.cancel();
+    _tickTimer = null;
+    await _submitLoop();
   }
 
   /// Re-check Postgres time and expiry after the app returns to the foreground.
@@ -186,6 +223,7 @@ class PlayerSession extends _$PlayerSession {
       _tickTimer?.cancel();
       _tickTimer = null;
       unawaited(_persist());
+      unawaited(ensureSubmitting());
       return;
     }
     if (persistImmediately) {
@@ -223,10 +261,52 @@ class PlayerSession extends _$PlayerSession {
     if (next.isPendingSubmit) {
       _tickTimer?.cancel();
       _tickTimer = null;
+      unawaited(ensureSubmitting());
     }
     if (persist) unawaited(_persist());
     if (next.sectionStartedAt != current.sectionStartedAt) {
       unawaited(_syncSectionStarts(next));
+    }
+  }
+
+  Future<void> _submitLoop() async {
+    var failures = 0;
+    while (_alive) {
+      final session = state.value;
+      final store = _store;
+      final userId = _userId;
+      if (session == null || store == null || userId == null) return;
+      if (session.isSubmitComplete) return;
+
+      await _persist();
+      final toSend = state.value ?? session;
+      final result = await ref
+          .read(testsRepositoryProvider)
+          .submitAttempt(AttemptSubmitRequest.fromSession(toSend));
+
+      if (!_alive) return;
+
+      switch (result) {
+        case Success(:final value):
+          await store.delete(session.attemptId);
+          if (!_alive) return;
+          state = AsyncData(
+            session.copyWith(submittedScore: value, clearSubmitError: true),
+          );
+          ref.invalidate(inProgressAttemptsProvider);
+          return;
+        case Failure(:final message) when isTerminalSubmitFailure(message):
+          if (message != 'Not signed in.') {
+            await store.delete(session.attemptId);
+          }
+          if (!_alive) return;
+          state = AsyncData(session.copyWith(submitError: message));
+          return;
+        case Failure(:final message):
+          failures++;
+          state = AsyncData(session.copyWith(submitError: message));
+          await Future<void>.delayed(SubmitBackoff.delayFor(failures));
+      }
     }
   }
 
@@ -260,6 +340,7 @@ class PlayerSession extends _$PlayerSession {
     final current = state.value;
     final store = _store;
     if (userId == null || current == null || store == null) return;
+    if (current.isSubmitComplete) return;
     final timed = _applyElapsed(current);
     if (!identical(timed, current)) {
       state = AsyncData(timed);
@@ -277,6 +358,7 @@ class PlayerSession extends _$PlayerSession {
     final current = state.value;
     final store = _store;
     if (userId == null || current == null || store == null) return;
+    if (current.isSubmitComplete) return;
     final timed = _applyElapsed(current);
     unawaited(store.write(timed.toSnapshot(userId: userId)));
   }

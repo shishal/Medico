@@ -10,16 +10,25 @@ part of 'player_session_provider.dart';
 // ignore_for_file: type=lint, type=warning
 /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
 /// questions, and autosaves answers to a local JSON file (spec §4).
+///
+/// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+/// only checks for expiry — remaining seconds are never written to disk.
 
 @ProviderFor(PlayerSession)
 final playerSessionProvider = PlayerSessionFamily._();
 
 /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
 /// questions, and autosaves answers to a local JSON file (spec §4).
+///
+/// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+/// only checks for expiry — remaining seconds are never written to disk.
 final class PlayerSessionProvider
     extends $AsyncNotifierProvider<PlayerSession, PlayerSessionState> {
   /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
   /// questions, and autosaves answers to a local JSON file (spec §4).
+  ///
+  /// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+  /// only checks for expiry — remaining seconds are never written to disk.
   PlayerSessionProvider._({
     required PlayerSessionFamily super.from,
     required String super.argument,
@@ -56,10 +65,13 @@ final class PlayerSessionProvider
   }
 }
 
-String _$playerSessionHash() => r'7152254c06505ff069f5850b67fdac69fe028e1b';
+String _$playerSessionHash() => r'4045789cc828f3f2fb09bf96b8826828adfbab49';
 
 /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
 /// questions, and autosaves answers to a local JSON file (spec §4).
+///
+/// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+/// only checks for expiry — remaining seconds are never written to disk.
 
 final class PlayerSessionFamily extends $Family
     with
@@ -81,6 +93,9 @@ final class PlayerSessionFamily extends $Family
 
   /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
   /// questions, and autosaves answers to a local JSON file (spec §4).
+  ///
+  /// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+  /// only checks for expiry — remaining seconds are never written to disk.
 
   PlayerSessionProvider call(String testId) =>
       PlayerSessionProvider._(argument: testId, from: this);
@@ -91,6 +106,9 @@ final class PlayerSessionFamily extends $Family
 
 /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
 /// questions, and autosaves answers to a local JSON file (spec §4).
+///
+/// The countdown is derived from wall-clock elapsed time (spec §3). A 1s tick
+/// only checks for expiry — remaining seconds are never written to disk.
 
 abstract class _$PlayerSession extends $AsyncNotifier<PlayerSessionState> {
   late final _$args = ref.$arg as String;

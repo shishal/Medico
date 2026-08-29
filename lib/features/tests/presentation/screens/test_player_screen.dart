@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../profile/domain/plan_tier.dart';
-import '../../domain/attempt_status.dart';
 import '../../domain/player_session_state.dart';
 import '../providers/player_session_provider.dart';
 import '../widgets/test_player_view.dart';
@@ -28,7 +27,7 @@ class TestPlayerScreen extends ConsumerStatefulWidget {
 
 class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     with WidgetsBindingObserver {
-  bool _finishStarted = false;
+  bool _didNavigateToResults = false;
 
   @override
   void initState() {
@@ -66,11 +65,9 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     ref.read(playerSessionProvider(widget.testId).notifier).flushSave();
   }
 
-  void _complete(PlayerSessionState session) {
-    if (_finishStarted || !mounted) return;
-    _finishStarted = true;
-    ref.read(playerSessionProvider(widget.testId).notifier).beginSubmit();
-    _flush();
+  void _goToResults(PlayerSessionState session) {
+    if (_didNavigateToResults || !mounted) return;
+    _didNavigateToResults = true;
     ref.invalidate(playerSessionProvider(widget.testId));
     context.go(
       AppRoutes.resultsPath(
@@ -88,9 +85,16 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
 
     ref.listen(playerSessionProvider(testId), (previous, next) {
       final session = next.asData?.value;
-      if (session != null && session.isPendingSubmit) {
+      if (session == null) return;
+      if (session.isSubmitComplete) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _complete(session);
+          _goToResults(session);
+        });
+        return;
+      }
+      if (session.isPendingSubmit) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(playerSessionProvider(testId).notifier).ensureSubmitting();
         });
       }
     });
@@ -112,22 +116,18 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
         );
       },
       data: (session) {
-        if (session.localStatus == LocalAttemptStatus.pendingSubmit) {
+        if (session.isSubmitComplete) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _complete(session);
+            _goToResults(session);
           });
-          return const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: Spacing.md),
-                  Text('Submitting…'),
-                ],
-              ),
-            ),
-          );
+          return const _SubmittingBody();
+        }
+
+        if (session.isPendingSubmit) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(playerSessionProvider(testId).notifier).ensureSubmitting();
+          });
+          return _SubmittingBody(errorMessage: session.submitError);
         }
 
         return TestPlayerView(
@@ -151,7 +151,9 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
               ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
           onSubmitSection: () =>
               ref.read(playerSessionProvider(testId).notifier).submitSection(),
-          onFinish: () => _complete(session),
+          onFinish: () => ref
+              .read(playerSessionProvider(testId).notifier)
+              .finishAndSubmit(),
           onExit: () => _exit(context, isPractice: session.isEphemeralPractice),
         );
       },
@@ -166,6 +168,41 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     }
     context.go(
       isPractice ? AppRoutes.home : AppRoutes.testDetailPath(widget.testId),
+    );
+  }
+}
+
+class _SubmittingBody extends StatelessWidget {
+  const _SubmittingBody({this.errorMessage});
+
+  final String? errorMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: Spacing.md),
+              const Text('Submitting…'),
+              if (errorMessage != null) ...[
+                const SizedBox(height: Spacing.sm),
+                Text(
+                  errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

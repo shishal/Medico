@@ -1,4 +1,5 @@
 import '../../practice/domain/practice_enums.dart';
+import 'attempt_score.dart';
 import 'attempt_status.dart';
 import 'local_attempt_snapshot.dart';
 import 'palette_cell.dart';
@@ -49,6 +50,8 @@ class PlayerSessionState {
     required this.startedAt,
     required this.sectionStartedAt,
     this.localStatus = LocalAttemptStatus.inProgress,
+    this.submitError,
+    this.submittedScore,
     this.isSectional = false,
     this.sectionCount = 1,
     this.questionsPerSection,
@@ -130,6 +133,12 @@ class PlayerSessionState {
   final DateTime startedAt;
   final Map<int, DateTime> sectionStartedAt;
   final LocalAttemptStatus localStatus;
+
+  /// Last RPC error while retrying. Null after a successful submit.
+  final String? submitError;
+
+  /// Set when `submit_attempt` returns. Not persisted locally.
+  final AttemptScore? submittedScore;
   final bool isSectional;
   final int sectionCount;
   final int? questionsPerSection;
@@ -159,6 +168,8 @@ class PlayerSessionState {
   bool get showsTimer => timerEnabled && _activeDurationSeconds > 0;
 
   bool get isPendingSubmit => localStatus == LocalAttemptStatus.pendingSubmit;
+
+  bool get isSubmitComplete => submittedScore != null;
 
   /// Previous is blocked at the start of a locked-behind section.
   bool get canGoPrevious =>
@@ -478,6 +489,9 @@ class PlayerSessionState {
     DateTime? startedAt,
     Map<int, DateTime>? sectionStartedAt,
     LocalAttemptStatus? localStatus,
+    String? submitError,
+    bool clearSubmitError = false,
+    AttemptScore? submittedScore,
     bool? isSectional,
     int? sectionCount,
     int? questionsPerSection,
@@ -498,6 +512,8 @@ class PlayerSessionState {
       startedAt: startedAt ?? this.startedAt,
       sectionStartedAt: sectionStartedAt ?? this.sectionStartedAt,
       localStatus: localStatus ?? this.localStatus,
+      submitError: clearSubmitError ? null : (submitError ?? this.submitError),
+      submittedScore: submittedScore ?? this.submittedScore,
       isSectional: isSectional ?? this.isSectional,
       sectionCount: sectionCount ?? this.sectionCount,
       questionsPerSection: questionsPerSection ?? this.questionsPerSection,

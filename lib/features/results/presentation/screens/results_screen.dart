@@ -88,6 +88,8 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
               showPracticeSimilar:
                   results.isEphemeralPractice || widget.isPractice,
               similarBusy: _similarBusy,
+              onReview: () =>
+                  context.push(AppRoutes.solutionReviewPath(widget.attemptId)),
               onPracticeSimilar: () =>
                   _practiceSimilarAgain(widget.testId ?? results.testId),
               onHome: _goHome,
@@ -103,12 +105,14 @@ class _ResultsActions extends StatelessWidget {
   const _ResultsActions({
     required this.showPracticeSimilar,
     required this.similarBusy,
+    required this.onReview,
     required this.onPracticeSimilar,
     required this.onHome,
   });
 
   final bool showPracticeSimilar;
   final bool similarBusy;
+  final VoidCallback onReview;
   final VoidCallback onPracticeSimilar;
   final VoidCallback onHome;
 
@@ -125,6 +129,11 @@ class _ResultsActions extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            FilledButton.tonal(
+              onPressed: onReview,
+              child: const Text('Review solutions'),
+            ),
+            const SizedBox(height: Spacing.md),
             if (showPracticeSimilar) ...[
               FilledButton.tonal(
                 onPressed: similarBusy ? null : onPracticeSimilar,

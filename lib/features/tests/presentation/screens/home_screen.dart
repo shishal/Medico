@@ -75,6 +75,11 @@ class HomeScreen extends ConsumerWidget {
             child: const Text('Browse tests'),
           ),
           const SizedBox(height: Spacing.md),
+          FilledButton.tonal(
+            onPressed: () => context.go(AppRoutes.bookmarks),
+            child: const Text('My Bookmarks'),
+          ),
+          const SizedBox(height: Spacing.md),
           OutlinedButton(
             onPressed: () => context.go(AppRoutes.profile),
             child: const Text('Profile'),

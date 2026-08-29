@@ -11,7 +11,9 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/upgrade_prompt_screen.dart';
 import '../../features/practice/domain/practice_builder_draft.dart';
 import '../../features/practice/presentation/screens/practice_builder_screen.dart';
+import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
+import '../../features/results/presentation/screens/solution_review_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
 import '../../features/tests/presentation/screens/test_list_screen.dart';
@@ -96,6 +98,13 @@ GoRouter goRouter(Ref ref) {
         },
       ),
       GoRoute(
+        path: AppRoutes.solutionReview,
+        builder: (context, state) {
+          final attemptId = state.pathParameters['attemptId']!;
+          return SolutionReviewScreen(attemptId: attemptId);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.results,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
@@ -107,6 +116,10 @@ GoRouter goRouter(Ref ref) {
             isPractice: isPractice,
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.bookmarks,
+        builder: (context, state) => const BookmarksScreen(),
       ),
       GoRoute(
         path: AppRoutes.profile,

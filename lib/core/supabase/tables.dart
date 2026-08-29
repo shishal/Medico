@@ -12,6 +12,7 @@ abstract final class Tables {
   static const dailyPracticeUsage = 'daily_practice_usage';
   static const attempts = 'attempts';
   static const attemptAnswers = 'attempt_answers';
+  static const bookmarks = 'bookmarks';
 
   /// Safe metadata only (title/type/counts) — all authenticated users.
   /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
@@ -69,6 +70,9 @@ abstract final class QuestionColumns {
   static const difficulty = 'difficulty';
   static const requiredPlan = 'required_plan';
   static const isActive = 'is_active';
+
+  /// PostgREST embed alias: `topic:topics(...)`.
+  static const topicEmbed = 'topic';
 }
 
 abstract final class TestQuestionColumns {
@@ -92,6 +96,9 @@ abstract final class TopicColumns {
   static const subjectId = 'subject_id';
   static const name = 'name';
   static const displayOrder = 'display_order';
+
+  /// PostgREST embed alias: `subject:subjects(...)`.
+  static const subjectEmbed = 'subject';
 }
 
 abstract final class TagColumns {
@@ -133,6 +140,15 @@ abstract final class AttemptColumns {
 
   /// PostgREST embed alias: `test:tests(...)`.
   static const testEmbed = 'test';
+}
+
+abstract final class BookmarkColumns {
+  static const userId = 'user_id';
+  static const questionId = 'question_id';
+  static const createdAt = 'created_at';
+
+  /// PostgREST embed alias: `question:questions(...)`.
+  static const questionEmbed = 'question';
 }
 
 abstract final class AttemptAnswerColumns {

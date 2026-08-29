@@ -363,6 +363,12 @@ set search_path = public as $$
 $$;
 ```
 
+### 6.3 Solution review (Phase 6.3)
+
+The review screen fetches `questions` (including `explanation_text`) through the same client-side RLS path as the test player. Do **not** return explanation content from `get_attempt_results` or any other `security definer` function — that would bypass plan gating.
+
+`tests.show_explanation_level` (`none` / `answer_only` / `full`) is a UI filter on data the student is already allowed to read, not a second access-control check (see `05_PRACTICE_MODE_SPEC.md` §3). Catalog tests default to `full`. If a question row is hidden by RLS, the review screen shows a plan-locked placeholder rather than crashing.
+
 ## 7. Practice Mode additions
 
 Practice Mode is **not** a separate system — a practice session is an ephemeral, personally-owned row in the existing `tests` table, generated on demand from a student's filters, then run through the exact same attempt/timer/scoring flow as a catalog test (with a few behavioral flags different — see `05_PRACTICE_MODE_SPEC.md`). This section adds what's needed to support that: a tagging system, per-plan limits stored as data, and a server-side generator function.

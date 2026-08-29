@@ -109,6 +109,7 @@ void main() {
     expect(find.text('Surgery'), findsOneWidget);
     expect(find.text('1 correct · 1 incorrect · 0 skipped'), findsOneWidget);
     expect(find.text('1 correct · 0 incorrect · 1 skipped'), findsOneWidget);
+    expect(find.text('Review solutions'), findsOneWidget);
   });
 
   testWidgets('practice without negative marking leads with accuracy', (
@@ -136,5 +137,6 @@ void main() {
       '/results/a1?testId=t1&practice=1',
     );
     expect(AppRoutes.resultsPath('a1'), '/results/a1');
+    expect(AppRoutes.solutionReviewPath('a1'), '/results/a1/review');
   });
 }

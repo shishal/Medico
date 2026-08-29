@@ -11,6 +11,8 @@ abstract final class AppRoutes {
   static const testDetail = '/tests/:testId';
   static const testPlayer = '/tests/:testId/play';
   static const results = '/results/:attemptId';
+  static const solutionReview = '/results/:attemptId/review';
+  static const bookmarks = '/bookmarks';
   static const profile = '/profile';
   static const upgrade = '/upgrade';
 
@@ -29,6 +31,9 @@ abstract final class AppRoutes {
     if (params.isEmpty) return '/results/$attemptId';
     return Uri(path: '/results/$attemptId', queryParameters: params).toString();
   }
+
+  static String solutionReviewPath(String attemptId) =>
+      '/results/$attemptId/review';
 
   /// Opens the upgrade prompt for the plan needed to unlock tapped content.
   static String upgradePath(PlanTier requiredPlan) =>

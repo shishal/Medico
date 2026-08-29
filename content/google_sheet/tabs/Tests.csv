@@ -1,4 +1,5 @@
-title,description,test_type,subject_name,required_plan,is_sectional,section_count,questions_per_section,section_duration_minutes,total_duration_minutes,total_questions,correct_marks,incorrect_marks,unattempted_marks,is_live,live_start_at,live_end_at,is_active
-Medicine Mini Drill,Short free drill for Medicine topics.,mini,Medicine,free,FALSE,1,,,20,2,4,-1,0,FALSE,,,TRUE
-Surgery Subject Sample,Subject-wise sample covering General Surgery.,subject,Surgery,pro,FALSE,1,,,30,1,4,-1,0,FALSE,,,TRUE
-NEET-PG Grand Sample,"Sectional grand-test shape (sample: 1 Q shown; scale up later).",grand,,elite,TRUE,5,36,42,210,1,4,-1,0,FALSE,,,TRUE
+﻿title,description,test_type,subject_name,required_plan,is_sectional,section_count,questions_per_section,section_duration_minutes,total_duration_minutes,total_questions,correct_marks,incorrect_marks,unattempted_marks,is_live,live_start_at,live_end_at,is_active
+Medicine Mini Drill,Short free drill covering high-yield Medicine topics (cardiology to neurology).,mini,Medicine,free,FALSE,1,,,20,15,4,-1,0,FALSE,,,TRUE
+Pathology Subject Test,"Subject-wise test covering general pathology, hematopathology, systemic pathology, and neoplasia.",subject,Pathology,pro,FALSE,1,,,30,20,4,-1,0,FALSE,,,TRUE
+NEET-PG Mock Test 1,Mixed-subject mock with +4/-1 marking. Covers pre- and para-clinical plus clinical specialties.,mock,,pro,FALSE,1,,,50,40,4,-1,0,FALSE,,,TRUE
+NEET-PG Grand Test 1,"Full sectional grand test matching the NEET-PG shape: 5 sections x 36 questions x 42 minutes (180 Q, 210 minutes).",grand,,elite,TRUE,5,36,42,210,180,4,-1,0,FALSE,,,TRUE

@@ -1,4 +1,68 @@
 subject_name,name,display_order
+Anatomy,Upper Limb Anatomy,1
+Anatomy,Head and Neck Anatomy,2
+Anatomy,Neuroanatomy,3
+Anatomy,Embryology,4
+Physiology,Cardiovascular Physiology,1
+Physiology,Respiratory Physiology,2
+Physiology,Renal Physiology,3
+Physiology,Neurophysiology,4
+Biochemistry,Carbohydrate Metabolism,1
+Biochemistry,Amino Acid Metabolism,2
+Biochemistry,Molecular Biology,3
+Biochemistry,Vitamins and Nutrition,4
+Pathology,General Pathology,1
+Pathology,Hematopathology,2
+Pathology,Systemic Pathology,3
+Pathology,Neoplasia,4
+Microbiology,Bacteriology,1
+Microbiology,Virology,2
+Microbiology,Parasitology,3
+Microbiology,Immunology,4
+Pharmacology,Autonomic Pharmacology,1
+Pharmacology,Cardiovascular Pharmacology,2
+Pharmacology,Antimicrobial Pharmacology,3
+Pharmacology,CNS Pharmacology,4
+Forensic Medicine,Forensic Thanatology,1
+Forensic Medicine,Forensic Toxicology,2
+Forensic Medicine,Medical Jurisprudence,3
+Community Medicine,Epidemiology,1
+Community Medicine,Biostatistics,2
+Community Medicine,National Health Programs,3
+Community Medicine,Immunization,4
 Medicine,Cardiology,1
 Medicine,Pulmonology,2
+Medicine,Gastroenterology,3
+Medicine,Endocrinology,4
+Medicine,Neurology,5
 Surgery,General Surgery,1
+Surgery,GI Surgery,2
+Surgery,Urology,3
+Surgery,Neurosurgery,4
+Obstetrics & Gynaecology,Obstetrics,1
+Obstetrics & Gynaecology,Gynaecology,2
+Obstetrics & Gynaecology,Labour and Delivery,3
+Pediatrics,Neonatology,1
+Pediatrics,Pediatric Infectious Disease,2
+Pediatrics,Pediatric Growth and Development,3
+Ophthalmology,Cornea and Conjunctiva,1
+Ophthalmology,Glaucoma,2
+Ophthalmology,Retina,3
+ENT,Otology,1
+ENT,Rhinology,2
+ENT,Laryngology,3
+Orthopedics,Fracture Management,1
+Orthopedics,Bone and Joint Infection,2
+Orthopedics,Spine Orthopedics,3
+Dermatology,Papulosquamous Disorders,1
+Dermatology,Cutaneous Infections,2
+Dermatology,Bullous Disorders,3
+Psychiatry,Mood Disorders,1
+Psychiatry,Schizophrenia Spectrum,2
+Psychiatry,Anxiety and Substance Use,3
+Anesthesia,General Anesthesia,1
+Anesthesia,Regional Anesthesia,2
+Anesthesia,Airway Management,3
+Radiology,Chest Radiology,1
+Radiology,Abdominal Radiology,2
+Radiology,Neuroradiology,3

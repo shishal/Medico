@@ -1,4 +1,20 @@
 name,display_order
-Medicine,1
-Surgery,2
-Pharmacology,3
+Anatomy,1
+Physiology,2
+Biochemistry,3
+Pathology,4
+Microbiology,5
+Pharmacology,6
+Forensic Medicine,7
+Community Medicine,8
+Medicine,9
+Surgery,10
+Obstetrics & Gynaecology,11
+Pediatrics,12
+Ophthalmology,13
+ENT,14
+Orthopedics,15
+Dermatology,16
+Psychiatry,17
+Anesthesia,18
+Radiology,19

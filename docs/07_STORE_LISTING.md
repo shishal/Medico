@@ -1,0 +1,207 @@
+# Store listing — Phase 9.2
+
+Paste these into Play Console and App Store Connect. Screenshot **sizes and
+shot list** are below; capture the images from a real build before Phase 9.4
+(do not upload the feature graphic as a screenshot — Play treats those as
+separate slots).
+
+**Brand color:** `#0D7377` (same as `AppTheme.seedColor`).
+**Launcher / Play icon source:** `assets/branding/app_icon.png`.
+**Play assets:** `store/play/icon-512.png`, `store/play/feature-graphic-1024x500.png`.
+
+Payments happen on the website, not in the app. Do not mention in-app
+purchase, a price next to a Buy button, or “subscribe in the app.” Phase 9.4
+notes that first-time EdTech reviews often ask for a **privacy policy** and a
+visible way to **manage / cancel** a plan — publish those pages before you
+submit, even though billing is external.
+
+Placeholder URLs below (`https://example.com/...`) must be replaced with the
+real hosted pages before submission.
+
+---
+
+## Google Play
+
+### App name
+Medico
+
+### Short description (80 characters max)
+
+```
+NEET-PG QBank: timed mocks, grand tests, and practice with explanations.
+```
+
+(72 characters including spaces.)
+
+### Full description
+
+```
+Medico is a NEET-PG test-prep QBank for sitting timed papers the way the real exam works — then reviewing every answer.
+
+WHAT YOU CAN DO
+• Browse Mini, Subject, Mock, and Grand tests. Grand tests follow the real NEET-PG shape: five timed sections.
+• Start a test only after you have seen duration, marking scheme, and (for sectional papers) the section-lock warning.
+• Sit the paper with a question palette, mark-for-review, and a timer that auto-submits at zero.
+• Practice on your own filters: subject, topic, difficulty, tutor mode (see the answer now) or exam mode (see everything at the end).
+• Open results for score, accuracy, percentile, and a subject-wise breakdown.
+• Bookmark questions from review and come back to them later.
+
+PLANS
+Download is free. A Free plan lets you try catalog tests and short practice sessions. Pro and Elite unlock more of the QBank, longer practice, full explanations, and extra builder controls (tags, timer, negative marking).
+
+Plans are purchased on our website in the device browser — not inside this app. After you pay, return to Medico and refresh your profile to see the new plan.
+
+PRIVACY AND ACCOUNT
+You sign in with email. We do not show ads. See the privacy policy for what we store and why.
+
+Privacy policy: https://example.com/privacy
+Manage or cancel a plan: https://example.com/account
+```
+
+### Category
+Education
+
+### Tags (Play, optional)
+Education, Medical, Exam prep, NEET-PG
+
+### Contact
+Support email: *(your support address)*
+Website: https://example.com
+
+### Graphics to upload
+| Slot | File | Size |
+|---|---|---|
+| App icon | `store/play/icon-512.png` | 512 × 512, 32-bit PNG |
+| Feature graphic | `store/play/feature-graphic-1024x500.png` | 1024 × 500 |
+| Phone screenshots | Capture per shot list below | At least 2; 16:9 or 9:16; 320–3840 px per side |
+
+Play also accepts a 7-inch / 10-inch tablet screenshot if you ever ship a
+tablet layout; phone shots are enough for a phone-first app.
+
+---
+
+## App Store
+
+### Name
+Medico
+
+### Subtitle (30 characters max)
+
+```
+NEET-PG QBank & Mock Tests
+```
+
+(26 characters including spaces.)
+
+### Promotional text (170 characters max, optional, editable without a new review)
+
+```
+Sit NEET-PG-style mocks and grand tests, then review every answer. Practice in tutor or exam mode. Free to download — unlock more of the QBank on our website.
+```
+
+### Description
+
+```
+Medico is a NEET-PG QBank built around sitting a paper, not flipping a flashcard deck.
+
+Take Mini, Subject, Mock, and Grand tests. Grand tests use five timed sections, matching the shape of the real exam. Before you start, you see duration, marking, and the section-lock rule so a section cannot be reopened after its time is up.
+
+Practice on your terms: pick subject and topic, then tutor mode (answer as you go) or exam mode (review at the end). Results show score, accuracy, percentile, and a subject-wise split. Bookmark any question from review.
+
+A Free plan is included. Pro and Elite unlock more tests, longer practice, and full explanations. Plans are bought on our website in Safari — this app does not charge inside the binary.
+
+Privacy policy: https://example.com/privacy
+Manage or cancel a plan: https://example.com/account
+```
+
+### Keywords (100 characters max, comma-separated, no spaces after commas preferred)
+
+```
+QBank,mock test,medical exam,PG preparation,grand test,MCQ,residency
+```
+
+Do **not** repeat the app name or “NEET-PG” here — those already sit in the
+name/subtitle. Trim or swap words so the whole string stays ≤ 100 characters.
+
+Current string is 69 characters.
+
+### Category
+Primary: Education
+Secondary: Medical (if available in your developer account)
+
+### Age rating
+This is an education QBank with no user-generated public chat and no
+controversial medical imagery beyond standard exam stems. Complete Apple’s
+questionnaire honestly; typical result is 4+.
+
+### What’s New (1.0.0)
+
+```
+First release: catalog tests, practice builder, results, bookmarks, and plan comparison.
+```
+
+### App Review notes (paste into App Review Information)
+
+```
+This app does not sell subscriptions or digital goods inside the binary. Tapping Upgrade opens our website checkout in the system browser (Razorpay). Sign in with the review account below to browse Free-tier tests without paying.
+
+Demo account: (create a Free-plan reviewer account and paste email/password here)
+Privacy policy: https://example.com/privacy
+```
+
+---
+
+## Screenshot shot list (both stores)
+
+Capture on a **physical device or a store-sized emulator**, light theme,
+signed in as a Free user who has at least one completed attempt (so results
+and review are not empty). Save PNG files under `store/screenshots/` using
+the names below.
+
+**Phone sizes to capture**
+- Play: 1080 × 1920 (9:16)
+- App Store 6.7": 1290 × 2796 (e.g. iPhone 15 Pro Max)
+- App Store 6.5": 1284 × 2778 if Apple still requires that slot
+
+Do not add device bezels unless you are using Apple’s official screenshot
+templates. Prefer raw full-screen captures of the Flutter UI.
+
+| File | Screen | Caption overlay (optional, keep short) |
+|---|---|---|
+| `01-tests.png` | Test list (Mini / Subject / Mock / Grand) | “Mini to Grand — the real exam shape” |
+| `02-instructions.png` | Test instructions (sectional warning visible) | “Rules before the clock starts” |
+| `03-player.png` | Test player, a question with palette | “Palette, mark for review, live timer” |
+| `04-practice.png` | Practice builder | “Tutor or exam mode, your filters” |
+| `05-results.png` | Results summary with subject breakdown | “Score, accuracy, percentile” |
+| `06-review.png` | Solution review (answer + explanation if plan allows) | “Review every question” |
+| `07-plans.png` | Plans screen (no price, no Buy — link-out CTA only) | “Compare Free, Pro, and Elite” |
+
+Play requires at least two phone screenshots; upload 01–05 as the core set.
+App Store looks more complete with 5–8.
+
+**How to capture on Android (emulator)**
+
+```
+flutter install
+# Then in another terminal, after you have the screen on-device:
+adb exec-out screencap -p > store/screenshots/01-tests.png
+```
+
+The debug banner is already off (`debugShowCheckedModeBanner: false`). Still
+capture from a **profile or release** build so the yellow slow-mode banner
+is absent.
+
+---
+
+## Regenerating brand art
+
+If you change the seed color or the mark:
+
+```
+scripts/.venv/bin/python scripts/generate_brand_assets.py
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+```
+
+Then visually check: home-screen icon is a white **M** on teal, not the
+Flutter logo; cold start is teal, not white.

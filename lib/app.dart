@@ -15,6 +15,7 @@ class MedicoApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Medico',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode,

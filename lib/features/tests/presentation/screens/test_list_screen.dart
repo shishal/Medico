@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../profile/domain/plan_tier.dart';
+import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../domain/catalog_test.dart';
 import '../../domain/test_type.dart';
 import '../providers/catalog_tests_provider.dart';
 
-/// Tabbed catalog of tests the user's plan can access (RLS filters the rest).
+/// Tabbed catalog: unlocked tests + locked teasers for higher plans.
 class TestListScreen extends ConsumerWidget {
   const TestListScreen({super.key});
 
@@ -23,6 +25,9 @@ class TestListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final testsAsync = ref.watch(catalogTestsProvider);
+    // Display-only plan for lock icons — RLS still gates real content.
+    // Prefer loaded plan; while loading/error, treat as free (more locks, safer UX).
+    final userPlan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
 
     return DefaultTabController(
       length: _tabs.length,
@@ -56,6 +61,7 @@ class TestListScreen extends ConsumerWidget {
             children: [
               for (final tab in _tabs)
                 _TestTypeList(
+                  userPlan: userPlan,
                   tests: tab.type == null
                       ? tests
                       : tests.where((t) => t.testType == tab.type).toList(),
@@ -76,9 +82,10 @@ class _TestTab {
 }
 
 class _TestTypeList extends StatelessWidget {
-  const _TestTypeList({required this.tests});
+  const _TestTypeList({required this.tests, required this.userPlan});
 
   final List<CatalogTest> tests;
+  final PlanTier userPlan;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +94,7 @@ class _TestTypeList extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(Spacing.lg),
           child: Text(
-            'No tests available on your plan for this type yet.',
+            'No tests of this type yet.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -101,52 +108,86 @@ class _TestTypeList extends StatelessWidget {
       padding: const EdgeInsets.all(Spacing.md),
       itemCount: tests.length,
       separatorBuilder: (_, _) => const SizedBox(height: Spacing.sm),
-      itemBuilder: (context, index) => _TestCard(test: tests[index]),
+      itemBuilder: (context, index) => _TestCard(
+        test: tests[index],
+        userPlan: userPlan,
+      ),
     );
   }
 }
 
 class _TestCard extends StatelessWidget {
-  const _TestCard({required this.test});
+  const _TestCard({required this.test, required this.userPlan});
 
   final CatalogTest test;
+  final PlanTier userPlan;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final locked = test.isLockedFor(userPlan);
 
     return Card(
+      // Locked cards stay tappable so users reach the upgrade prompt.
       child: InkWell(
         borderRadius: BorderRadius.circular(Spacing.sm),
-        onTap: () => context.go(AppRoutes.testPlayerPath(test.id)),
-        child: Padding(
-          padding: const EdgeInsets.all(Spacing.md),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _TypeBadge(type: test.testType),
-                    const SizedBox(height: Spacing.sm),
-                    Text(test.title, style: textTheme.titleMedium),
-                    const SizedBox(height: Spacing.xs),
-                    Text(
-                      '${test.totalQuestions} questions · ${test.durationLabel}',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+        onTap: () {
+          if (locked) {
+            context.go(AppRoutes.upgradePath(test.requiredPlan));
+          } else {
+            // Instructions first — never jump straight into a timed test.
+            context.go(AppRoutes.testDetailPath(test.id));
+          }
+        },
+        child: Opacity(
+          opacity: locked ? 0.72 : 1,
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _TypeBadge(type: test.testType),
+                      const SizedBox(height: Spacing.sm),
+                      Text(
+                        locked
+                            ? '${test.title} 🔒'
+                            : test.title,
+                        style: textTheme.titleMedium,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: Spacing.xs),
+                      if (locked) ...[
+                        Text(
+                          'Upgrade to ${test.requiredPlan.label}',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: Spacing.xs),
+                      ],
+                      Text(
+                        '${test.totalQuestions} questions · '
+                        '${test.durationLabel}',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
+                Icon(
+                  locked ? Icons.lock_outline : Icons.chevron_right,
+                  color: locked
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -12,7 +12,7 @@ part 'current_plan_provider.g.dart';
 ///
 /// Usage from any screen:
 /// ```dart
-/// final plan = ref.watch(currentPlanProvider).valueOrNull;
+/// final plan = ref.watch(currentPlanProvider).value;
 /// if (plan == PlanTier.free) { /* show lock */ }
 /// ```
 @Riverpod(keepAlive: true)

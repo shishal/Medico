@@ -8,24 +8,27 @@ part of 'catalog_tests_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Catalog tests the current user's plan is allowed to see (via RLS).
+/// Catalog teasers (including locked higher-plan tests) for the signed-in user.
 ///
 /// Rebuilds on sign-in/out. Call [refresh] after you expect the set to change
-/// (e.g. plan upgrade reflected in Supabase).
+/// (e.g. plan upgrade reflected in Supabase). Lock state is computed in the
+/// list UI from [currentPlanProvider], not here.
 
 @ProviderFor(CatalogTestsNotifier)
 final catalogTestsProvider = CatalogTestsNotifierProvider._();
 
-/// Catalog tests the current user's plan is allowed to see (via RLS).
+/// Catalog teasers (including locked higher-plan tests) for the signed-in user.
 ///
 /// Rebuilds on sign-in/out. Call [refresh] after you expect the set to change
-/// (e.g. plan upgrade reflected in Supabase).
+/// (e.g. plan upgrade reflected in Supabase). Lock state is computed in the
+/// list UI from [currentPlanProvider], not here.
 final class CatalogTestsNotifierProvider
     extends $AsyncNotifierProvider<CatalogTestsNotifier, List<CatalogTest>> {
-  /// Catalog tests the current user's plan is allowed to see (via RLS).
+  /// Catalog teasers (including locked higher-plan tests) for the signed-in user.
   ///
   /// Rebuilds on sign-in/out. Call [refresh] after you expect the set to change
-  /// (e.g. plan upgrade reflected in Supabase).
+  /// (e.g. plan upgrade reflected in Supabase). Lock state is computed in the
+  /// list UI from [currentPlanProvider], not here.
   CatalogTestsNotifierProvider._()
     : super(
         from: null,
@@ -48,10 +51,11 @@ final class CatalogTestsNotifierProvider
 String _$catalogTestsNotifierHash() =>
     r'22367ea96150411a24a70559b468005903d917b3';
 
-/// Catalog tests the current user's plan is allowed to see (via RLS).
+/// Catalog teasers (including locked higher-plan tests) for the signed-in user.
 ///
 /// Rebuilds on sign-in/out. Call [refresh] after you expect the set to change
-/// (e.g. plan upgrade reflected in Supabase).
+/// (e.g. plan upgrade reflected in Supabase). Lock state is computed in the
+/// list UI from [currentPlanProvider], not here.
 
 abstract class _$CatalogTestsNotifier
     extends $AsyncNotifier<List<CatalogTest>> {

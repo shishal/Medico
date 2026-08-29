@@ -2,6 +2,10 @@
 abstract final class Tables {
   static const profiles = 'profiles';
   static const tests = 'tests';
+
+  /// Safe metadata only (title/type/counts) — all authenticated users.
+  /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
+  static const catalogTestTeasers = 'catalog_test_teasers';
 }
 
 abstract final class ProfileColumns {
@@ -22,8 +26,14 @@ abstract final class TestColumns {
   static const subjectId = 'subject_id';
   static const requiredPlan = 'required_plan';
   static const isSectional = 'is_sectional';
+  static const sectionCount = 'section_count';
+  static const questionsPerSection = 'questions_per_section';
+  static const sectionDurationMinutes = 'section_duration_minutes';
   static const totalDurationMinutes = 'total_duration_minutes';
   static const totalQuestions = 'total_questions';
+  static const correctMarks = 'correct_marks';
+  static const incorrectMarks = 'incorrect_marks';
+  static const unattemptedMarks = 'unattempted_marks';
   static const isActive = 'is_active';
   static const createdAt = 'created_at';
 }

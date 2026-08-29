@@ -254,6 +254,32 @@ create policy "own bookmarks all" on bookmarks for all using (auth.uid() = user_
 
 **Important note for the AI agent doing this task**: `questions.explanation_text` and `explanation_video_url` are covered by the same plan-gated SELECT policy as the rest of the row — do not create a separate, looser policy for "just the explanation," even if a future task asks for a "preview the solution" feature. If you need a genuine free preview of a paid question, that should be a deliberate, separate `is_preview` boolean column with its own narrow policy, not a loosened blanket policy.
 
+### 5.1 Catalog test teasers (Phase 4.2)
+
+Free users must *see that* pro/elite tests exist (locked cards), without getting question content. Do **not** loosen the `tests` SELECT policy — that would expose marking scheme / description and is the wrong boundary. Use a view of safe columns only; `test_questions` / `questions` stay plan-gated.
+
+```sql
+create or replace view public.catalog_test_teasers
+with (security_invoker = false) as
+select
+  id,
+  title,
+  test_type,
+  required_plan,
+  total_questions,
+  total_duration_minutes,
+  is_sectional,
+  is_active,
+  created_at
+from public.tests
+where is_active;
+
+grant select on public.catalog_test_teasers to authenticated;
+grant select on public.catalog_test_teasers to service_role;
+```
+
+`security_invoker = false` means the view runs as its owner and bypasses RLS on `tests` — only for the columns listed. Validation: as a free user, `select * from catalog_test_teasers` returns pro/elite titles; `select * from test_questions where test_id = '<pro-test-id>'` returns nothing.
+
 ## 6. Percentile calculation (simple version for Phase 1)
 
 ```sql

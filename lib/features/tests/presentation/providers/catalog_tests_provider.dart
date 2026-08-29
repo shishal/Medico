@@ -7,10 +7,11 @@ import '../../domain/catalog_test.dart';
 
 part 'catalog_tests_provider.g.dart';
 
-/// Catalog tests the current user's plan is allowed to see (via RLS).
+/// Catalog teasers (including locked higher-plan tests) for the signed-in user.
 ///
 /// Rebuilds on sign-in/out. Call [refresh] after you expect the set to change
-/// (e.g. plan upgrade reflected in Supabase).
+/// (e.g. plan upgrade reflected in Supabase). Lock state is computed in the
+/// list UI from [currentPlanProvider], not here.
 @Riverpod(keepAlive: true)
 class CatalogTestsNotifier extends _$CatalogTestsNotifier {
   @override

@@ -12,6 +12,13 @@ enum PlanTier {
     };
   }
 
+  /// Same ordering as Postgres `plan_rank()` — free < pro < elite.
+  /// Enum declaration order matches, so [index] is the rank.
+  int get rank => index;
+
+  /// Whether this plan can open content that requires [required].
+  bool covers(PlanTier required) => rank >= required.rank;
+
   /// Short label for UI (lock badges, profile header, etc.).
   String get label => switch (this) {
         PlanTier.free => 'Free',

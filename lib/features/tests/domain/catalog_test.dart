@@ -2,15 +2,15 @@ import '../../../core/supabase/tables.dart';
 import '../../profile/domain/plan_tier.dart';
 import 'test_type.dart';
 
-/// A shared catalog row from `tests` (not an ephemeral practice session).
+/// Catalog list row from `catalog_test_teasers` (safe metadata only).
 ///
-/// RLS already hides rows the user's plan cannot access — this model is what
-/// comes back after that filter, for list UI only.
+/// Teasers are visible to every signed-in user. Use [isLockedFor] with the
+/// user's effective plan to show a lock — do not treat presence in this list
+/// as permission to open questions (those stay RLS-gated on `tests`).
 class CatalogTest {
   const CatalogTest({
     required this.id,
     required this.title,
-    this.description,
     required this.testType,
     required this.requiredPlan,
     required this.totalDurationMinutes,
@@ -20,12 +20,14 @@ class CatalogTest {
 
   final String id;
   final String title;
-  final String? description;
   final TestType testType;
   final PlanTier requiredPlan;
   final int totalDurationMinutes;
   final int totalQuestions;
   final bool isSectional;
+
+  /// True when [userPlan] is below [requiredPlan] — show lock + upgrade CTA.
+  bool isLockedFor(PlanTier userPlan) => !userPlan.covers(requiredPlan);
 
   /// e.g. "45 min" or "1h 30m" for the list subtitle.
   String get durationLabel {
@@ -40,7 +42,6 @@ class CatalogTest {
     return CatalogTest(
       id: json[TestColumns.id] as String,
       title: json[TestColumns.title] as String,
-      description: json[TestColumns.description] as String?,
       testType: TestType.fromString(json[TestColumns.testType] as String),
       requiredPlan: PlanTier.fromString(
         json[TestColumns.requiredPlan] as String? ?? 'free',

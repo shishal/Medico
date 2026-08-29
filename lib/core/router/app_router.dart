@@ -6,9 +6,12 @@ import '../../features/auth/presentation/providers/auth_session_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/profile/domain/plan_tier.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/upgrade_prompt_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
+import '../../features/tests/presentation/screens/test_instructions_screen.dart';
 import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import 'app_routes.dart';
@@ -67,11 +70,19 @@ GoRouter goRouter(Ref ref) {
         path: AppRoutes.testList,
         builder: (context, state) => const TestListScreen(),
       ),
+      // More specific `/play` route before bare `:testId` so paths match correctly.
       GoRoute(
         path: AppRoutes.testPlayer,
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestPlayerScreen(testId: testId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.testDetail,
+        builder: (context, state) {
+          final testId = state.pathParameters['testId']!;
+          return TestInstructionsScreen(testId: testId);
         },
       ),
       GoRoute(
@@ -84,6 +95,16 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.upgrade,
+        builder: (context, state) {
+          final planParam = state.uri.queryParameters['plan'];
+          final requiredPlan = planParam != null
+              ? PlanTier.fromString(planParam)
+              : PlanTier.pro;
+          return UpgradePromptScreen(requiredPlan: requiredPlan);
+        },
       ),
     ],
   );

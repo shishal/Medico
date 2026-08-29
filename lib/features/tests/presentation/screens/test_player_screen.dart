@@ -20,7 +20,7 @@ class TestPlayerScreen extends StatelessWidget {
         title: Text('Test: $testId'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.testList),
+          onPressed: () => context.go(AppRoutes.testDetailPath(testId)),
         ),
       ),
       body: Padding(

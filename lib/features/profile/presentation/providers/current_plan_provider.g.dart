@@ -15,7 +15,7 @@ part of 'current_plan_provider.dart';
 ///
 /// Usage from any screen:
 /// ```dart
-/// final plan = ref.watch(currentPlanProvider).valueOrNull;
+/// final plan = ref.watch(currentPlanProvider).value;
 /// if (plan == PlanTier.free) { /* show lock */ }
 /// ```
 
@@ -29,7 +29,7 @@ final currentPlanProvider = CurrentPlanProvider._();
 ///
 /// Usage from any screen:
 /// ```dart
-/// final plan = ref.watch(currentPlanProvider).valueOrNull;
+/// final plan = ref.watch(currentPlanProvider).value;
 /// if (plan == PlanTier.free) { /* show lock */ }
 /// ```
 
@@ -48,7 +48,7 @@ final class CurrentPlanProvider
   ///
   /// Usage from any screen:
   /// ```dart
-  /// final plan = ref.watch(currentPlanProvider).valueOrNull;
+  /// final plan = ref.watch(currentPlanProvider).value;
   /// if (plan == PlanTier.free) { /* show lock */ }
   /// ```
   CurrentPlanProvider._()
@@ -76,4 +76,4 @@ final class CurrentPlanProvider
   }
 }
 
-String _$currentPlanHash() => r'e1f3e4c92f7430887debf41c2a7c95bad8d14ac2';
+String _$currentPlanHash() => r'53f4f336f994e4faba672303cd84cf94c2e8133c';

@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../domain/attempt.dart';
+import '../domain/attempt_status.dart';
 import '../domain/catalog_test.dart';
 import '../domain/player_question.dart';
 import '../domain/test_detail.dart';
@@ -21,6 +23,22 @@ class TestsRepository {
   TestsRepository(this._client);
 
   final SupabaseClient _client;
+
+  static const _attemptColumns =
+      '${AttemptColumns.id},'
+      '${AttemptColumns.userId},'
+      '${AttemptColumns.testId},'
+      '${AttemptColumns.status},'
+      '${AttemptColumns.startedAt}';
+
+  static const _attemptListSelect =
+      '$_attemptColumns,'
+      '${AttemptColumns.testEmbed}:${Tables.tests}('
+      '${TestColumns.title},'
+      '${TestColumns.isEphemeralPractice}'
+      ')';
+
+  String? get currentUserId => _client.auth.currentUser?.id;
 
   /// Active catalog teasers (locked + unlocked). Caller applies plan locks in UI.
   Future<Result<List<CatalogTest>>> fetchCatalogTests() async {
@@ -164,6 +182,129 @@ class TestsRepository {
       return const Failure('Could not load this test. Please try again.');
     } catch (_) {
       return const Failure('Could not load this test. Please try again.');
+    }
+  }
+
+  /// Existing in-progress attempt for this test, or null if none.
+  Future<Result<Attempt?>> findInProgressAttempt(String testId) async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final rows = await _client
+          .from(Tables.attempts)
+          .select(_attemptColumns)
+          .eq(AttemptColumns.userId, userId)
+          .eq(AttemptColumns.testId, testId)
+          .eq(AttemptColumns.status, AttemptStatus.inProgress.dbValue)
+          .limit(1);
+
+      final list = (rows as List<dynamic>).cast<Map<String, dynamic>>();
+      if (list.isEmpty) return const Success(null);
+      return Success(Attempt.fromJson(list.first));
+    } on PostgrestException catch (_) {
+      return const Failure('Could not check for an existing attempt.');
+    } catch (_) {
+      return const Failure('Could not check for an existing attempt.');
+    }
+  }
+
+  Future<Result<Attempt?>> fetchAttempt(String attemptId) async {
+    if (currentUserId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final rows = await _client
+          .from(Tables.attempts)
+          .select(_attemptColumns)
+          .eq(AttemptColumns.id, attemptId)
+          .limit(1);
+
+      final list = (rows as List<dynamic>).cast<Map<String, dynamic>>();
+      if (list.isEmpty) return const Success(null);
+      return Success(Attempt.fromJson(list.first));
+    } on PostgrestException catch (_) {
+      return const Failure('Could not load this attempt.');
+    } catch (_) {
+      return const Failure('Could not load this attempt.');
+    }
+  }
+
+  /// Open attempts for the resume banner. Title comes from an embedded test.
+  Future<Result<List<Attempt>>> listInProgressAttempts() async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final rows = await _client
+          .from(Tables.attempts)
+          .select(_attemptListSelect)
+          .eq(AttemptColumns.userId, userId)
+          .eq(AttemptColumns.status, AttemptStatus.inProgress.dbValue)
+          .order(AttemptColumns.startedAt, ascending: false);
+
+      final attempts = (rows as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map(Attempt.fromJson)
+          .toList();
+      return Success(attempts);
+    } on PostgrestException catch (_) {
+      return const Failure('Could not load in-progress tests.');
+    } catch (_) {
+      return const Failure('Could not load in-progress tests.');
+    }
+  }
+
+  /// Resume the existing in-progress row, or insert a new one.
+  ///
+  /// Duplicate inserts hit `idx_attempts_one_in_progress` (23505) and fall
+  /// back to a re-fetch so two taps cannot create two rows.
+  Future<Result<Attempt>> startOrResumeAttempt(String testId) async {
+    final existing = await findInProgressAttempt(testId);
+    switch (existing) {
+      case Failure(:final message):
+        return Failure(message);
+      case Success(:final value) when value != null:
+        return Success(value);
+      case Success():
+        return _createAttempt(testId);
+    }
+  }
+
+  Future<Result<Attempt>> _createAttempt(String testId) async {
+    final userId = currentUserId;
+    if (userId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final row = await _client
+          .from(Tables.attempts)
+          .insert({
+            AttemptColumns.userId: userId,
+            AttemptColumns.testId: testId,
+            AttemptColumns.status: AttemptStatus.inProgress.dbValue,
+          })
+          .select(_attemptColumns)
+          .single();
+
+      return Success(Attempt.fromJson(row));
+    } on PostgrestException catch (e) {
+      // Unique violation — another request created the row first.
+      if (e.code == '23505') {
+        final retry = await findInProgressAttempt(testId);
+        if (retry is Success<Attempt?> && retry.value != null) {
+          return Success(retry.value!);
+        }
+      }
+      return const Failure('Could not start this test. Please try again.');
+    } catch (_) {
+      return const Failure('Could not start this test. Please try again.');
     }
   }
 }

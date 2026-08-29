@@ -8,30 +8,18 @@ part of 'player_session_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-/// its own notifier). Branches on `feedback_timing` inside
-/// [PlayerSessionState] — there is no second Tutor Mode screen.
-///
-/// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-/// session the UI needs for 4B.3.
+/// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+/// questions, and autosaves answers to a local JSON file (spec §4).
 
 @ProviderFor(PlayerSession)
 final playerSessionProvider = PlayerSessionFamily._();
 
-/// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-/// its own notifier). Branches on `feedback_timing` inside
-/// [PlayerSessionState] — there is no second Tutor Mode screen.
-///
-/// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-/// session the UI needs for 4B.3.
+/// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+/// questions, and autosaves answers to a local JSON file (spec §4).
 final class PlayerSessionProvider
     extends $AsyncNotifierProvider<PlayerSession, PlayerSessionState> {
-  /// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-  /// its own notifier). Branches on `feedback_timing` inside
-  /// [PlayerSessionState] — there is no second Tutor Mode screen.
-  ///
-  /// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-  /// session the UI needs for 4B.3.
+  /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+  /// questions, and autosaves answers to a local JSON file (spec §4).
   PlayerSessionProvider._({
     required PlayerSessionFamily super.from,
     required String super.argument,
@@ -68,14 +56,10 @@ final class PlayerSessionProvider
   }
 }
 
-String _$playerSessionHash() => r'd8162bd2f58c38b1f9441532a4cd5c063e8e043d';
+String _$playerSessionHash() => r'7152254c06505ff069f5850b67fdac69fe028e1b';
 
-/// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-/// its own notifier). Branches on `feedback_timing` inside
-/// [PlayerSessionState] — there is no second Tutor Mode screen.
-///
-/// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-/// session the UI needs for 4B.3.
+/// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+/// questions, and autosaves answers to a local JSON file (spec §4).
 
 final class PlayerSessionFamily extends $Family
     with
@@ -95,12 +79,8 @@ final class PlayerSessionFamily extends $Family
         isAutoDispose: false,
       );
 
-  /// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-  /// its own notifier). Branches on `feedback_timing` inside
-  /// [PlayerSessionState] — there is no second Tutor Mode screen.
-  ///
-  /// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-  /// session the UI needs for 4B.3.
+  /// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+  /// questions, and autosaves answers to a local JSON file (spec §4).
 
   PlayerSessionProvider call(String testId) =>
       PlayerSessionProvider._(argument: testId, from: this);
@@ -109,12 +89,8 @@ final class PlayerSessionFamily extends $Family
   String toString() => r'playerSessionProvider';
 }
 
-/// In-memory player for one [testId] (a Riverpod *family* — each testId gets
-/// its own notifier). Branches on `feedback_timing` inside
-/// [PlayerSessionState] — there is no second Tutor Mode screen.
-///
-/// Attempt creation / autosave is Phase 5.1; this notifier only holds the
-/// session the UI needs for 4B.3.
+/// Player for one [testId]. Creates or resumes an `attempts` row, downloads
+/// questions, and autosaves answers to a local JSON file (spec §4).
 
 abstract class _$PlayerSession extends $AsyncNotifier<PlayerSessionState> {
   late final _$args = ref.$arg as String;

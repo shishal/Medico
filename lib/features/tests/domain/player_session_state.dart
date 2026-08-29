@@ -1,4 +1,6 @@
 import '../../practice/domain/practice_enums.dart';
+import 'attempt_status.dart';
+import 'local_attempt_snapshot.dart';
 import 'palette_cell.dart';
 import 'player_question.dart';
 import 'question_answer.dart';
@@ -31,10 +33,11 @@ enum OptionVisual {
 
 /// In-memory player session. Mutations return a new instance (immutable).
 ///
-/// Attempt rows, autosave, and timers are Phase 5 — this type is the
-/// behavioral core that 4B.3 branches on [feedbackTiming].
+/// Answers live here and in a local JSON snapshot (Phase 5.1). Timers and
+/// server-side scoring arrive in 5.3 / 6.1.
 class PlayerSessionState {
   const PlayerSessionState({
+    required this.attemptId,
     required this.testId,
     required this.title,
     required this.feedbackTiming,
@@ -43,11 +46,21 @@ class PlayerSessionState {
     required this.questions,
     required this.answers,
     required this.currentIndex,
+    required this.startedAt,
+    required this.sectionStartedAt,
+    this.localStatus = LocalAttemptStatus.inProgress,
   });
 
-  factory PlayerSessionState.fromBundle(TestPlayerBundle bundle) {
+  factory PlayerSessionState.fromBundle(
+    TestPlayerBundle bundle, {
+    String attemptId = 'local',
+    DateTime? startedAt,
+  }) {
     final firstId = bundle.questions.first.id;
+    final start = startedAt ?? DateTime.now();
+    final firstSection = bundle.questions.first.sectionNumber;
     return PlayerSessionState(
+      attemptId: attemptId,
       testId: bundle.testId,
       title: bundle.title,
       feedbackTiming: bundle.feedbackTiming,
@@ -56,9 +69,38 @@ class PlayerSessionState {
       questions: bundle.questions,
       answers: {firstId: const QuestionAnswer(visited: true)},
       currentIndex: 0,
+      startedAt: start,
+      sectionStartedAt: {firstSection: start},
     );
   }
 
+  factory PlayerSessionState.fromSnapshot(LocalAttemptSnapshot snapshot) {
+    final clamped = snapshot.questions.isEmpty
+        ? 0
+        : snapshot.currentIndex.clamp(0, snapshot.questions.length - 1);
+    final answers = Map<String, QuestionAnswer>.from(snapshot.answers);
+    if (snapshot.questions.isNotEmpty) {
+      final current = snapshot.questions[clamped];
+      answers[current.id] = (answers[current.id] ?? const QuestionAnswer())
+          .copyWith(visited: true);
+    }
+    return PlayerSessionState(
+      attemptId: snapshot.attemptId,
+      testId: snapshot.testId,
+      title: snapshot.title,
+      feedbackTiming: snapshot.feedbackTiming,
+      explanationLevel: snapshot.explanationLevel,
+      isEphemeralPractice: snapshot.isEphemeralPractice,
+      questions: snapshot.questions,
+      answers: answers,
+      currentIndex: clamped,
+      startedAt: snapshot.startedAt,
+      sectionStartedAt: snapshot.sectionStartedAt,
+      localStatus: snapshot.localStatus,
+    );
+  }
+
+  final String attemptId;
   final String testId;
   final String title;
   final FeedbackTiming feedbackTiming;
@@ -67,6 +109,9 @@ class PlayerSessionState {
   final List<PlayerQuestion> questions;
   final Map<String, QuestionAnswer> answers;
   final int currentIndex;
+  final DateTime startedAt;
+  final Map<int, DateTime> sectionStartedAt;
+  final LocalAttemptStatus localStatus;
 
   bool get isTutorMode => feedbackTiming == FeedbackTiming.immediate;
 
@@ -168,13 +213,7 @@ class PlayerSessionState {
   PlayerSessionState goTo(int index) {
     if (index < 0 || index >= questions.length) return this;
     final target = questions[index];
-    return PlayerSessionState(
-      testId: testId,
-      title: title,
-      feedbackTiming: feedbackTiming,
-      explanationLevel: explanationLevel,
-      isEphemeralPractice: isEphemeralPractice,
-      questions: questions,
+    return copyWith(
       answers: {
         ...answers,
         target.id: answerFor(target).copyWith(visited: true),
@@ -183,16 +222,80 @@ class PlayerSessionState {
     );
   }
 
-  PlayerSessionState _writeCurrent(QuestionAnswer next) {
-    return PlayerSessionState(
+  PlayerSessionState addTimeToCurrent(int seconds) {
+    if (seconds <= 0) return this;
+    return _writeCurrent(currentAnswer.addTime(seconds));
+  }
+
+  /// Re-apply saved answers onto a freshly downloaded question list.
+  PlayerSessionState restoreProgress({
+    required Map<String, QuestionAnswer> savedAnswers,
+    required int savedIndex,
+    Map<int, DateTime>? savedSectionStartedAt,
+  }) {
+    final clamped = savedIndex.clamp(0, questions.length - 1);
+    final target = questions[clamped];
+    return copyWith(
+      answers: {
+        ...savedAnswers,
+        target.id: (savedAnswers[target.id] ?? const QuestionAnswer()).copyWith(
+          visited: true,
+        ),
+      },
+      currentIndex: clamped,
+      sectionStartedAt: savedSectionStartedAt ?? sectionStartedAt,
+    );
+  }
+
+  LocalAttemptSnapshot toSnapshot({required String userId}) {
+    return LocalAttemptSnapshot(
+      attemptId: attemptId,
       testId: testId,
+      userId: userId,
       title: title,
+      startedAt: startedAt,
+      sectionStartedAt: sectionStartedAt,
+      currentIndex: currentIndex,
+      localStatus: localStatus,
       feedbackTiming: feedbackTiming,
       explanationLevel: explanationLevel,
       isEphemeralPractice: isEphemeralPractice,
+      answers: answers,
       questions: questions,
-      answers: {...answers, currentQuestion.id: next},
-      currentIndex: currentIndex,
     );
+  }
+
+  PlayerSessionState copyWith({
+    String? attemptId,
+    String? testId,
+    String? title,
+    FeedbackTiming? feedbackTiming,
+    ExplanationLevel? explanationLevel,
+    bool? isEphemeralPractice,
+    List<PlayerQuestion>? questions,
+    Map<String, QuestionAnswer>? answers,
+    int? currentIndex,
+    DateTime? startedAt,
+    Map<int, DateTime>? sectionStartedAt,
+    LocalAttemptStatus? localStatus,
+  }) {
+    return PlayerSessionState(
+      attemptId: attemptId ?? this.attemptId,
+      testId: testId ?? this.testId,
+      title: title ?? this.title,
+      feedbackTiming: feedbackTiming ?? this.feedbackTiming,
+      explanationLevel: explanationLevel ?? this.explanationLevel,
+      isEphemeralPractice: isEphemeralPractice ?? this.isEphemeralPractice,
+      questions: questions ?? this.questions,
+      answers: answers ?? this.answers,
+      currentIndex: currentIndex ?? this.currentIndex,
+      startedAt: startedAt ?? this.startedAt,
+      sectionStartedAt: sectionStartedAt ?? this.sectionStartedAt,
+      localStatus: localStatus ?? this.localStatus,
+    );
+  }
+
+  PlayerSessionState _writeCurrent(QuestionAnswer next) {
+    return copyWith(answers: {...answers, currentQuestion.id: next});
   }
 }

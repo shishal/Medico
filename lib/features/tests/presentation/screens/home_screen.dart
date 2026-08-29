@@ -7,6 +7,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
+import '../providers/in_progress_attempts_provider.dart';
 
 /// Landing screen after authentication (placeholder until Phase 4).
 class HomeScreen extends ConsumerWidget {
@@ -30,10 +31,7 @@ class HomeScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
-          Text(
-            'Home',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text('Home', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: Spacing.sm),
           planAsync.when(
             data: (plan) => Text(
@@ -50,19 +48,20 @@ class HomeScreen extends ConsumerWidget {
             ),
             error: (_, _) => Text(
               'Plan unavailable',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(color: Theme.of(context).colorScheme.error),
             ),
           ),
           const SizedBox(height: Spacing.sm),
           Text(
             'Placeholder shell — content screens arrive in later phases.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: Spacing.lg),
+          const _ResumeBanner(),
+          const SizedBox(height: Spacing.md),
           FilledButton(
             onPressed: () => context.go(AppRoutes.practice),
             child: const Text('Practice'),
@@ -89,6 +88,39 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Offers resume when a local/server in-progress attempt exists (spec §4).
+class _ResumeBanner extends ConsumerWidget {
+  const _ResumeBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(inProgressAttemptsProvider);
+    final items = async.value;
+    if (items == null || items.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final item in items.take(3))
+          Padding(
+            padding: const EdgeInsets.only(bottom: Spacing.sm),
+            child: Card(
+              child: ListTile(
+                leading: const Icon(Icons.play_circle_outline),
+                title: Text(item.title),
+                subtitle: const Text('In progress — tap to resume'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.go(AppRoutes.testPlayerPath(item.testId)),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

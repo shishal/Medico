@@ -109,6 +109,11 @@ create table attempts (
 );
 create index idx_attempts_user on attempts(user_id);
 create index idx_attempts_test on attempts(test_id);
+-- One in-progress attempt per user+test (Phase 5.1). Submitted rows are
+-- excluded so a later retake can insert a new in_progress row.
+create unique index idx_attempts_one_in_progress
+  on attempts(user_id, test_id)
+  where status = 'in_progress';
 
 create table attempt_answers (
   id uuid primary key default gen_random_uuid(),
@@ -279,6 +284,16 @@ grant select on public.catalog_test_teasers to service_role;
 ```
 
 `security_invoker = false` means the view runs as its owner and bypasses RLS on `tests` — only for the columns listed. Validation: as a free user, `select * from catalog_test_teasers` returns pro/elite titles; `select * from test_questions where test_id = '<pro-test-id>'` returns nothing.
+
+### 5.2 One in-progress attempt (Phase 5.1)
+
+A student must not get a second `attempts` row for the same test while one is still `in_progress`. Retakes after submit are allowed — the index is partial.
+
+```sql
+create unique index if not exists idx_attempts_one_in_progress
+  on public.attempts (user_id, test_id)
+  where status = 'in_progress';
+```
 
 ## 6. Percentile calculation (simple version for Phase 1)
 

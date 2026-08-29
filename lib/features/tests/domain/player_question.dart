@@ -65,6 +65,43 @@ class PlayerQuestion {
     );
   }
 
+  /// Flat JSON for the local attempt snapshot (not the nested PostgREST join).
+  factory PlayerQuestion.fromSnapshotJson(Map<String, dynamic> json) {
+    return PlayerQuestion(
+      id: json[QuestionColumns.id] as String,
+      orderIndex: _asInt(json[TestQuestionColumns.orderIndex] ?? 0),
+      sectionNumber: _asInt(json[TestQuestionColumns.sectionNumber] ?? 1),
+      questionText: json[QuestionColumns.questionText] as String? ?? '',
+      optionA: json[QuestionColumns.optionA] as String? ?? '',
+      optionB: json[QuestionColumns.optionB] as String? ?? '',
+      optionC: json[QuestionColumns.optionC] as String? ?? '',
+      optionD: json[QuestionColumns.optionD] as String? ?? '',
+      correctOption: QuestionOption.fromString(
+        json[QuestionColumns.correctOption] as String? ?? 'A',
+      ),
+      explanationText: json[QuestionColumns.explanationText] as String?,
+      explanationVideoUrl: json[QuestionColumns.explanationVideoUrl] as String?,
+      imageUrl: json[QuestionColumns.imageUrl] as String?,
+    );
+  }
+
+  Map<String, dynamic> toSnapshotJson() {
+    return {
+      QuestionColumns.id: id,
+      TestQuestionColumns.orderIndex: orderIndex,
+      TestQuestionColumns.sectionNumber: sectionNumber,
+      QuestionColumns.questionText: questionText,
+      QuestionColumns.optionA: optionA,
+      QuestionColumns.optionB: optionB,
+      QuestionColumns.optionC: optionC,
+      QuestionColumns.optionD: optionD,
+      QuestionColumns.correctOption: correctOption.dbValue,
+      QuestionColumns.explanationText: explanationText,
+      QuestionColumns.explanationVideoUrl: explanationVideoUrl,
+      QuestionColumns.imageUrl: imageUrl,
+    };
+  }
+
   static int _asInt(Object? value) {
     if (value is int) return value;
     if (value is num) return value.toInt();

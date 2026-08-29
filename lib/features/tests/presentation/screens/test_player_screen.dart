@@ -12,7 +12,7 @@ import '../widgets/test_player_view.dart';
 ///
 /// Behavior branches on `tests.feedback_timing` inside [PlayerSessionState]:
 /// Tutor Mode reveals + locks; Exam Mode does not. Same widget either way.
-class TestPlayerScreen extends ConsumerWidget {
+class TestPlayerScreen extends ConsumerStatefulWidget {
   const TestPlayerScreen({super.key, required this.testId});
 
   final String testId;
@@ -21,7 +21,46 @@ class TestPlayerScreen extends ConsumerWidget {
       'This test is not available on your current plan.';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TestPlayerScreen> createState() => _TestPlayerScreenState();
+}
+
+class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void deactivate() {
+    _flush();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      _flush();
+    }
+  }
+
+  void _flush() {
+    ref.read(playerSessionProvider(widget.testId).notifier).flushSave();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final testId = widget.testId;
     final sessionAsync = ref.watch(playerSessionProvider(testId));
 
     return sessionAsync.when(
@@ -33,7 +72,7 @@ class TestPlayerScreen extends ConsumerWidget {
           appBar: AppBar(title: const Text('Test')),
           body: _ErrorBody(
             message: message,
-            planLocked: message == _planLockedMessage,
+            planLocked: message == TestPlayerScreen._planLockedMessage,
             onRetry: () => ref.invalidate(playerSessionProvider(testId)),
             onUpgrade: () => context.go(AppRoutes.upgradePath(PlanTier.pro)),
             onBack: () => _exit(context, isPractice: false),
@@ -57,10 +96,11 @@ class TestPlayerScreen extends ConsumerWidget {
         onSaveAndNext: () =>
             ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
         onFinish: () {
+          _flush();
           ref.invalidate(playerSessionProvider(testId));
           context.go(
             AppRoutes.resultsPath(
-              'local-$testId',
+              session.attemptId,
               testId: testId,
               isPractice: session.isEphemeralPractice,
             ),
@@ -72,11 +112,14 @@ class TestPlayerScreen extends ConsumerWidget {
   }
 
   void _exit(BuildContext context, {required bool isPractice}) {
+    _flush();
     if (context.canPop()) {
       context.pop();
       return;
     }
-    context.go(isPractice ? AppRoutes.home : AppRoutes.testDetailPath(testId));
+    context.go(
+      isPractice ? AppRoutes.home : AppRoutes.testDetailPath(widget.testId),
+    );
   }
 }
 

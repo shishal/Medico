@@ -8,6 +8,7 @@ import '../../../profile/domain/plan_tier.dart';
 import '../../domain/test_detail.dart';
 import '../../domain/test_type.dart';
 import '../providers/catalog_tests_provider.dart';
+import '../providers/in_progress_attempts_provider.dart';
 import '../providers/test_detail_provider.dart';
 
 /// Pre-start screen: duration, marking, and sectional lock rules before the player.
@@ -40,12 +41,12 @@ class TestInstructionsScreen extends ConsumerWidget {
       body: detailAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) {
-          final message =
-              error.toString().replaceFirst('Exception: ', '');
+          final message = error.toString().replaceFirst('Exception: ', '');
           final planLocked = message == _planLockedMessage;
           // Teaser list still has required_plan even when full row is RLS-empty.
           final teasers = ref.watch(catalogTestsProvider).value;
-          final requiredPlan = teasers
+          final requiredPlan =
+              teasers
                   ?.where((t) => t.id == testId)
                   .map((t) => t.requiredPlan)
                   .firstOrNull ??
@@ -61,10 +62,15 @@ class TestInstructionsScreen extends ConsumerWidget {
                 : null,
           );
         },
-        data: (detail) => _InstructionsBody(
-          detail: detail,
-          onStart: () => context.go(AppRoutes.testPlayerPath(detail.id)),
-        ),
+        data: (detail) {
+          final inProgress = ref.watch(inProgressAttemptsProvider).value ?? [];
+          final canResume = inProgress.any((a) => a.testId == testId);
+          return _InstructionsBody(
+            detail: detail,
+            canResume: canResume,
+            onStart: () => context.go(AppRoutes.testPlayerPath(detail.id)),
+          );
+        },
       ),
     );
   }
@@ -73,10 +79,12 @@ class TestInstructionsScreen extends ConsumerWidget {
 class _InstructionsBody extends StatelessWidget {
   const _InstructionsBody({
     required this.detail,
+    required this.canResume,
     required this.onStart,
   });
 
   final TestDetail detail;
+  final bool canResume;
   final VoidCallback onStart;
 
   @override
@@ -152,7 +160,7 @@ class _InstructionsBody extends StatelessWidget {
             width: double.infinity,
             child: FilledButton(
               onPressed: onStart,
-              child: const Text('Start test'),
+              child: Text(canResume ? 'Resume test' : 'Start test'),
             ),
           ),
         ),
@@ -307,9 +315,9 @@ class _TypeBadge extends StatelessWidget {
         child: Text(
           type.label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSecondaryContainer,
-                fontWeight: FontWeight.w600,
-              ),
+            color: colorScheme.onSecondaryContainer,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -357,10 +365,7 @@ class _ErrorBody extends StatelessWidget {
                 child: const Text('View upgrade options'),
               )
             else if (onRetry != null)
-              FilledButton(
-                onPressed: onRetry,
-                child: const Text('Retry'),
-              ),
+              FilledButton(onPressed: onRetry, child: const Text('Retry')),
             const SizedBox(height: Spacing.sm),
             TextButton(
               onPressed: () => context.go(AppRoutes.testList),

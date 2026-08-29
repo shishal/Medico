@@ -10,6 +10,8 @@ abstract final class Tables {
   static const questionTags = 'question_tags';
   static const planLimits = 'plan_limits';
   static const dailyPracticeUsage = 'daily_practice_usage';
+  static const attempts = 'attempts';
+  static const attemptAnswers = 'attempt_answers';
 
   /// Safe metadata only (title/type/counts) — all authenticated users.
   /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
@@ -112,6 +114,19 @@ abstract final class DailyPracticeUsageColumns {
   static const userId = 'user_id';
   static const usageDate = 'usage_date';
   static const questionsUsed = 'questions_used';
+}
+
+abstract final class AttemptColumns {
+  static const id = 'id';
+  static const userId = 'user_id';
+  static const testId = 'test_id';
+  static const status = 'status';
+  static const startedAt = 'started_at';
+  static const submittedAt = 'submitted_at';
+  static const createdAt = 'created_at';
+
+  /// PostgREST embed alias: `test:tests(...)`.
+  static const testEmbed = 'test';
 }
 
 /// Postgres RPC function names (see `docs/02_DATABASE_SCHEMA.md`).

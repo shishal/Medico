@@ -104,8 +104,12 @@ def check_migration(conn) -> list[str]:
     if not constraint_exists(conn, "topics_subject_id_name_key"):
         errors.append("topics_subject_id_name_key constraint missing — run Phase 2.2 migration")
 
-    if not constraint_exists(conn, "tests_title_key"):
-        errors.append("tests_title_key constraint missing — run Phase 2.2 migration")
+    if not constraint_exists(conn, "tests_sheet_key_key"):
+        errors.append(
+            "tests_sheet_key_key constraint missing — run "
+            "supabase/migrations/20260829240000_tests_sheet_key_upsert.sql "
+            "(PostgREST cannot upsert on the Phase 4B partial title index)"
+        )
 
     return errors
 
@@ -205,8 +209,8 @@ def main() -> int:
             for e in migration_errors:
                 print(f"  • {e}")
             print(
-                "\nFix: Supabase Dashboard → SQL → paste and run:\n"
-                "  supabase/migrations/20260820133000_phase2_2_sheet_upsert_keys.sql"
+                "\nFix: Supabase Dashboard → SQL → paste and run the listed "
+                "migration file(s) under supabase/migrations/"
             )
             return 1
 

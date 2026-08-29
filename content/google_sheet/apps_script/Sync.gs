@@ -146,8 +146,12 @@ function performSync_(data) {
   });
 
   // 4) Tests
+  // sheet_key (not title) is the PostgREST conflict target. Phase 4B dropped
+  // UNIQUE(title) so practice sessions can share "Practice Session"; PostgREST
+  // cannot ON CONFLICT on that partial unique index (Postgres 42P10).
   var testRows = data.tests.map(function (t) {
     var payload = {
+      sheet_key: t.title,
       title: t.title,
       description: t.description,
       test_type: t.test_type,
@@ -172,7 +176,7 @@ function performSync_(data) {
     }
     return payload;
   });
-  var testReturned = supabaseUpsert_('tests', testRows, 'title');
+  var testReturned = supabaseUpsert_('tests', testRows, 'sheet_key');
   var testIdByKey = {};
   testReturned.forEach(function (row) {
     testIdByKey[normKey_(row.title)] = row.id;

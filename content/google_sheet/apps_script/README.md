@@ -5,10 +5,9 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 ## Prerequisites
 
 1. Phase 2.1 sheet tabs exist with the headers in `../tabs/`.
-2. Apply the migration `supabase/migrations/20260820133000_phase2_2_sheet_upsert_keys.sql` on your Supabase project (SQL editor or CLI). This adds:
-   - `questions.external_id` (unique)
-   - `topics (subject_id, name)` unique
-   - `tests.title` unique
+2. Apply these migrations on your Supabase project (SQL editor or CLI):
+   - `supabase/migrations/20260820133000_phase2_2_sheet_upsert_keys.sql` — `questions.external_id`, `topics (subject_id, name)` unique
+   - `supabase/migrations/20260829240000_tests_sheet_key_upsert.sql` — `tests.sheet_key` unique (PostgREST cannot upsert on the Phase 4B partial unique index on `title`)
 3. Supabase **Project URL** and **service_role** key (Settings → API). Treat service_role like a root password.
 
 ## Install into the Sheet
@@ -54,7 +53,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 | subjects | `name` |
 | topics | `subject_id,name` |
 | questions | `external_id` |
-| tests | `title` |
+| tests | `sheet_key` (set from the sheet `title`; not a sheet column) |
 | test_questions | delete-by-test then insert (so removals/reorder apply) |
 
 ## Your validation

@@ -33,6 +33,8 @@ abstract final class ProfileColumns {
 abstract final class TestColumns {
   static const id = 'id';
   static const title = 'title';
+  /// Catalog sheet upsert key. NULL on practice sessions.
+  static const sheetKey = 'sheet_key';
   static const description = 'description';
   static const testType = 'test_type';
   static const subjectId = 'subject_id';

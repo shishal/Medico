@@ -65,7 +65,7 @@ Human-friendly lookup columns replace UUID foreign keys. Names match the DB wher
 
 | Column | Required | Allowed / notes |
 |---|---|---|
-| `title` | yes | Unique among catalog tests. Natural upsert key. |
+| `title` | yes | Unique among catalog tests. Sync stores this on `tests.sheet_key` for upserts (PostgREST cannot upsert on the partial unique index on `title`). |
 | `description` | no | Shown on instructions screen later. |
 | `test_type` | yes | `mini` / `subject` / `mock` / `grand`. |
 | `subject_name` | no | Blank = mixed-subject. Else must match `Subjects.name`. |

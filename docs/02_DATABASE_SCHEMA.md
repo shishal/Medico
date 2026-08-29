@@ -63,7 +63,7 @@ create index idx_questions_active on questions(is_active) where is_active;
 
 create table tests (
   id uuid primary key default gen_random_uuid(),
-  title text not null unique,     -- Phase 2.2 sheet upsert key (revisit if Phase 4B practice sessions need partial unique)
+  title text not null,            -- catalog uniqueness is tests_catalog_title_key (partial); sheet upserts use sheet_key
   description text,
   test_type test_type not null,
   subject_id uuid references subjects(id),          -- null for mixed-subject tests
@@ -439,6 +439,15 @@ alter table tests
   add column show_explanation_level text not null default 'full' check (show_explanation_level in ('none','answer_only','full')),
   add column timer_enabled boolean not null default true,
   add column practice_filter_criteria jsonb;                    -- stores the filters used, for a "redo similar" feature later
+
+-- Catalog titles stay unique among owner-less rows; practice sessions may
+-- all be titled 'Practice Session'. PostgREST upserts cannot target a
+-- partial unique index (error 42P10), so catalog sync uses sheet_key.
+alter table tests drop constraint if exists tests_title_key;
+create unique index tests_catalog_title_key
+  on tests (title)
+  where owner_user_id is null;
+alter table tests add column sheet_key text unique;  -- NULL on practice rows
 ```
 
 ### 7.5 RLS updates (tests/test_questions must also allow the owner to see their own practice session)

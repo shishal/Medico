@@ -9,6 +9,8 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/profile/domain/plan_tier.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/upgrade_prompt_screen.dart';
+import '../../features/practice/domain/practice_builder_draft.dart';
+import '../../features/practice/presentation/screens/practice_builder_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
@@ -65,6 +67,14 @@ GoRouter goRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.practice,
+        builder: (context, state) {
+          final extra = state.extra;
+          final draft = extra is PracticeBuilderDraft ? extra : null;
+          return PracticeBuilderScreen(initialDraft: draft);
+        },
       ),
       GoRoute(
         path: AppRoutes.testList,

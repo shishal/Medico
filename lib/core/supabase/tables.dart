@@ -1,6 +1,8 @@
 /// Supabase table and column name constants — no magic strings in queries.
 abstract final class Tables {
   static const profiles = 'profiles';
+  static const subjects = 'subjects';
+  static const topics = 'topics';
   static const tests = 'tests';
   static const tags = 'tags';
   static const questionTags = 'question_tags';
@@ -48,6 +50,24 @@ abstract final class TestColumns {
   static const practiceFilterCriteria = 'practice_filter_criteria';
 }
 
+abstract final class SubjectColumns {
+  static const id = 'id';
+  static const name = 'name';
+  static const displayOrder = 'display_order';
+}
+
+abstract final class TopicColumns {
+  static const id = 'id';
+  static const subjectId = 'subject_id';
+  static const name = 'name';
+  static const displayOrder = 'display_order';
+}
+
+abstract final class TagColumns {
+  static const id = 'id';
+  static const name = 'name';
+}
+
 abstract final class PlanLimitsColumns {
   static const plan = 'plan';
   static const maxPracticeSessionQuestions = 'max_practice_session_questions';
@@ -57,6 +77,12 @@ abstract final class PlanLimitsColumns {
   static const allowTagFilter = 'allow_tag_filter';
   static const allowDifficultyFilter = 'allow_difficulty_filter';
   static const allowNegativeMarkingToggle = 'allow_negative_marking_toggle';
+}
+
+abstract final class DailyPracticeUsageColumns {
+  static const userId = 'user_id';
+  static const usageDate = 'usage_date';
+  static const questionsUsed = 'questions_used';
 }
 
 /// Postgres RPC function names (see `docs/02_DATABASE_SCHEMA.md`).

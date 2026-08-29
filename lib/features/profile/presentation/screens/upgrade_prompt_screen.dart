@@ -29,7 +29,7 @@ class UpgradePromptScreen extends StatelessWidget {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(AppRoutes.testList);
+              context.go(AppRoutes.home);
             }
           },
         ),
@@ -52,7 +52,7 @@ class UpgradePromptScreen extends StatelessWidget {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'This test is available on the $planLabel plan. '
+              'This is available on the $planLabel plan. '
               'Checkout will open in your browser in a later update — '
               'for now this screen confirms the lock works.',
               style: textTheme.bodyLarge?.copyWith(
@@ -62,8 +62,8 @@ class UpgradePromptScreen extends StatelessWidget {
             ),
             const Spacer(),
             FilledButton(
-              onPressed: () => context.go(AppRoutes.testList),
-              child: const Text('Back to tests'),
+              onPressed: () => context.go(AppRoutes.home),
+              child: const Text('Not now'),
             ),
           ],
         ),

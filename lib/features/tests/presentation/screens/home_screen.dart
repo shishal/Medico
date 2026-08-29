@@ -64,6 +64,11 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: Spacing.lg),
           FilledButton(
+            onPressed: () => context.go(AppRoutes.practice),
+            child: const Text('Practice'),
+          ),
+          const SizedBox(height: Spacing.md),
+          FilledButton.tonal(
             onPressed: () => context.go(AppRoutes.testList),
             child: const Text('Browse tests'),
           ),

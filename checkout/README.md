@@ -1,11 +1,18 @@
-# Phase 7.2 — External web checkout
+# Phase 7.2 / 7.3 — External web checkout + plan update
+
+**Test Mode only.** When you are ready for real money, follow
+[`docs/06_PAYMENTS_PRODUCTION.md`](../docs/06_PAYMENTS_PRODUCTION.md) (Live
+keys, HTTPS hosting, Flutter `CHECKOUT_URL`, Live webhook). Do not put
+`rzp_live_` keys in this local setup.
 
 A small static site (not part of the Flutter app) where a student signs in
 with their Medico email and pays through **Razorpay Checkout**. The app
 only opens this page in the system browser.
 
-Payment success makes Razorpay POST to the `razorpay-webhook` Edge Function.
-Phase 7.3 is what verifies that webhook and updates `profiles.plan`.
+A successful **Test Mode** payment makes Razorpay POST to the
+`razorpay-webhook` Edge Function. That function verifies Razorpay's
+signature and calls `apply_razorpay_payment()`, which sets `profiles.plan`
+and `plan_expires_at`.
 
 ## What lives where
 
@@ -13,7 +20,8 @@ Phase 7.3 is what verifies that webhook and updates `profiles.plan`.
 |---|---|
 | This folder | HTML/JS page: email login, plan pick, Razorpay modal |
 | `supabase/functions/create-razorpay-order` | Creates the Razorpay **Order** (amount is chosen here, not in the browser) |
-| `supabase/functions/razorpay-webhook` | 7.2 stub: accepts the webhook so a test payment can fire one. **Does not change the plan.** |
+| `supabase/functions/razorpay-webhook` | Verifies `X-Razorpay-Signature`, then grants the plan |
+| `apply_razorpay_payment()` (Postgres) | Amount check + idempotent `profiles` update |
 
 ## One-time setup
 
@@ -25,30 +33,45 @@ Phase 7.3 is what verifies that webhook and updates `profiles.plan`.
    ```
    RAZORPAY_KEY_ID=rzp_test_...
    RAZORPAY_KEY_SECRET=...
+   RAZORPAY_WEBHOOK_SECRET=...
    CHECKOUT_URL=http://127.0.0.1:4173
    ```
 
    On an Android emulator, use `http://10.0.2.2:4173` so the device reaches
    your laptop.
 
-4. Push the secrets to Supabase (hosted project the Flutter app already uses):
+4. Push the secrets and functions to the hosted project the Flutter app uses:
 
    ```bash
-   supabase secrets set RAZORPAY_KEY_ID="$RAZORPAY_KEY_ID" RAZORPAY_KEY_SECRET="$RAZORPAY_KEY_SECRET"
-   supabase functions deploy create-razorpay-order
-   supabase functions deploy razorpay-webhook
+   npx supabase db push
+   npx supabase secrets set \
+     RAZORPAY_KEY_ID="$RAZORPAY_KEY_ID" \
+     RAZORPAY_KEY_SECRET="$RAZORPAY_KEY_SECRET" \
+     RAZORPAY_WEBHOOK_SECRET="$RAZORPAY_WEBHOOK_SECRET"
+   npx supabase functions deploy create-razorpay-order
+   npx supabase functions deploy razorpay-webhook
    ```
 
    `razorpay-webhook` must stay `verify_jwt = false` — Razorpay does not send
-   a Supabase JWT. Phase 7.3 will check Razorpay's own signature instead.
+   a Supabase JWT. Auth is Razorpay's HMAC instead.
 
 5. In Razorpay Dashboard → **Account & Settings → Webhooks** (Test Mode),
-   add:
+   add this URL:
 
    `https://<PROJECT_REF>.supabase.co/functions/v1/razorpay-webhook`
 
-   Subscribe to `payment.captured` and `order.paid`. Set any webhook secret;
-   7.2 ignores it, 7.3 will verify it.
+   Active event: **`payment.captured`** (required). `order.paid` is optional
+   and ignored by the function.
+
+   Secret: the same value as `RAZORPAY_WEBHOOK_SECRET`.
+
+   Custom headers (Supabase's gateway still wants the public anon key even
+   though JWT verification is off):
+
+   | Header | Value |
+   |---|---|
+   | `apikey` | `SUPABASE_ANON_KEY` (same key as the Flutter app — it is public) |
+   | `Authorization` | `Bearer <SUPABASE_ANON_KEY>` |
 
 ## Run the page locally
 
@@ -67,18 +90,47 @@ Sign in with a real Medico test account, pick Pro or Elite, pay.
 3. Any future expiry, any CVV.
 4. On the mock bank page, click **Success**.
 
-Then in Razorpay Dashboard → **Transactions → Payments**, the payment should
-be **Captured**. Under Webhooks, the delivery to `razorpay-webhook` should
-show as sent (the stub returns 200 and logs the event; it does **not**
-upgrade the user yet).
+Then:
+
+- Razorpay Dashboard → **Transactions → Payments** should show **Captured**.
+- Razorpay Dashboard → **Webhooks** should show a 200 delivery.
+- Supabase Table Editor → `profiles` for that user: `plan` is `pro` or
+  `elite`, `plan_expires_at` is in the future.
+- In the Flutter app, open **Profile** and tap the refresh icon — the plan
+  label updates without rebuilding the app.
+
+### Unsigned webhook (must fail)
+
+```bash
+curl -i -X POST "$SUPABASE_URL/functions/v1/razorpay-webhook" \
+  -H "apikey: $SUPABASE_ANON_KEY" \
+  -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"event":"payment.captured"}'
+```
+
+Expect **400** and `{"error":"Invalid signature"}`. A 200 here means the
+endpoint would grant plans to anyone.
+
+Or run:
+
+```bash
+python3 scripts/validate_phase7_3_webhook.py
+```
+
+Signature helper (no network):
+
+```bash
+npx deno test supabase/functions/_shared/razorpay_webhook_test.ts
+```
 
 ## Prices
 
-| Plan | Amount | Access window (applied in 7.3) |
+| Plan | Amount | Access window |
 |---|---|---|
 | Pro | ₹1,499 | 180 days |
 | Elite | ₹2,999 | 365 days |
 
-Change both `checkout/paid_plans.js` and
-`supabase/functions/_shared/paid_plans.ts`, then run
-`python3 scripts/validate_phase7_2_paid_plans.py`.
+Change `checkout/paid_plans.js`, `supabase/functions/_shared/paid_plans.ts`,
+**and** the catalog inside `apply_razorpay_payment()` (the migration), then
+run `python3 scripts/validate_phase7_3_webhook.py`.

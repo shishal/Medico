@@ -128,8 +128,8 @@
       <div class="card">
         <p class="success">Payment received.</p>
         <p>
-          Razorpay will notify our server next (the webhook). Your plan updates
-          in the app after that — reopen Medico and pull to refresh on Profile.
+          Your plan should update within a few seconds. Reopen Medico and tap
+          refresh on Profile if it still shows Free.
         </p>
         <p class="muted">You can close this tab.</p>
       </div>

@@ -202,7 +202,9 @@ alter table bookmarks enable row level security;
 
 -- Privileges for API roles (RLS still filters rows)
 grant usage on schema public to anon, authenticated, service_role;
-grant select, update on table profiles to authenticated;
+grant select on table profiles to authenticated;
+-- Phase 7.3: students cannot write plan / plan_expires_at — webhook RPC only.
+grant update (full_name, phone) on table profiles to authenticated;
 grant select on table subjects to authenticated;
 grant select on table topics to authenticated;
 grant select on table questions to authenticated;
@@ -220,6 +222,7 @@ grant execute on function server_now() to authenticated;
 grant execute on function submit_attempt(uuid, jsonb) to authenticated;
 grant execute on function get_attempt_results(uuid) to authenticated;
 -- calculate_percentile is not granted to authenticated — see §6.1.
+-- apply_razorpay_payment is not granted to authenticated — see §8.
 
 -- profiles: users see/edit only their own row
 create policy "own profile select" on profiles for select using (auth.uid() = id);
@@ -561,6 +564,45 @@ $$;
 ```
 
 **Validation for this function specifically**: as a free-tier test user, call it requesting `p_question_count = 999` and `p_explanation_level = 'full'` — confirm the returned session has at most 10 questions (the free-tier `max_practice_session_questions`) and that `show_explanation_level` was silently downgraded to `'answer_only'` on the created row, not honored as `'full'`. This is the single most important test in this whole addition: it's proving the limit can't be bypassed by just asking for more.
+
+## 8. Payments (Phase 7.3)
+
+Razorpay's webhook hits a Supabase Edge Function (`razorpay-webhook`). That function's only job is to verify `X-Razorpay-Signature` (HMAC-SHA256 of the **raw** body with `RAZORPAY_WEBHOOK_SECRET`). After a valid `payment.captured` event, it calls `apply_razorpay_payment()` — it does **not** write `profiles.plan` itself.
+
+Amount and duration live in the SQL catalog (must match `supabase/functions/_shared/paid_plans.ts`). A signed webhook that claims Elite but paid the Pro amount is rejected.
+
+```sql
+create table payments (
+  razorpay_payment_id text primary key,
+  razorpay_order_id text not null,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  plan plan_tier not null,
+  amount_paise int not null,
+  currency text not null,
+  applied_at timestamptz not null default now()
+);
+
+create function apply_razorpay_payment(
+  p_payment_id text,
+  p_order_id text,
+  p_user_id uuid,
+  p_plan plan_tier,
+  p_amount_paise int,
+  p_currency text
+) returns jsonb
+language plpgsql security definer
+set search_path = public as $$
+-- reject unknown plan / amount / currency (catalog: pro 149900/180d, elite 299900/365d)
+-- insert payments; on unique payment id, return {applied:false, duplicate:true}
+-- else set profiles.plan, plan_started_at, plan_expires_at = now() + duration
+$$;
+```
+
+`apply_razorpay_payment` is **not** granted to `authenticated` (same reason as `calculate_percentile`). The Flutter client never calls it. Students also cannot `UPDATE` `profiles.plan` / `plan_expires_at` — those columns are revoked from the `authenticated` role; only `full_name` and `phone` remain updatable.
+
+Idempotency: Razorpay retries. The unique `razorpay_payment_id` means a second delivery returns `duplicate: true` and does not add more days.
+
+**Validation**: complete a Test Mode payment, watch `profiles.plan` change in Table Editor, then `POST` the same Edge Function URL with no `X-Razorpay-Signature` header and confirm HTTP 400. Script: `python3 scripts/validate_phase7_3_webhook.py`.
 
 ## Seed data strategy (placeholder content for testing)
 

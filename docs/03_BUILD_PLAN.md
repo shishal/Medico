@@ -187,7 +187,7 @@ Full behavioral spec is in `04_TEST_ENGINE_SPEC.md` — read that file in full b
 - Description: A Supabase Edge Function that receives Razorpay's webhook, verifies its signature (critical — an unverified webhook endpoint is a free way for anyone to grant themselves a paid plan), and updates the matching `profiles` row's `plan` and `plan_expires_at`.
 - Expected Outcome: Within seconds of a successful test payment, the corresponding Supabase user's plan updates; the Flutter app reflects it on next data refresh without needing a rebuild or manual sync.
 - Validation: complete a test payment, watch the `profiles` row update in real time in Supabase's Table Editor; then separately, send a fake unsigned webhook payload and confirm it's rejected.
-- Notes: strong model + careful review, this is a real money/security boundary.
+- Notes: strong model + careful review, this is a real money/security boundary. Production cutover (Live keys, HTTPS checkout, store `.env`) is in `docs/06_PAYMENTS_PRODUCTION.md` — do that when you take real money, not as part of 7.3 Test Mode.
 
 ---
 

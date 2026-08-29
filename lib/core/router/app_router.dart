@@ -99,7 +99,13 @@ GoRouter goRouter(Ref ref) {
         path: AppRoutes.results,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
-          return ResultsScreen(attemptId: attemptId);
+          final testId = state.uri.queryParameters['testId'];
+          final isPractice = state.uri.queryParameters['practice'] == '1';
+          return ResultsScreen(
+            attemptId: attemptId,
+            testId: testId,
+            isPractice: isPractice,
+          );
         },
       ),
       GoRoute(

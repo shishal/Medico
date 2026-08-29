@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:medico/core/supabase/tables.dart';
 import 'package:medico/features/practice/domain/created_practice_session.dart';
 import 'package:medico/features/practice/domain/plan_limits.dart';
 import 'package:medico/features/practice/domain/practice_builder_draft.dart';
@@ -175,6 +176,118 @@ void main() {
         ),
         isNull,
       );
+    });
+  });
+
+  group('PracticeBuilderDraft.fromPracticeTestRow', () {
+    test('restores requested filters from stored JSON', () {
+      final draft = PracticeBuilderDraft.fromPracticeTestRow({
+        TestColumns.feedbackTiming: 'on_submit',
+        TestColumns.showExplanationLevel: 'answer_only',
+        TestColumns.timerEnabled: true,
+        TestColumns.totalQuestions: 10,
+        TestColumns.practiceFilterCriteria: {
+          PracticeFilterCriteriaKeys.topicIds: ['card', 'gi'],
+          PracticeFilterCriteriaKeys.tagIds: ['pyq'],
+          PracticeFilterCriteriaKeys.difficulties: ['hard'],
+          PracticeFilterCriteriaKeys.sourceFilter: 'incorrect',
+          PracticeFilterCriteriaKeys.requestedQuestionCount: 40,
+          PracticeFilterCriteriaKeys.requestedExplanationLevel: 'full',
+          PracticeFilterCriteriaKeys.negativeMarking: true,
+          PracticeFilterCriteriaKeys.timerMinutes: 25,
+        },
+      });
+
+      expect(draft.selectedTopicIds, {'card', 'gi'});
+      expect(draft.selectedTagIds, {'pyq'});
+      expect(draft.selectedDifficulties, {QuestionDifficulty.hard});
+      expect(draft.sourceFilter, QuestionSourceFilter.incorrect);
+      expect(draft.questionCount, 40);
+      expect(draft.feedbackTiming, FeedbackTiming.onSubmit);
+      expect(draft.explanationLevel, ExplanationLevel.full);
+      expect(draft.timerEnabled, isTrue);
+      expect(draft.timerMinutes, 25);
+      expect(draft.negativeMarking, isTrue);
+    });
+
+    test('null JSON arrays mean no filter, timer null means off', () {
+      final draft = PracticeBuilderDraft.fromPracticeTestRow({
+        TestColumns.feedbackTiming: 'immediate',
+        TestColumns.showExplanationLevel: 'answer_only',
+        TestColumns.timerEnabled: false,
+        TestColumns.totalQuestions: 8,
+        TestColumns.practiceFilterCriteria: {
+          PracticeFilterCriteriaKeys.topicIds: null,
+          PracticeFilterCriteriaKeys.tagIds: null,
+          PracticeFilterCriteriaKeys.difficulties: null,
+          PracticeFilterCriteriaKeys.sourceFilter: 'all',
+          PracticeFilterCriteriaKeys.requestedQuestionCount: 8,
+          PracticeFilterCriteriaKeys.requestedExplanationLevel: 'none',
+          PracticeFilterCriteriaKeys.negativeMarking: false,
+          PracticeFilterCriteriaKeys.timerMinutes: null,
+        },
+      });
+
+      expect(draft.selectedTopicIds, isEmpty);
+      expect(draft.selectedTagIds, isEmpty);
+      expect(draft.selectedDifficulties, isEmpty);
+      expect(draft.sourceFilter, QuestionSourceFilter.all);
+      expect(draft.explanationLevel, ExplanationLevel.none);
+      expect(draft.timerEnabled, isFalse);
+    });
+
+    test('re-clamps stored filters against the current plan', () {
+      // A session generated while Pro; user is now on Free.
+      final stored = PracticeBuilderDraft.fromPracticeTestRow({
+        TestColumns.feedbackTiming: 'immediate',
+        TestColumns.showExplanationLevel: 'full',
+        TestColumns.timerEnabled: false,
+        TestColumns.totalQuestions: 40,
+        TestColumns.practiceFilterCriteria: {
+          PracticeFilterCriteriaKeys.tagIds: ['pyq'],
+          PracticeFilterCriteriaKeys.requestedQuestionCount: 80,
+          PracticeFilterCriteriaKeys.requestedExplanationLevel: 'full',
+          PracticeFilterCriteriaKeys.negativeMarking: true,
+          PracticeFilterCriteriaKeys.timerMinutes: null,
+        },
+      });
+
+      final clamped = stored.clampedTo(
+        const PracticePlanContext(limits: freeLimits, questionsUsedToday: 0),
+      );
+
+      expect(clamped.questionCount, 10);
+      expect(clamped.selectedTagIds, isEmpty);
+      expect(clamped.explanationLevel, ExplanationLevel.answerOnly);
+      expect(clamped.timerEnabled, isTrue);
+      expect(clamped.negativeMarking, isFalse);
+    });
+  });
+
+  group('PracticeBuilderDraft.alignedWithCatalog', () {
+    const catalog = PracticeCatalog(
+      subjects: [
+        Subject(id: 'med', name: 'Medicine', displayOrder: 0),
+      ],
+      topics: [
+        Topic(id: 'card', subjectId: 'med', name: 'Cardio', displayOrder: 0),
+      ],
+      tags: [
+        PracticeTag(id: 'pyq', name: 'PYQ'),
+      ],
+    );
+
+    test('infers subjects from topics and drops unknown ids', () {
+      const draft = PracticeBuilderDraft(
+        selectedTopicIds: {'card', 'gone'},
+        selectedTagIds: {'pyq', 'retired'},
+      );
+
+      final aligned = draft.alignedWithCatalog(catalog);
+
+      expect(aligned.selectedTopicIds, {'card'});
+      expect(aligned.selectedTagIds, {'pyq'});
+      expect(aligned.selectedSubjectIds, {'med'});
     });
   });
 

@@ -137,3 +137,15 @@ abstract final class CreatePracticeSessionParams {
   static const timerMinutes = 'p_timer_minutes';
   static const negativeMarking = 'p_negative_marking';
 }
+
+/// Keys inside `tests.practice_filter_criteria` (written by `create_practice_session`).
+abstract final class PracticeFilterCriteriaKeys {
+  static const topicIds = 'topic_ids';
+  static const tagIds = 'tag_ids';
+  static const difficulties = 'difficulties';
+  static const sourceFilter = 'source_filter';
+  static const requestedQuestionCount = 'requested_question_count';
+  static const requestedExplanationLevel = 'requested_explanation_level';
+  static const negativeMarking = 'negative_marking';
+  static const timerMinutes = 'timer_minutes';
+}

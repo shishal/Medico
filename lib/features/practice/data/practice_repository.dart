@@ -166,6 +166,48 @@ class PracticeRepository {
     }
   }
 
+  /// Filters stored on a practice session, for "Practice Similar Again".
+  ///
+  /// Returns [Success] with `null` for catalog tests (no button to show).
+  /// Does not clamp here — the builder and `create_practice_session` both
+  /// re-apply the *current* plan, in case it changed since this session.
+  Future<Result<PracticeBuilderDraft?>> fetchSimilarDraft(String testId) async {
+    if (_client.auth.currentUser == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final rows = await _client
+          .from(Tables.tests)
+          .select(
+            '${TestColumns.id},'
+            '${TestColumns.isEphemeralPractice},'
+            '${TestColumns.feedbackTiming},'
+            '${TestColumns.showExplanationLevel},'
+            '${TestColumns.timerEnabled},'
+            '${TestColumns.totalQuestions},'
+            '${TestColumns.practiceFilterCriteria}',
+          )
+          .eq(TestColumns.id, testId)
+          .limit(1);
+
+      final list = (rows as List<dynamic>).cast<Map<String, dynamic>>();
+      if (list.isEmpty) {
+        return const Failure('Could not load that practice session.');
+      }
+
+      final row = list.first;
+      final isPractice = row[TestColumns.isEphemeralPractice] as bool? ?? false;
+      if (!isPractice) return const Success(null);
+
+      return Success(PracticeBuilderDraft.fromPracticeTestRow(row));
+    } on PostgrestException catch (_) {
+      return const Failure('Could not restore those filters. Please try again.');
+    } catch (_) {
+      return const Failure('Could not restore those filters. Please try again.');
+    }
+  }
+
   static List<T> _mapRows<T>(
     dynamic rows,
     T Function(Map<String, dynamic>) fromJson,

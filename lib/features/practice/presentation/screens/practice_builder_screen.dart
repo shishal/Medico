@@ -118,7 +118,10 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
                 ref.read(practicePlanContextProvider.notifier).refresh(),
           ),
           data: (planContext) {
-            final draft = _draft.clampedTo(planContext);
+            // Align stale IDs, then re-clamp to *this* plan — stored JSON
+            // is a hint, not a grant (plan may have changed since last time).
+            final draft =
+                _draft.alignedWithCatalog(catalog).clampedTo(planContext);
             return Column(
               children: [
                 Expanded(

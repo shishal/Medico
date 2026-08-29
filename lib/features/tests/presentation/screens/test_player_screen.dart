@@ -58,7 +58,13 @@ class TestPlayerScreen extends ConsumerWidget {
             ref.read(playerSessionProvider(testId).notifier).saveAndNext(),
         onFinish: () {
           ref.invalidate(playerSessionProvider(testId));
-          context.go(AppRoutes.resultsPath('local-$testId'));
+          context.go(
+            AppRoutes.resultsPath(
+              'local-$testId',
+              testId: testId,
+              isPractice: session.isEphemeralPractice,
+            ),
+          );
         },
         onExit: () => _exit(context, isPractice: session.isEphemeralPractice),
       ),

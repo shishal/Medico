@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medico/features/practice/domain/plan_limits.dart';
 import 'package:medico/features/practice/domain/practice_builder_draft.dart';
 import 'package:medico/features/practice/domain/practice_catalog.dart';
+import 'package:medico/features/practice/domain/practice_enums.dart';
 import 'package:medico/features/practice/presentation/widgets/practice_builder_form.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 
@@ -89,6 +90,44 @@ void main() {
     // Difficulty stays available on free.
     expect(find.text('Upgrade to filter by difficulty'), findsNothing);
     expect(find.text('Easy'), findsOneWidget);
+  });
+
+  testWidgets('similar-again draft is shown clamped for free', (tester) async {
+    tester.view.physicalSize = const Size(800, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const stored = PracticeBuilderDraft(
+      selectedTagIds: {'pyq'},
+      selectedTopicIds: {'card'},
+      sourceFilter: QuestionSourceFilter.incorrect,
+      questionCount: 80,
+      feedbackTiming: FeedbackTiming.onSubmit,
+      explanationLevel: ExplanationLevel.full,
+      timerEnabled: false,
+      negativeMarking: true,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PracticeBuilderForm(
+            draft: stored.clampedTo(freeContext),
+            catalog: catalog,
+            planContext: freeContext,
+            onChanged: (_) {},
+            onUpgrade: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('10 questions'), findsOneWidget);
+    expect(find.text('Previously Incorrect'), findsOneWidget);
+    expect(find.text('Exam Mode'), findsOneWidget);
+    expect(find.text('Answer only'), findsOneWidget);
+    expect(find.text('Upgrade to filter by tags'), findsOneWidget);
   });
 
   testWidgets('pro plan leaves tag/timer/explanation controls unlocked', (tester) async {

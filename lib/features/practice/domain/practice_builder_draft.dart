@@ -1,14 +1,15 @@
 import 'dart:math' as math;
 
+import '../../../core/supabase/tables.dart';
 import 'plan_limits.dart';
 import 'practice_catalog.dart';
 import 'practice_enums.dart';
 
 /// Form state for the Practice Builder.
 ///
-/// Immutable so 4B.4 can pass a pre-filled copy via the route later.
-/// [clampedTo] re-applies the current plan's limits — never trust stored
-/// filters blindly if the user's plan changed.
+/// Immutable so "Practice Similar Again" can pass a pre-filled copy via
+/// the route. [clampedTo] re-applies the current plan's limits — never trust
+/// stored filters blindly if the user's plan changed.
 class PracticeBuilderDraft {
   const PracticeBuilderDraft({
     this.selectedSubjectIds = const {},
@@ -36,6 +37,80 @@ class PracticeBuilderDraft {
   final bool timerEnabled;
   final int timerMinutes;
   final bool negativeMarking;
+
+  /// Rebuilds the form from a practice `tests` row.
+  ///
+  /// Prefers the student's *requested* count/explanation from the JSON so a
+  /// later plan change can grant more — [clampedTo] still caps to the
+  /// current plan before anything is sent.
+  factory PracticeBuilderDraft.fromPracticeTestRow(Map<String, dynamic> row) {
+    final criteria = _asMap(row[TestColumns.practiceFilterCriteria]);
+
+    final questionCount = _asNullableInt(
+          criteria[PracticeFilterCriteriaKeys.requestedQuestionCount],
+        ) ??
+        _asInt(row[TestColumns.totalQuestions], fallback: 10);
+
+    final hasTimerKey =
+        criteria.containsKey(PracticeFilterCriteriaKeys.timerMinutes);
+    final timerMinutesRaw = criteria[PracticeFilterCriteriaKeys.timerMinutes];
+    final timerEnabled = hasTimerKey
+        ? timerMinutesRaw != null
+        : (row[TestColumns.timerEnabled] as bool? ?? true);
+    final timerMinutes = timerMinutesRaw != null
+        ? _asInt(timerMinutesRaw, fallback: questionCount)
+        : questionCount;
+
+    final requestedExplanation =
+        criteria[PracticeFilterCriteriaKeys.requestedExplanationLevel] as String?;
+
+    return PracticeBuilderDraft(
+      selectedTopicIds: _stringSet(criteria[PracticeFilterCriteriaKeys.topicIds]),
+      selectedTagIds: _stringSet(criteria[PracticeFilterCriteriaKeys.tagIds]),
+      selectedDifficulties: _difficultySet(
+        criteria[PracticeFilterCriteriaKeys.difficulties],
+      ),
+      sourceFilter: QuestionSourceFilter.fromString(
+        criteria[PracticeFilterCriteriaKeys.sourceFilter] as String? ??
+            QuestionSourceFilter.unattempted.dbValue,
+      ),
+      questionCount: questionCount < 1 ? 1 : questionCount,
+      feedbackTiming: FeedbackTiming.fromString(
+        row[TestColumns.feedbackTiming] as String? ??
+            FeedbackTiming.immediate.dbValue,
+      ),
+      explanationLevel: ExplanationLevel.fromString(
+        requestedExplanation ??
+            row[TestColumns.showExplanationLevel] as String? ??
+            ExplanationLevel.answerOnly.dbValue,
+      ),
+      timerEnabled: timerEnabled,
+      timerMinutes: timerMinutes < 1 ? 1 : timerMinutes,
+      negativeMarking:
+          criteria[PracticeFilterCriteriaKeys.negativeMarking] as bool? ??
+              false,
+    );
+  }
+
+  /// Drop IDs that no longer exist; infer subjects from remaining topics.
+  PracticeBuilderDraft alignedWithCatalog(PracticeCatalog catalog) {
+    final topicById = {for (final topic in catalog.topics) topic.id: topic};
+    final knownTagIds = catalog.tags.map((t) => t.id).toSet();
+    final knownSubjectIds = catalog.subjects.map((s) => s.id).toSet();
+
+    final topics =
+        selectedTopicIds.where(topicById.containsKey).toSet();
+    final tags = selectedTagIds.where(knownTagIds.contains).toSet();
+    final subjects = selectedSubjectIds.isEmpty
+        ? topics.map((id) => topicById[id]!.subjectId).toSet()
+        : selectedSubjectIds.where(knownSubjectIds.contains).toSet();
+
+    return copyWith(
+      selectedSubjectIds: subjects,
+      selectedTopicIds: topics,
+      selectedTagIds: tags,
+    );
+  }
 
   /// Topic IDs to send to the RPC. Null means "no topic filter" (all).
   ///
@@ -160,5 +235,38 @@ class PracticeBuilderDraft {
       timerMinutes: timerMinutes ?? this.timerMinutes,
       negativeMarking: negativeMarking ?? this.negativeMarking,
     );
+  }
+
+  static Map<String, dynamic> _asMap(Object? value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return const {};
+  }
+
+  static Set<String> _stringSet(Object? value) {
+    if (value is! List) return const {};
+    return {
+      for (final item in value)
+        if (item != null) item.toString(),
+    };
+  }
+
+  static Set<QuestionDifficulty> _difficultySet(Object? value) {
+    if (value is! List) return const {};
+    return {
+      for (final item in value)
+        if (item != null) QuestionDifficulty.fromString(item.toString()),
+    };
+  }
+
+  static int _asInt(Object? value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+
+  static int? _asNullableInt(Object? value) {
+    if (value == null) return null;
+    return _asInt(value);
   }
 }

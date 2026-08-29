@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../providers/current_plan_provider.dart';
@@ -76,10 +78,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            error: (error, _) => Text(
-              'Could not load plan',
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.error),
+            error: (error, _) => InlineErrorMessage(
+              message: UserFacingError.display(error),
+              onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
             ),
           ),
           const SizedBox(height: Spacing.sm),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:medico/core/router/app_routes.dart';
+import 'package:medico/core/utils/user_facing_error.dart';
 import 'package:medico/features/results/domain/attempt_results.dart';
 import 'package:medico/features/results/presentation/providers/attempt_results_provider.dart';
 import 'package:medico/features/results/presentation/screens/results_screen.dart';
@@ -138,5 +139,30 @@ void main() {
     );
     expect(AppRoutes.resultsPath('a1'), '/results/a1');
     expect(AppRoutes.solutionReviewPath('a1'), '/results/a1/review');
+  });
+
+  testWidgets('error state shows offline copy and Retry', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          attemptResultsProvider.overrideWith(
+            (ref, id) => throw Exception(UserFacingError.offlineMessage),
+          ),
+        ],
+        child: const MaterialApp(
+          home: ResultsScreen(attemptId: 'a1', testId: 't1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserFacingError.offlineMessage), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Back to home'), findsOneWidget);
   });
 }

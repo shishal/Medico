@@ -1,8 +1,14 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/user_facing_error.dart';
+
 /// Maps Supabase [AuthException]s to user-readable messages for the UI.
 abstract final class AuthFailure {
   static String fromException(AuthException exception) {
+    if (UserFacingError.looksOffline(exception)) {
+      return UserFacingError.offlineMessage;
+    }
+
     final message = exception.message.toLowerCase();
 
     if (message.contains('invalid login credentials') ||

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../../profile/domain/plan_tier.dart';
 import '../domain/created_practice_session.dart';
 import '../domain/plan_limits.dart';
@@ -56,10 +57,13 @@ class PracticeRepository {
           tags: _mapRows(results[2], PracticeTag.fromJson),
         ),
       );
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load practice options. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load practice options. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load practice options. Please try again.',
+        ),
+      );
     }
   }
 
@@ -83,7 +87,8 @@ class PracticeRepository {
           .eq(DailyPracticeUsageColumns.usageDate, _todayIsoDate())
           .limit(1);
 
-      final usageList = (usageRows as List<dynamic>).cast<Map<String, dynamic>>();
+      final usageList = (usageRows as List<dynamic>)
+          .cast<Map<String, dynamic>>();
       final used = usageList.isEmpty
           ? 0
           : _asInt(usageList.first[DailyPracticeUsageColumns.questionsUsed]);
@@ -94,10 +99,13 @@ class PracticeRepository {
           questionsUsedToday: used,
         ),
       );
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load your plan limits. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load your plan limits. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load your plan limits. Please try again.',
+        ),
+      );
     }
   }
 
@@ -117,8 +125,9 @@ class PracticeRepository {
         params: {
           CreatePracticeSessionParams.topicIds: draft.resolvedTopicIds(catalog),
           CreatePracticeSessionParams.tagIds: draft.resolvedTagIds,
-          CreatePracticeSessionParams.difficulties:
-              draft.resolvedDifficulties?.map((d) => d.dbValue).toList(),
+          CreatePracticeSessionParams.difficulties: draft.resolvedDifficulties
+              ?.map((d) => d.dbValue)
+              .toList(),
           CreatePracticeSessionParams.sourceFilter: draft.sourceFilter.dbValue,
           CreatePracticeSessionParams.questionCount: draft.questionCount,
           CreatePracticeSessionParams.feedbackTiming:
@@ -160,9 +169,14 @@ class PracticeRepository {
 
       return Success(CreatedPracticeSession.fromJson(list.first));
     } on PostgrestException catch (e) {
-      return Failure(_mapRpcError(e));
-    } catch (_) {
-      return const Failure('Could not start practice. Please try again.');
+      return Failure(UserFacingError.from(e, fallback: _mapRpcError(e)));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not start practice. Please try again.',
+        ),
+      );
     }
   }
 
@@ -201,10 +215,13 @@ class PracticeRepository {
       if (!isPractice) return const Success(null);
 
       return Success(PracticeBuilderDraft.fromPracticeTestRow(row));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not restore those filters. Please try again.');
-    } catch (_) {
-      return const Failure('Could not restore those filters. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not restore those filters. Please try again.',
+        ),
+      );
     }
   }
 

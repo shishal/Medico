@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../practice/domain/practice_builder_draft.dart';
 import '../../../practice/domain/practice_enums.dart';
 import '../../domain/bookmarked_question.dart';
@@ -35,15 +37,11 @@ class BookmarksScreen extends ConsumerWidget {
       ),
       body: listAsync.when(
         skipLoadingOnReload: true,
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) {
-          final message = error.toString().replaceFirst('Exception: ', '');
-          return _MessageBody(
-            message: message,
-            actionLabel: 'Retry',
-            onAction: () => ref.invalidate(bookmarksListProvider),
-          );
-        },
+        loading: () => const AsyncLoadingView(),
+        error: (error, _) => AsyncErrorView(
+          message: UserFacingError.display(error),
+          onAction: () => ref.invalidate(bookmarksListProvider),
+        ),
         data: (items) {
           // Hide rows the ID set already dropped (optimistic unbookmark).
           final visible = ids == null
@@ -51,7 +49,8 @@ class BookmarksScreen extends ConsumerWidget {
               : items.where((item) => ids.contains(item.questionId)).toList();
 
           if (visible.isEmpty) {
-            return const _MessageBody(
+            return const AsyncEmptyView(
+              icon: Icons.bookmark_border,
               message:
                   'No bookmarks yet. Bookmark a question from solution review '
                   'to practice it later.',
@@ -147,33 +146,6 @@ class _PracticeBar extends StatelessWidget {
                   : 'Practice $count bookmarked questions',
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MessageBody extends StatelessWidget {
-  const _MessageBody({required this.message, this.actionLabel, this.onAction});
-
-  final String message;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            if (onAction != null && actionLabel != null) ...[
-              const SizedBox(height: Spacing.md),
-              FilledButton(onPressed: onAction, child: Text(actionLabel!)),
-            ],
-          ],
         ),
       ),
     );

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../domain/test_detail.dart';
 import '../../domain/test_type.dart';
@@ -39,9 +41,9 @@ class TestInstructionsScreen extends ConsumerWidget {
         ),
       ),
       body: detailAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AsyncLoadingView(),
         error: (error, _) {
-          final message = error.toString().replaceFirst('Exception: ', '');
+          final message = UserFacingError.display(error);
           final planLocked = message == _planLockedMessage;
           // Teaser list still has required_plan even when full row is RLS-empty.
           final teasers = ref.watch(catalogTestsProvider).value;
@@ -51,15 +53,15 @@ class TestInstructionsScreen extends ConsumerWidget {
                   .map((t) => t.requiredPlan)
                   .firstOrNull ??
               PlanTier.pro;
-          return _ErrorBody(
+          return AsyncErrorView(
             message: message,
-            planLocked: planLocked,
-            onRetry: planLocked
-                ? null
-                : () => ref.invalidate(testDetailProvider(testId)),
-            onUpgrade: planLocked
+            icon: planLocked ? Icons.lock_outline : null,
+            actionLabel: planLocked ? 'View upgrade options' : 'Retry',
+            onAction: planLocked
                 ? () => context.go(AppRoutes.upgradePath(requiredPlan))
-                : null,
+                : () => ref.invalidate(testDetailProvider(testId)),
+            secondaryLabel: 'Back to tests',
+            onSecondary: () => context.go(AppRoutes.testList),
           );
         },
         data: (detail) {
@@ -318,60 +320,6 @@ class _TypeBadge extends StatelessWidget {
             color: colorScheme.onSecondaryContainer,
             fontWeight: FontWeight.w600,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({
-    required this.message,
-    required this.planLocked,
-    this.onRetry,
-    this.onUpgrade,
-  });
-
-  final String message;
-  final bool planLocked;
-  final VoidCallback? onRetry;
-  final VoidCallback? onUpgrade;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (planLocked) ...[
-              Icon(
-                Icons.lock_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: Spacing.md),
-            ],
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: Spacing.md),
-            if (onUpgrade != null)
-              FilledButton(
-                onPressed: onUpgrade,
-                child: const Text('View upgrade options'),
-              )
-            else if (onRetry != null)
-              FilledButton(onPressed: onRetry, child: const Text('Retry')),
-            const SizedBox(height: Spacing.sm),
-            TextButton(
-              onPressed: () => context.go(AppRoutes.testList),
-              child: const Text('Back to tests'),
-            ),
-          ],
         ),
       ),
     );

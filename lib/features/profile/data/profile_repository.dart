@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../domain/plan_tier.dart';
 import '../domain/user_profile.dart';
 
@@ -31,10 +32,13 @@ class ProfileRepository {
           .single();
 
       return Success(UserProfile.fromJson(row));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load your profile. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load your profile. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load your profile. Please try again.',
+        ),
+      );
     }
   }
 
@@ -59,10 +63,13 @@ class ProfileRepository {
       }
 
       return Success(PlanTier.fromString(raw));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load your plan. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load your plan. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load your plan. Please try again.',
+        ),
+      );
     }
   }
 }

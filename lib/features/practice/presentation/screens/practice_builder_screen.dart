@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../data/practice_repository.dart';
 import '../../domain/plan_limits.dart';
@@ -48,10 +50,9 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
       _isSubmitting = true;
     });
 
-    final result = await ref.read(practiceRepositoryProvider).createSession(
-          draft: draft,
-          catalog: catalog,
-        );
+    final result = await ref
+        .read(practiceRepositoryProvider)
+        .createSession(draft: draft, catalog: catalog);
 
     if (!mounted) return;
 
@@ -67,7 +68,8 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
           maxSessionQuestions: planContext.limits.maxPracticeSessionQuestions,
         );
         if (toast != null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(toast)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(toast)));
         }
         context.go(AppRoutes.testPlayerPath(value.testId));
       case Failure(:final message):
@@ -105,51 +107,63 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
         ],
       ),
       body: catalogAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _ErrorBody(
-          message: error.toString().replaceFirst('Exception: ', ''),
-          onRetry: () => ref.read(practiceCatalogProvider.notifier).refresh(),
+        loading: () => const AsyncLoadingView(),
+        error: (error, _) => AsyncErrorView(
+          message: UserFacingError.display(error),
+          onAction: () => ref.read(practiceCatalogProvider.notifier).refresh(),
         ),
-        data: (catalog) => planAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _ErrorBody(
-            message: error.toString().replaceFirst('Exception: ', ''),
-            onRetry: () =>
-                ref.read(practicePlanContextProvider.notifier).refresh(),
-          ),
-          data: (planContext) {
-            // Align stale IDs, then re-clamp to *this* plan — stored JSON
-            // is a hint, not a grant (plan may have changed since last time).
-            final draft =
-                _draft.alignedWithCatalog(catalog).clampedTo(planContext);
-            return Column(
-              children: [
-                Expanded(
-                  child: PracticeBuilderForm(
-                    draft: draft,
-                    catalog: catalog,
-                    planContext: planContext,
-                    onChanged: (next) => setState(() => _draft = next),
-                    onUpgrade: () =>
-                        context.go(AppRoutes.upgradePath(PlanTier.pro)),
+        data: (catalog) {
+          if (catalog.subjects.isEmpty) {
+            return AsyncEmptyView(
+              icon: Icons.menu_book_outlined,
+              message: 'No practice content is available yet.',
+              actionLabel: 'Retry',
+              onAction: () =>
+                  ref.read(practiceCatalogProvider.notifier).refresh(),
+            );
+          }
+          return planAsync.when(
+            loading: () => const AsyncLoadingView(),
+            error: (error, _) => AsyncErrorView(
+              message: UserFacingError.display(error),
+              onAction: () =>
+                  ref.read(practicePlanContextProvider.notifier).refresh(),
+            ),
+            data: (planContext) {
+              // Align stale IDs, then re-clamp to *this* plan — stored JSON
+              // is a hint, not a grant (plan may have changed since last time).
+              final draft = _draft
+                  .alignedWithCatalog(catalog)
+                  .clampedTo(planContext);
+              return Column(
+                children: [
+                  Expanded(
+                    child: PracticeBuilderForm(
+                      draft: draft,
+                      catalog: catalog,
+                      planContext: planContext,
+                      onChanged: (next) => setState(() => _draft = next),
+                      onUpgrade: () =>
+                          context.go(AppRoutes.upgradePath(PlanTier.pro)),
+                    ),
                   ),
-                ),
-                _StartBar(
-                  errorMessage: _errorMessage,
-                  isSubmitting: _isSubmitting,
-                  quotaExhausted: planContext.dailyQuotaExhausted,
-                  onStart: _isSubmitting || planContext.dailyQuotaExhausted
-                      ? null
-                      : () => _submit(
+                  _StartBar(
+                    errorMessage: _errorMessage,
+                    isSubmitting: _isSubmitting,
+                    quotaExhausted: planContext.dailyQuotaExhausted,
+                    onStart: _isSubmitting || planContext.dailyQuotaExhausted
+                        ? null
+                        : () => _submit(
                             draft: draft,
                             catalog: catalog,
                             planContext: planContext,
                           ),
-                ),
-              ],
-            );
-          },
-        ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -186,9 +200,8 @@ class _StartBar extends StatelessWidget {
           if (errorMessage != null) ...[
             Text(
               errorMessage!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error,
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.error),
             ),
             const SizedBox(height: Spacing.sm),
           ],
@@ -197,9 +210,8 @@ class _StartBar extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: Spacing.sm),
               child: Text(
                 "You've used today's practice questions. Come back tomorrow.",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.error,
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.error),
               ),
             ),
           FilledButton(
@@ -216,37 +228,6 @@ class _StartBar extends StatelessWidget {
                 : const Text('Start practice'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: Spacing.md),
-            FilledButton(
-              onPressed: onRetry,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
       ),
     );
   }

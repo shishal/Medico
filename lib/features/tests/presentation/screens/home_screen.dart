@@ -4,9 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
+import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../providers/in_progress_attempts_provider.dart';
 import '../providers/pending_submit_sync_provider.dart';
 
@@ -49,10 +52,9 @@ class HomeScreen extends ConsumerWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            error: (_, _) => Text(
-              'Plan unavailable',
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.error),
+            error: (error, _) => InlineErrorMessage(
+              message: UserFacingError.display(error),
+              onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
             ),
           ),
           const SizedBox(height: Spacing.sm),
@@ -107,6 +109,16 @@ class _ResumeBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(inProgressAttemptsProvider);
+    if (async.hasError) {
+      return Card(
+        child: AsyncErrorView(
+          compact: true,
+          message: UserFacingError.display(async.error!),
+          onAction: () => ref.invalidate(inProgressAttemptsProvider),
+        ),
+      );
+    }
+
     final items = async.value;
     if (items == null || items.isEmpty) {
       return const SizedBox.shrink();

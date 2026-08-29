@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../bookmarks/presentation/widgets/bookmark_icon_button.dart';
 import '../../../security/domain/capture_event.dart';
 import '../../../security/presentation/widgets/content_capture_guard.dart';
@@ -63,19 +65,20 @@ class _SolutionReviewScreenState extends ConsumerState<SolutionReviewScreen> {
           ],
         ),
         body: reviewAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) {
-            final message = error.toString().replaceFirst('Exception: ', '');
-            return _ErrorBody(
-              message: message,
-              onRetry: () =>
-                  ref.invalidate(attemptReviewProvider(widget.attemptId)),
-              onBack: _goBack,
-            );
-          },
+          loading: () => const AsyncLoadingView(),
+          error: (error, _) => AsyncErrorView(
+            message: UserFacingError.display(error),
+            onAction: () =>
+                ref.invalidate(attemptReviewProvider(widget.attemptId)),
+            secondaryLabel: 'Back',
+            onSecondary: _goBack,
+          ),
           data: (review) {
             if (review.items.isEmpty) {
-              return const Center(child: Text('No questions to review.'));
+              return const AsyncEmptyView(
+                icon: Icons.quiz_outlined,
+                message: 'No questions to review.',
+              );
             }
             final last = review.items.length - 1;
             final index = _index.clamp(0, last);
@@ -104,36 +107,6 @@ class _SolutionReviewScreenState extends ConsumerState<SolutionReviewScreen> {
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({
-    required this.message,
-    required this.onRetry,
-    required this.onBack,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: Spacing.md),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
-            TextButton(onPressed: onBack, child: const Text('Back')),
-          ],
         ),
       ),
     );

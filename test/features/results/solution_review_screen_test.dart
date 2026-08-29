@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:medico/core/utils/result.dart';
+import 'package:medico/core/utils/user_facing_error.dart';
 import 'package:medico/features/bookmarks/presentation/providers/bookmarks_provider.dart';
 import 'package:medico/features/practice/domain/practice_enums.dart';
 import 'package:medico/features/results/domain/attempt_review.dart';
@@ -200,6 +201,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Remove bookmark'), findsOneWidget);
+  });
+
+  testWidgets('empty review shows an empty state', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const review = AttemptReview(
+      attemptId: 'a1',
+      testId: 't1',
+      testTitle: 'Mini Test',
+      explanationLevel: ExplanationLevel.full,
+      items: [],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          attemptReviewProvider.overrideWith((ref, id) => review),
+          bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
+          screenshotProtectionProvider.overrideWithValue(_NoOpProtection()),
+          watermarkLabelProvider.overrideWithValue('ada@example.com'),
+        ],
+        child: const MaterialApp(home: SolutionReviewScreen(attemptId: 'a1')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No questions to review.'), findsOneWidget);
+  });
+
+  testWidgets('error state shows offline copy and Retry', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          attemptReviewProvider.overrideWith(
+            (ref, id) => throw Exception(UserFacingError.offlineMessage),
+          ),
+          bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
+          screenshotProtectionProvider.overrideWithValue(_NoOpProtection()),
+          watermarkLabelProvider.overrideWithValue('ada@example.com'),
+        ],
+        child: const MaterialApp(home: SolutionReviewScreen(attemptId: 'a1')),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserFacingError.offlineMessage), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
   });
 }
 

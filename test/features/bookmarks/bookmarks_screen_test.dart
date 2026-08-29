@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:medico/core/utils/result.dart';
+import 'package:medico/core/utils/user_facing_error.dart';
 import 'package:medico/features/bookmarks/domain/bookmarked_question.dart';
 import 'package:medico/features/bookmarks/presentation/providers/bookmarks_provider.dart';
 import 'package:medico/features/bookmarks/presentation/screens/bookmarks_screen.dart';
@@ -126,5 +127,30 @@ void main() {
 
     expect(find.text('Which organelle produces ATP?'), findsNothing);
     expect(find.textContaining('No bookmarks yet'), findsOneWidget);
+  });
+
+  testWidgets('error state shows offline copy and Retry', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          bookmarksListProvider.overrideWith(
+            (ref) => throw Exception(UserFacingError.offlineMessage),
+          ),
+          bookmarkedIdsProvider.overrideWith(
+            () => _StubBookmarkedIds(const {}),
+          ),
+        ],
+        child: const MaterialApp(home: BookmarksScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserFacingError.offlineMessage), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
   });
 }

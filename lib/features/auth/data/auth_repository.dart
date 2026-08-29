@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../domain/auth_failure.dart';
 
 part 'auth_repository.g.dart';
@@ -29,8 +30,13 @@ class AuthRepository {
       return const Success(null);
     } on AuthException catch (e) {
       return Failure(AuthFailure.fromException(e));
-    } catch (_) {
-      return const Failure('Something went wrong. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Something went wrong. Please try again.',
+        ),
+      );
     }
   }
 
@@ -43,8 +49,13 @@ class AuthRepository {
       return const Success(null);
     } on AuthException catch (e) {
       return Failure(AuthFailure.fromException(e));
-    } catch (_) {
-      return const Failure('Something went wrong. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Something went wrong. Please try again.',
+        ),
+      );
     }
   }
 
@@ -54,8 +65,13 @@ class AuthRepository {
       return const Success(null);
     } on AuthException catch (e) {
       return Failure(AuthFailure.fromException(e));
-    } catch (_) {
-      return const Failure('Could not sign out. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not sign out. Please try again.',
+        ),
+      );
     }
   }
 }

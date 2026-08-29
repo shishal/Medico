@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../domain/bookmarked_question.dart';
 
 part 'bookmarks_repository.g.dart';
@@ -31,10 +32,13 @@ class BookmarksRepository {
           if (row[BookmarkColumns.questionId] is String)
             row[BookmarkColumns.questionId] as String,
       });
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load bookmarks. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load bookmarks. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load bookmarks. Please try again.',
+        ),
+      );
     }
   }
 
@@ -69,10 +73,13 @@ class BookmarksRepository {
         for (final row in (rows as List<dynamic>).cast<Map<String, dynamic>>())
           ?BookmarkedQuestion.fromJson(row),
       ]);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load bookmarks. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load bookmarks. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load bookmarks. Please try again.',
+        ),
+      );
     }
   }
 
@@ -91,9 +98,19 @@ class BookmarksRepository {
     } on PostgrestException catch (e) {
       // Unique violation — already bookmarked. Treat as success.
       if (e.code == '23505') return const Success(null);
-      return const Failure('Could not save bookmark. Please try again.');
-    } catch (_) {
-      return const Failure('Could not save bookmark. Please try again.');
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not save bookmark. Please try again.',
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not save bookmark. Please try again.',
+        ),
+      );
     }
   }
 
@@ -110,10 +127,13 @@ class BookmarksRepository {
           .eq(BookmarkColumns.userId, userId)
           .eq(BookmarkColumns.questionId, questionId);
       return const Success(null);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not remove bookmark. Please try again.');
-    } catch (_) {
-      return const Failure('Could not remove bookmark. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not remove bookmark. Please try again.',
+        ),
+      );
     }
   }
 }

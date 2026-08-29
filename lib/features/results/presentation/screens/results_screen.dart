@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../practice/data/practice_repository.dart';
 import '../providers/attempt_results_provider.dart';
 import '../widgets/results_summary.dart';
@@ -71,16 +73,14 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
         ),
       ),
       body: resultsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) {
-          final message = error.toString().replaceFirst('Exception: ', '');
-          return _ErrorBody(
-            message: message,
-            onRetry: () =>
-                ref.invalidate(attemptResultsProvider(widget.attemptId)),
-            onBack: _goHome,
-          );
-        },
+        loading: () => const AsyncLoadingView(),
+        error: (error, _) => AsyncErrorView(
+          message: UserFacingError.display(error),
+          onAction: () =>
+              ref.invalidate(attemptResultsProvider(widget.attemptId)),
+          secondaryLabel: 'Back to home',
+          onSecondary: _goHome,
+        ),
         data: (results) => Column(
           children: [
             Expanded(child: ResultsSummary(results: results)),
@@ -153,36 +153,6 @@ class _ResultsActions extends StatelessWidget {
               const SizedBox(height: Spacing.md),
             ],
             FilledButton(onPressed: onHome, child: const Text('Back to home')),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({
-    required this.message,
-    required this.onRetry,
-    required this.onBack,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: Spacing.md),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
-            TextButton(onPressed: onBack, child: const Text('Back to home')),
           ],
         ),
       ),

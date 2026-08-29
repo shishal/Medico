@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../domain/catalog_test.dart';
@@ -52,16 +54,19 @@ class TestListScreen extends ConsumerWidget {
           ),
         ),
         body: testsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _ErrorBody(
-            message: error.toString().replaceFirst('Exception: ', ''),
-            onRetry: () => ref.read(catalogTestsProvider.notifier).refresh(),
+          loading: () => const AsyncLoadingView(),
+          error: (error, _) => AsyncErrorView(
+            message: UserFacingError.display(error),
+            onAction: () => ref.read(catalogTestsProvider.notifier).refresh(),
           ),
           data: (tests) => TabBarView(
             children: [
               for (final tab in _tabs)
                 _TestTypeList(
                   userPlan: userPlan,
+                  emptyMessage: tab.type == null
+                      ? 'No tests available yet.'
+                      : 'No tests of this type yet.',
                   tests: tab.type == null
                       ? tests
                       : tests.where((t) => t.testType == tab.type).toList(),
@@ -82,36 +87,28 @@ class _TestTab {
 }
 
 class _TestTypeList extends StatelessWidget {
-  const _TestTypeList({required this.tests, required this.userPlan});
+  const _TestTypeList({
+    required this.tests,
+    required this.userPlan,
+    required this.emptyMessage,
+  });
 
   final List<CatalogTest> tests;
   final PlanTier userPlan;
+  final String emptyMessage;
 
   @override
   Widget build(BuildContext context) {
     if (tests.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(Spacing.lg),
-          child: Text(
-            'No tests of this type yet.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-        ),
-      );
+      return AsyncEmptyView(icon: Icons.quiz_outlined, message: emptyMessage);
     }
 
     return ListView.separated(
       padding: const EdgeInsets.all(Spacing.md),
       itemCount: tests.length,
       separatorBuilder: (_, _) => const SizedBox(height: Spacing.sm),
-      itemBuilder: (context, index) => _TestCard(
-        test: tests[index],
-        userPlan: userPlan,
-      ),
+      itemBuilder: (context, index) =>
+          _TestCard(test: tests[index], userPlan: userPlan),
     );
   }
 }
@@ -154,9 +151,7 @@ class _TestCard extends StatelessWidget {
                       _TypeBadge(type: test.testType),
                       const SizedBox(height: Spacing.sm),
                       Text(
-                        locked
-                            ? '${test.title} 🔒'
-                            : test.title,
+                        locked ? '${test.title} 🔒' : test.title,
                         style: textTheme.titleMedium,
                       ),
                       const SizedBox(height: Spacing.xs),
@@ -216,39 +211,8 @@ class _TypeBadge extends StatelessWidget {
       child: Text(
         type.label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSecondaryContainer,
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: Spacing.md),
-            FilledButton(
-              onPressed: onRetry,
-              child: const Text('Retry'),
-            ),
-          ],
+          color: colorScheme.onSecondaryContainer,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

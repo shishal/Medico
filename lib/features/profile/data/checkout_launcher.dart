@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../../auth/data/auth_repository.dart';
 import '../domain/plan_tier.dart';
 import 'checkout_env.dart';
@@ -55,8 +56,13 @@ class CheckoutLauncher {
         );
       }
       return const Success(null);
-    } catch (_) {
-      return const Failure('Could not open the checkout page in your browser.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not open the checkout page in your browser.',
+        ),
+      );
     }
   }
 }

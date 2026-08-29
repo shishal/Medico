@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../../../core/utils/wall_clock.dart';
 import '../domain/attempt.dart';
 import '../domain/attempt_score.dart';
@@ -70,10 +71,13 @@ class TestsRepository {
           .toList();
 
       return Success(tests);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load tests. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load tests. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load tests. Please try again.',
+        ),
+      );
     }
   }
 
@@ -114,10 +118,13 @@ class TestsRepository {
       }
 
       return Success(TestDetail.fromJson(list.first));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load test details. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load test details. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load test details. Please try again.',
+        ),
+      );
     }
   }
 
@@ -188,10 +195,13 @@ class TestsRepository {
       return Success(
         TestPlayerBundle.fromParts(testRow: tests.first, questions: questions),
       );
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load this test. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load this test. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load this test. Please try again.',
+        ),
+      );
     }
   }
 
@@ -214,10 +224,13 @@ class TestsRepository {
       final list = (rows as List<dynamic>).cast<Map<String, dynamic>>();
       if (list.isEmpty) return const Success(null);
       return Success(Attempt.fromJson(list.first));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not check for an existing attempt.');
-    } catch (_) {
-      return const Failure('Could not check for an existing attempt.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not check for an existing attempt.',
+        ),
+      );
     }
   }
 
@@ -236,10 +249,10 @@ class TestsRepository {
       final list = (rows as List<dynamic>).cast<Map<String, dynamic>>();
       if (list.isEmpty) return const Success(null);
       return Success(Attempt.fromJson(list.first));
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load this attempt.');
-    } catch (_) {
-      return const Failure('Could not load this attempt.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not load this attempt.'),
+      );
     }
   }
 
@@ -263,10 +276,10 @@ class TestsRepository {
           .map(Attempt.fromJson)
           .toList();
       return Success(attempts);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load in-progress tests.');
-    } catch (_) {
-      return const Failure('Could not load in-progress tests.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not load in-progress tests.'),
+      );
     }
   }
 
@@ -312,9 +325,19 @@ class TestsRepository {
           return Success(retry.value!);
         }
       }
-      return const Failure('Could not start this test. Please try again.');
-    } catch (_) {
-      return const Failure('Could not start this test. Please try again.');
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not start this test. Please try again.',
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not start this test. Please try again.',
+        ),
+      );
     }
   }
 
@@ -338,10 +361,10 @@ class TestsRepository {
           })
           .eq(AttemptColumns.id, attemptId);
       return const Success(true);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not sync section timer.');
-    } catch (_) {
-      return const Failure('Could not sync section timer.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not sync section timer.'),
+      );
     }
   }
 
@@ -354,10 +377,10 @@ class TestsRepository {
         return const Failure('Could not read server time.');
       }
       return Success(parsed);
-    } on PostgrestException catch (_) {
-      return const Failure('Could not read server time.');
-    } catch (_) {
-      return const Failure('Could not read server time.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not read server time.'),
+      );
     }
   }
 
@@ -383,10 +406,13 @@ class TestsRepository {
       }
       return Success(AttemptScore.fromJson(map));
     } on PostgrestException catch (e) {
-      return Failure(_mapSubmitError(e));
-    } catch (_) {
-      return const Failure(
-        'Could not submit. Check your connection and try again.',
+      return Failure(UserFacingError.from(e, fallback: _mapSubmitError(e)));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not submit. Check your connection and try again.',
+        ),
       );
     }
   }

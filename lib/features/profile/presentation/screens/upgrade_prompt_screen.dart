@@ -5,10 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../data/checkout_launcher.dart';
 import '../../domain/plan_offering.dart';
 import '../../domain/plan_tier.dart';
 import '../providers/current_plan_provider.dart';
+import '../providers/user_profile_provider.dart';
 import '../widgets/plan_comparison_card.dart';
 
 /// Plan comparison + a link out to web checkout (Phase 7.1).
@@ -51,7 +54,8 @@ class _UpgradePromptScreenState extends ConsumerState<UpgradePromptScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final currentPlan = ref.watch(currentPlanProvider).value;
+    final planAsync = ref.watch(currentPlanProvider);
+    final currentPlan = planAsync.value;
     final required = widget.requiredPlan == PlanTier.free
         ? null
         : widget.requiredPlan;
@@ -88,6 +92,13 @@ class _UpgradePromptScreenState extends ConsumerState<UpgradePromptScreen> {
             ),
           ),
           const SizedBox(height: Spacing.lg),
+          if (planAsync.hasError) ...[
+            InlineErrorMessage(
+              message: UserFacingError.display(planAsync.error!),
+              onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
+            ),
+            const SizedBox(height: Spacing.md),
+          ],
           for (final offering in PlanOffering.comparison) ...[
             PlanComparisonCard(
               offering: offering,

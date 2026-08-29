@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase/supabase_provider.dart';
 import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/user_facing_error.dart';
 import '../../practice/domain/practice_enums.dart';
 import '../../tests/domain/attempt_status.dart';
 import '../../tests/domain/player_question.dart';
@@ -36,9 +37,14 @@ class ResultsRepository {
       }
       return Success(AttemptResults.fromJson(map));
     } on PostgrestException catch (e) {
-      return Failure(_mapError(e));
-    } catch (_) {
-      return const Failure('Could not load results. Please try again.');
+      return Failure(UserFacingError.from(e, fallback: _mapError(e)));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load results. Please try again.',
+        ),
+      );
     }
   }
 
@@ -153,10 +159,13 @@ class ResultsRepository {
           answers: answers,
         ),
       );
-    } on PostgrestException catch (_) {
-      return const Failure('Could not load solutions. Please try again.');
-    } catch (_) {
-      return const Failure('Could not load solutions. Please try again.');
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not load solutions. Please try again.',
+        ),
+      );
     }
   }
 

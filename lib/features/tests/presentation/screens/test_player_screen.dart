@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../security/domain/capture_event.dart';
 import '../../../security/presentation/widgets/content_capture_guard.dart';
@@ -104,18 +106,24 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
     return ContentCaptureGuard(
       screen: ContentScreens.testPlayer,
       child: sessionAsync.when(
-        loading: () =>
-            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        loading: () => Scaffold(
+          appBar: AppBar(title: const Text('Test')),
+          body: const AsyncLoadingView(),
+        ),
         error: (error, _) {
-          final message = error.toString().replaceFirst('Exception: ', '');
+          final message = UserFacingError.display(error);
+          final planLocked = message == TestPlayerScreen._planLockedMessage;
           return Scaffold(
             appBar: AppBar(title: const Text('Test')),
-            body: _ErrorBody(
+            body: AsyncErrorView(
               message: message,
-              planLocked: message == TestPlayerScreen._planLockedMessage,
-              onRetry: () => ref.invalidate(playerSessionProvider(testId)),
-              onUpgrade: () => context.go(AppRoutes.upgradePath(PlanTier.pro)),
-              onBack: () => _exit(context, isPractice: false),
+              icon: planLocked ? Icons.lock_outline : null,
+              actionLabel: planLocked ? 'View upgrade options' : 'Retry',
+              onAction: planLocked
+                  ? () => context.go(AppRoutes.upgradePath(PlanTier.pro))
+                  : () => ref.invalidate(playerSessionProvider(testId)),
+              secondaryLabel: 'Back',
+              onSecondary: () => _exit(context, isPractice: false),
             ),
           );
         },
@@ -211,46 +219,6 @@ class _SubmittingBody extends StatelessWidget {
               ],
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({
-    required this.message,
-    required this.planLocked,
-    required this.onRetry,
-    required this.onUpgrade,
-    required this.onBack,
-  });
-
-  final String message;
-  final bool planLocked;
-  final VoidCallback onRetry;
-  final VoidCallback onUpgrade;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: Spacing.md),
-            if (planLocked)
-              FilledButton(
-                onPressed: onUpgrade,
-                child: const Text('View upgrade options'),
-              )
-            else
-              FilledButton(onPressed: onRetry, child: const Text('Retry')),
-            TextButton(onPressed: onBack, child: const Text('Back')),
-          ],
         ),
       ),
     );

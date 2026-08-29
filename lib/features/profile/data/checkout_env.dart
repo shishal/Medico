@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// Reads the external checkout URL from `.env` (see `.env.example`).
 ///
 /// Missing or placeholder values return null so the upgrade screen can explain
-/// instead of crashing — the real page is built in Phase 7.2.
+/// instead of crashing. The page itself lives in `checkout/` (Phase 7.2).
 abstract final class CheckoutEnv {
   static Uri? get urlOrNull {
     try {

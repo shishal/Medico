@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/utils/result.dart';
+import '../../auth/data/auth_repository.dart';
 import '../domain/plan_tier.dart';
 import 'checkout_env.dart';
 
@@ -10,10 +11,20 @@ part 'checkout_launcher.g.dart';
 /// Opens the web checkout in the **device browser** — never an in-app
 /// purchase, WebView, or payment form.
 class CheckoutLauncher {
-  CheckoutLauncher({required this.checkoutUri, required this.launch});
+  CheckoutLauncher({
+    required this.checkoutUri,
+    required this.launch,
+    this.resolveEmail,
+  });
 
   final Uri? checkoutUri;
   final Future<bool> Function(Uri uri) launch;
+
+  /// Prefill for the web login field — not a session or login token.
+  ///
+  /// `String? Function()?` is an optional callback: if provided, we call it
+  /// and, when it returns a non-empty string, append `?email=`.
+  final String? Function()? resolveEmail;
 
   /// [plan] is passed as a query param so the web page can pre-select it.
   Future<Result<void>> openCheckout({required PlanTier plan}) async {
@@ -28,9 +39,13 @@ class CheckoutLauncher {
       );
     }
 
-    final uri = base.replace(
-      queryParameters: {...base.queryParameters, 'plan': plan.name},
-    );
+    final query = {...base.queryParameters, 'plan': plan.name};
+    final email = resolveEmail?.call()?.trim();
+    if (email != null && email.isNotEmpty) {
+      query['email'] = email;
+    }
+
+    final uri = base.replace(queryParameters: query);
 
     try {
       final opened = await launch(uri);
@@ -52,5 +67,6 @@ CheckoutLauncher checkoutLauncher(Ref ref) {
     checkoutUri: CheckoutEnv.urlOrNull,
     // externalApplication = the system browser, not an in-app WebView.
     launch: (uri) => launchUrl(uri, mode: LaunchMode.externalApplication),
+    resolveEmail: () => ref.read(authRepositoryProvider).currentEmail,
   );
 }

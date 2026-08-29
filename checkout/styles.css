@@ -1,0 +1,143 @@
+:root {
+  --seed: #0d7377;
+  --bg: #f4f7f7;
+  --surface: #ffffff;
+  --text: #122022;
+  --muted: #4a5c5e;
+  --outline: #c5d4d5;
+  --radius: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1617;
+    --surface: #152022;
+    --text: #e6eef0;
+    --muted: #9bb0b3;
+    --outline: #2a3d40;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-xs);
+}
+
+.lede {
+  color: var(--muted);
+  margin: 0 0 var(--space-lg);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.card.selected {
+  outline: 2px solid var(--seed);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: baseline;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+}
+
+input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius);
+  border: 0;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.primary {
+  width: 100%;
+  background: var(--seed);
+  color: #fff;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghost {
+  width: 100%;
+  margin-top: var(--space-sm);
+  background: transparent;
+  color: var(--seed);
+}
+
+.error {
+  color: #b3261e;
+  margin: 0 0 var(--space-md);
+}
+
+.success {
+  color: var(--seed);
+}
+
+button.plan-pick {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}

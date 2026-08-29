@@ -37,6 +37,24 @@ void main() {
 
     expect(launched.queryParameters['src'], 'app');
     expect(launched.queryParameters['plan'], 'pro');
+    expect(launched.queryParameters.containsKey('email'), isFalse);
+  });
+
+  test('openCheckout appends email as a prefill query param', () async {
+    late Uri launched;
+    final launcher = CheckoutLauncher(
+      checkoutUri: Uri.parse('https://checkout.test/pay'),
+      resolveEmail: () => '  a@b.com  ',
+      launch: (uri) async {
+        launched = uri;
+        return true;
+      },
+    );
+
+    await launcher.openCheckout(plan: PlanTier.pro);
+
+    expect(launched.queryParameters['plan'], 'pro');
+    expect(launched.queryParameters['email'], 'a@b.com');
   });
 
   test('openCheckout refuses the free plan', () async {

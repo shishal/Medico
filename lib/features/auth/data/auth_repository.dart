@@ -15,6 +15,9 @@ class AuthRepository {
 
   bool get isSignedIn => _client.auth.currentSession != null;
 
+  /// Prefill only — checkout still requires a password on the web page.
+  String? get currentEmail => _client.auth.currentUser?.email;
+
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
   Future<Result<void>> signUp({

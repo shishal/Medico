@@ -33,9 +33,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       case Success():
         context.go(AppRoutes.login);
       case Failure(:final message):
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -62,10 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
-          Text(
-            'Profile',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text('Profile', style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: Spacing.md),
           planAsync.when(
             data: (plan) => Text(
@@ -82,9 +78,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             error: (error, _) => Text(
               'Could not load plan',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(color: Theme.of(context).colorScheme.error),
             ),
           ),
           const SizedBox(height: Spacing.sm),
@@ -97,14 +92,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ? 'No plan expiry set'
                     : 'Stored plan: ${profile.plan.label} · expires ${expires.toLocal()}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               );
             },
             loading: () => const SizedBox.shrink(),
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.lg),
+          FilledButton.tonal(
+            onPressed: () => context.go(AppRoutes.upgrade),
+            child: const Text('Compare plans'),
+          ),
+          const SizedBox(height: Spacing.md),
           const ThemeModeToggleButton(),
           const SizedBox(height: Spacing.md),
           TextButton(

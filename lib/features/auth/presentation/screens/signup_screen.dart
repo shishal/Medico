@@ -7,6 +7,7 @@ import '../../../../core/supabase/supabase_provider.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/widgets/auth_hero.dart';
 import '../../data/auth_repository.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await ref.read(authRepositoryProvider).signUp(
+    final result = await ref
+        .read(authRepositoryProvider)
+        .signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -76,71 +79,73 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign up')),
-      body: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Create your account',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: Spacing.md),
-              if (_errorMessage != null) ...[
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: colorScheme.error),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                const SizedBox(height: Spacing.lg),
+                const AuthHero(
+                  title: "Let's start",
+                  subtitle: 'Create an account to unlock NEET-PG practice',
+                ),
+                const SizedBox(height: Spacing.xl),
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
+                if (_infoMessage != null) ...[
+                  Text(
+                    _infoMessage!,
+                    style: TextStyle(color: colorScheme.primary),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  textInputAction: TextInputAction.next,
+                  enabled: !_isLoading,
+                  validator: AuthValidators.email,
                 ),
                 const SizedBox(height: Spacing.md),
-              ],
-              if (_infoMessage != null) ...[
-                Text(
-                  _infoMessage!,
-                  style: TextStyle(color: colorScheme.primary),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  enabled: !_isLoading,
+                  onFieldSubmitted: (_) => _submit(),
+                  validator: AuthValidators.password,
+                ),
+                const SizedBox(height: Spacing.xl),
+                FilledButton(
+                  onPressed: _isLoading ? null : _submit,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Create account'),
                 ),
                 const SizedBox(height: Spacing.md),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => context.go(AppRoutes.login),
+                  child: const Text('Already have an account? Log in'),
+                ),
               ],
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                autofillHints: const [AutofillHints.email],
-                textInputAction: TextInputAction.next,
-                enabled: !_isLoading,
-                validator: AuthValidators.email,
-              ),
-              const SizedBox(height: Spacing.md),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                autofillHints: const [AutofillHints.newPassword],
-                textInputAction: TextInputAction.done,
-                enabled: !_isLoading,
-                onFieldSubmitted: (_) => _submit(),
-                validator: AuthValidators.password,
-              ),
-              const SizedBox(height: Spacing.lg),
-              FilledButton(
-                onPressed: _isLoading ? null : _submit,
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Sign up'),
-              ),
-              const SizedBox(height: Spacing.md),
-              TextButton(
-                onPressed:
-                    _isLoading ? null : () => context.go(AppRoutes.login),
-                child: const Text('Already have an account? Log in'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

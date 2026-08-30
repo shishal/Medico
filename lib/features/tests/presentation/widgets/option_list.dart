@@ -54,7 +54,7 @@ class OptionTile extends StatelessWidget {
     return Material(
       color: fill,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: BorderRadius.circular(18),
         side: BorderSide(
           color: border,
           width: visual == OptionVisual.idle ? 1 : 2,
@@ -63,7 +63,7 @@ class OptionTile extends StatelessWidget {
       child: InkWell(
         key: Key('option-$letter'),
         onTap: locked ? null : onTap,
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.all(Spacing.md),
           child: Row(

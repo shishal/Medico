@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../practice/domain/practice_builder_draft.dart';
 import '../../../practice/domain/practice_enums.dart';
@@ -63,9 +64,10 @@ class BookmarksScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
+                  padding: const EdgeInsets.all(Spacing.md),
                   itemCount: visible.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: Spacing.sm),
                   itemBuilder: (context, index) {
                     return _BookmarkTile(item: visible[index]);
                   },
@@ -101,21 +103,40 @@ class _BookmarkTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final subtitle = item.subtitle;
 
-    return ListTile(
-      leading: Icon(
-        item.isPlanLocked ? Icons.lock_outline : Icons.quiz_outlined,
-        color: item.isPlanLocked ? colorScheme.outline : colorScheme.primary,
-      ),
-      title: Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: subtitle == null
-          ? (item.isPlanLocked
-                ? Text(
+    return AppCard(
+      child: Row(
+        children: [
+          Icon(
+            item.isPlanLocked ? Icons.lock_outline : Icons.quiz_outlined,
+            color: item.isPlanLocked
+                ? colorScheme.outline
+                : colorScheme.primary,
+          ),
+          const SizedBox(width: Spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: Spacing.xs),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                ] else if (item.isPlanLocked)
+                  Text(
                     'Upgrade to see this question.',
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
-                  )
-                : null)
-          : Text(subtitle),
-      trailing: BookmarkIconButton(questionId: item.questionId),
+                  ),
+              ],
+            ),
+          ),
+          BookmarkIconButton(questionId: item.questionId),
+        ],
+      ),
     );
   }
 }

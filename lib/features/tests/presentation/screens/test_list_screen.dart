@@ -5,12 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../domain/catalog_test.dart';
 import '../../domain/test_type.dart';
 import '../providers/catalog_tests_provider.dart';
+import '../widgets/test_type_style.dart';
 
 /// Tabbed catalog: unlocked tests + locked teasers for higher plans.
 class TestListScreen extends ConsumerWidget {
@@ -36,10 +38,6 @@ class TestListScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Tests'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go(AppRoutes.home),
-          ),
           actions: [
             IconButton(
               tooltip: 'Refresh',
@@ -124,66 +122,66 @@ class _TestCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final locked = test.isLockedFor(userPlan);
+    final brightness = Theme.of(context).brightness;
 
-    return Card(
-      // Locked cards stay tappable so users reach the upgrade prompt.
-      child: InkWell(
-        borderRadius: BorderRadius.circular(Spacing.sm),
-        onTap: () {
-          if (locked) {
-            context.go(AppRoutes.upgradePath(test.requiredPlan));
-          } else {
-            // Instructions first — never jump straight into a timed test.
-            context.go(AppRoutes.testDetailPath(test.id));
-          }
-        },
-        child: Opacity(
-          opacity: locked ? 0.72 : 1,
-          child: Padding(
-            padding: const EdgeInsets.all(Spacing.md),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _TypeBadge(type: test.testType),
-                      const SizedBox(height: Spacing.sm),
-                      Text(
-                        locked ? '${test.title} 🔒' : test.title,
-                        style: textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: Spacing.xs),
-                      if (locked) ...[
-                        Text(
-                          'Upgrade to ${test.requiredPlan.label}',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: Spacing.xs),
-                      ],
-                      Text(
-                        '${test.totalQuestions} questions · '
-                        '${test.durationLabel}',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+    return AppCard(
+      color: TestTypeStyle.tint(
+        test.testType,
+        brightness,
+      ).withValues(alpha: locked ? 0.45 : 0.55),
+      onTap: () {
+        if (locked) {
+          context.go(AppRoutes.upgradePath(test.requiredPlan));
+        } else {
+          // Instructions first — never jump straight into a timed test.
+          context.go(AppRoutes.testDetailPath(test.id));
+        }
+      },
+      child: Opacity(
+        opacity: locked ? 0.85 : 1,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _TypeBadge(type: test.testType),
+                  const SizedBox(height: Spacing.sm),
+                  Text(
+                    locked ? '${test.title} 🔒' : test.title,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                Icon(
-                  locked ? Icons.lock_outline : Icons.chevron_right,
-                  color: locked
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                ),
-              ],
+                  const SizedBox(height: Spacing.xs),
+                  if (locked) ...[
+                    Text(
+                      'Upgrade to ${test.requiredPlan.label}',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.xs),
+                  ],
+                  Text(
+                    '${test.totalQuestions} questions · '
+                    '${test.durationLabel}',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Icon(
+              locked ? Icons.lock_outline : Icons.chevron_right,
+              color: locked
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
+            ),
+          ],
         ),
       ),
     );
@@ -197,23 +195,19 @@ class _TypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: Spacing.sm,
         vertical: Spacing.xs,
       ),
       decoration: BoxDecoration(
-        color: colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(Spacing.xs),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         type.label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSecondaryContainer,
-          fontWeight: FontWeight.w600,
-        ),
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

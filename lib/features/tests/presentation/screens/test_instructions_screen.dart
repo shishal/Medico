@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
@@ -114,27 +115,33 @@ class _InstructionsBody extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: Spacing.lg),
-              _FactRow(
-                icon: Icons.timer_outlined,
-                label: 'Duration',
-                value: detail.durationLabel,
-              ),
-              _FactRow(
-                icon: Icons.quiz_outlined,
-                label: 'Questions',
-                value: '${detail.totalQuestions}',
-              ),
-              _FactRow(
-                icon: Icons.scoreboard_outlined,
-                label: 'Marking',
-                value: detail.markingSchemeLabel,
-              ),
-              if (detail.sectionLayoutLabel != null)
-                _FactRow(
-                  icon: Icons.view_agenda_outlined,
-                  label: 'Sections',
-                  value: detail.sectionLayoutLabel!,
+              AppCard(
+                child: Column(
+                  children: [
+                    _FactRow(
+                      icon: Icons.timer_outlined,
+                      label: 'Duration',
+                      value: detail.durationLabel,
+                    ),
+                    _FactRow(
+                      icon: Icons.quiz_outlined,
+                      label: 'Questions',
+                      value: '${detail.totalQuestions}',
+                    ),
+                    _FactRow(
+                      icon: Icons.scoreboard_outlined,
+                      label: 'Marking',
+                      value: detail.markingSchemeLabel,
+                    ),
+                    if (detail.sectionLayoutLabel != null)
+                      _FactRow(
+                        icon: Icons.view_agenda_outlined,
+                        label: 'Sections',
+                        value: detail.sectionLayoutLabel!,
+                      ),
+                  ],
                 ),
+              ),
               const SizedBox(height: Spacing.lg),
               if (detail.isSectional)
                 const _SectionLockWarning()
@@ -215,7 +222,7 @@ class _InfoCallout extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
         padding: const EdgeInsets.all(Spacing.md),

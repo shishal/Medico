@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/data/auth_repository.dart';
@@ -44,14 +45,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final planAsync = ref.watch(currentPlanProvider);
     final profileAsync = ref.watch(userProfileProvider);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final name = profileAsync.value?.fullName?.trim();
+    final initial = (name == null || name.isEmpty)
+        ? 'M'
+        : name[0].toUpperCase();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
-        ),
         actions: [
           IconButton(
             tooltip: 'Refresh plan',
@@ -63,15 +66,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
-          Text('Profile', style: Theme.of(context).textTheme.headlineSmall),
+          Center(
+            child: CircleAvatar(
+              radius: 40,
+              backgroundColor: scheme.primary.withValues(alpha: 0.16),
+              child: Text(
+                initial,
+                style: textTheme.headlineSmall?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: Spacing.md),
+          Text(
+            (name == null || name.isEmpty) ? 'Medico student' : name,
+            textAlign: TextAlign.center,
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: Spacing.sm),
           planAsync.when(
             data: (plan) => Text(
               plan == null ? 'Plan: —' : 'Current plan: ${plan.label}',
-              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
+              style: textTheme.titleMedium,
             ),
-            loading: () => const Align(
-              alignment: Alignment.centerLeft,
+            loading: () => const Center(
               child: SizedBox(
                 height: 20,
                 width: 20,
@@ -92,8 +113,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 expires == null
                     ? 'No plan expiry set'
                     : 'Stored plan: ${profile.plan.label} · expires ${expires.toLocal()}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                textAlign: TextAlign.center,
+                style: textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
                 ),
               );
             },
@@ -101,12 +123,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.lg),
-          FilledButton.tonal(
-            onPressed: () => context.go(AppRoutes.upgrade),
-            child: const Text('Compare plans'),
+          AppCard(
+            onTap: () => context.go(AppRoutes.upgrade),
+            child: Row(
+              children: [
+                Icon(Icons.workspace_premium_outlined, color: scheme.primary),
+                const SizedBox(width: Spacing.md),
+                Expanded(
+                  child: Text(
+                    'Compare plans',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded),
+              ],
+            ),
           ),
           const SizedBox(height: Spacing.md),
-          const ThemeModeToggleButton(),
+          const AppCard(child: ThemeModeToggleButton()),
           const SizedBox(height: Spacing.md),
           TextButton(
             onPressed: _isSigningOut ? null : _signOut,

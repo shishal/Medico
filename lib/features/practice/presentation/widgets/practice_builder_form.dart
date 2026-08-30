@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../domain/plan_limits.dart';
 import '../../domain/practice_builder_draft.dart';
 import '../../domain/practice_catalog.dart';
@@ -64,8 +65,8 @@ class PracticeBuilderForm extends StatelessWidget {
               Text(
                 'No topics for the selected subjects yet.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               )
             else
               for (final topic in topics)
@@ -223,11 +224,11 @@ class _SourceCard extends StatelessWidget {
   final VoidCallback onTap;
 
   IconData get _icon => switch (filter) {
-        QuestionSourceFilter.unattempted => Icons.quiz_outlined,
-        QuestionSourceFilter.incorrect => Icons.replay,
-        QuestionSourceFilter.bookmarked => Icons.bookmark_outline,
-        QuestionSourceFilter.all => Icons.library_books_outlined,
-      };
+    QuestionSourceFilter.unattempted => Icons.quiz_outlined,
+    QuestionSourceFilter.incorrect => Icons.replay,
+    QuestionSourceFilter.bookmarked => Icons.bookmark_outline,
+    QuestionSourceFilter.all => Icons.library_books_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +238,7 @@ class _SourceCard extends StatelessWidget {
     return Material(
       color: selected ? colorScheme.primaryContainer : colorScheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: BorderRadius.circular(18),
         side: BorderSide(
           color: selected ? colorScheme.primary : colorScheme.outlineVariant,
           width: selected ? 2 : 1,
@@ -245,7 +246,7 @@ class _SourceCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(Spacing.sm),
+        borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.all(Spacing.md),
           child: Column(
@@ -302,41 +303,43 @@ class _ChipSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(child: Text(title, style: textTheme.titleMedium)),
-            if (locked)
-              Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(title, style: textTheme.titleMedium)),
+              if (locked)
+                Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            ],
+          ),
+          if (helper != null && !locked) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              helper!,
+              style: textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
+            ),
           ],
-        ),
-        if (helper != null && !locked) ...[
-          const SizedBox(height: Spacing.xs),
-          Text(
-            helper!,
-            style: textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          const SizedBox(height: Spacing.sm),
+          Opacity(
+            opacity: locked ? 0.55 : 1,
+            child: Wrap(
+              spacing: Spacing.sm,
+              runSpacing: Spacing.sm,
+              children: children,
             ),
           ),
+          if (locked && upgradeHint != null)
+            _UpgradeHint(message: upgradeHint!, onUpgrade: onUpgrade),
         ],
-        const SizedBox(height: Spacing.sm),
-        Opacity(
-          opacity: locked ? 0.55 : 1,
-          child: Wrap(
-            spacing: Spacing.sm,
-            runSpacing: Spacing.sm,
-            children: children,
-          ),
-        ),
-        if (locked && upgradeHint != null)
-          _UpgradeHint(message: upgradeHint!, onUpgrade: onUpgrade),
-      ],
+      ),
     );
   }
 }
@@ -362,46 +365,48 @@ class _QuestionCountSection extends StatelessWidget {
     final sliderMax = maxQ < 1 ? 1 : maxQ;
     final value = count.clamp(1, sliderMax).toDouble();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Question count', style: textTheme.titleMedium),
-        const SizedBox(height: Spacing.xs),
-        Text(
-          'Your ${planContext.limits.plan.label} plan allows up to '
-          '${planContext.limits.maxPracticeSessionQuestions} per session.',
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        if (quota != null) ...[
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Question count', style: textTheme.titleMedium),
           const SizedBox(height: Spacing.xs),
           Text(
-            remaining == 0
-                ? "You've used today's $quota practice questions."
-                : '$quota per day · $remaining left today.',
+            'Your ${planContext.limits.plan.label} plan allows up to '
+            '${planContext.limits.maxPracticeSessionQuestions} per session.',
             style: textTheme.bodySmall?.copyWith(
-              color: remaining == 0 ? colorScheme.error : colorScheme.primary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
-        ],
-        const SizedBox(height: Spacing.sm),
-        if (planContext.dailyQuotaExhausted)
-          const SizedBox.shrink()
-        else
-          Slider(
-            min: 1,
-            max: sliderMax.toDouble(),
-            divisions: sliderMax > 1 ? sliderMax - 1 : null,
-            value: value,
-            label: '${value.round()}',
-            onChanged: (v) => onChanged(v.round()),
+          if (quota != null) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              remaining == 0
+                  ? "You've used today's $quota practice questions."
+                  : '$quota per day · $remaining left today.',
+              style: textTheme.bodySmall?.copyWith(
+                color: remaining == 0 ? colorScheme.error : colorScheme.primary,
+              ),
+            ),
+          ],
+          const SizedBox(height: Spacing.sm),
+          if (planContext.dailyQuotaExhausted)
+            const SizedBox.shrink()
+          else
+            Slider(
+              min: 1,
+              max: sliderMax.toDouble(),
+              divisions: sliderMax > 1 ? sliderMax - 1 : null,
+              value: value,
+              label: '${value.round()}',
+              onChanged: (v) => onChanged(v.round()),
+            ),
+          Text(
+            '$count ${count == 1 ? 'question' : 'questions'}',
+            style: textTheme.titleSmall,
           ),
-        Text(
-          '$count ${count == 1 ? 'question' : 'questions'}',
-          style: textTheme.titleSmall,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -419,30 +424,29 @@ class _FeedbackTimingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Feedback timing', style: textTheme.titleMedium),
-        const SizedBox(height: Spacing.sm),
-        SegmentedButton<FeedbackTiming>(
-          segments: [
-            for (final timing in FeedbackTiming.values)
-              ButtonSegment(
-                value: timing,
-                label: Text(timing.label),
-              ),
-          ],
-          selected: {selected},
-          onSelectionChanged: (value) => onSelected(value.first),
-        ),
-        const SizedBox(height: Spacing.sm),
-        Text(
-          selected.subtitle,
-          style: textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Feedback timing', style: textTheme.titleMedium),
+          const SizedBox(height: Spacing.sm),
+          SegmentedButton<FeedbackTiming>(
+            segments: [
+              for (final timing in FeedbackTiming.values)
+                ButtonSegment(value: timing, label: Text(timing.label)),
+            ],
+            selected: {selected},
+            onSelectionChanged: (value) => onSelected(value.first),
           ),
-        ),
-      ],
+          const SizedBox(height: Spacing.sm),
+          Text(
+            selected.subtitle,
+            style: textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -464,47 +468,49 @@ class _ExplanationLevelSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text('Explanation level', style: textTheme.titleMedium),
-            ),
-            if (!allowFull)
-              Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text('Explanation level', style: textTheme.titleMedium),
               ),
-          ],
-        ),
-        const SizedBox(height: Spacing.sm),
-        Wrap(
-          spacing: Spacing.sm,
-          runSpacing: Spacing.sm,
-          children: [
-            for (final level in ExplanationLevel.values)
-              ChoiceChip(
-                label: Text(
-                  level == ExplanationLevel.full && !allowFull
-                      ? '${level.label} 🔒'
-                      : level.label,
+              if (!allowFull)
+                Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                selected: selected == level,
-                onSelected: (!allowFull && level == ExplanationLevel.full)
-                    ? null
-                    : (_) => onSelected(level),
-              ),
-          ],
-        ),
-        if (!allowFull)
-          _UpgradeHint(
-            message: 'Upgrade to Pro for full explanations',
-            onUpgrade: onUpgrade,
+            ],
           ),
-      ],
+          const SizedBox(height: Spacing.sm),
+          Wrap(
+            spacing: Spacing.sm,
+            runSpacing: Spacing.sm,
+            children: [
+              for (final level in ExplanationLevel.values)
+                ChoiceChip(
+                  label: Text(
+                    level == ExplanationLevel.full && !allowFull
+                        ? '${level.label} 🔒'
+                        : level.label,
+                  ),
+                  selected: selected == level,
+                  onSelected: (!allowFull && level == ExplanationLevel.full)
+                      ? null
+                      : (_) => onSelected(level),
+                ),
+            ],
+          ),
+          if (!allowFull)
+            _UpgradeHint(
+              message: 'Upgrade to Pro for full explanations',
+              onUpgrade: onUpgrade,
+            ),
+        ],
+      ),
     );
   }
 }
@@ -530,60 +536,63 @@ class _TimerSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(child: Text('Timer', style: textTheme.titleMedium)),
-            if (!canToggle)
-              Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-          ],
-        ),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Timed session'),
-          subtitle: Text(
-            canToggle
-                ? 'Turn off to practice without a countdown'
-                : 'Timer stays on for your plan',
-          ),
-          value: enabled,
-          onChanged: canToggle ? onEnabledChanged : null,
-        ),
-        if (!canToggle)
-          _UpgradeHint(
-            message: 'Upgrade to turn the timer off',
-            onUpgrade: onUpgrade,
-          ),
-        if (enabled) ...[
-          const SizedBox(height: Spacing.sm),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
-              Text('Duration', style: textTheme.bodyLarge),
-              const Spacer(),
-              IconButton(
-                tooltip: 'Fewer minutes',
-                onPressed:
-                    minutes > 1 ? () => onMinutesChanged(minutes - 1) : null,
-                icon: const Icon(Icons.remove_circle_outline),
-              ),
-              Text('$minutes min', style: textTheme.titleSmall),
-              IconButton(
-                tooltip: 'More minutes',
-                onPressed: minutes < 180
-                    ? () => onMinutesChanged(minutes + 1)
-                    : null,
-                icon: const Icon(Icons.add_circle_outline),
-              ),
+              Expanded(child: Text('Timer', style: textTheme.titleMedium)),
+              if (!canToggle)
+                Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
             ],
           ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Timed session'),
+            subtitle: Text(
+              canToggle
+                  ? 'Turn off to practice without a countdown'
+                  : 'Timer stays on for your plan',
+            ),
+            value: enabled,
+            onChanged: canToggle ? onEnabledChanged : null,
+          ),
+          if (!canToggle)
+            _UpgradeHint(
+              message: 'Upgrade to turn the timer off',
+              onUpgrade: onUpgrade,
+            ),
+          if (enabled) ...[
+            const SizedBox(height: Spacing.sm),
+            Row(
+              children: [
+                Text('Duration', style: textTheme.bodyLarge),
+                const Spacer(),
+                IconButton(
+                  tooltip: 'Fewer minutes',
+                  onPressed: minutes > 1
+                      ? () => onMinutesChanged(minutes - 1)
+                      : null,
+                  icon: const Icon(Icons.remove_circle_outline),
+                ),
+                Text('$minutes min', style: textTheme.titleSmall),
+                IconButton(
+                  tooltip: 'More minutes',
+                  onPressed: minutes < 180
+                      ? () => onMinutesChanged(minutes + 1)
+                      : null,
+                  icon: const Icon(Icons.add_circle_outline),
+                ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -603,38 +612,40 @@ class _NegativeMarkingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Negative marking',
-                style: Theme.of(context).textTheme.titleMedium,
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Negative marking',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-            ),
-            if (!canToggle)
-              Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-          ],
-        ),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Use +4 / −1 marking'),
-          subtitle: const Text('Off by default — practice is for learning'),
-          value: enabled,
-          onChanged: canToggle ? onChanged : null,
-        ),
-        if (!canToggle)
-          _UpgradeHint(
-            message: 'Upgrade to practice with exam-style negative marking',
-            onUpgrade: onUpgrade,
+              if (!canToggle)
+                Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            ],
           ),
-      ],
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Use +4 / −1 marking'),
+            subtitle: const Text('Off by default — practice is for learning'),
+            value: enabled,
+            onChanged: canToggle ? onChanged : null,
+          ),
+          if (!canToggle)
+            _UpgradeHint(
+              message: 'Upgrade to practice with exam-style negative marking',
+              onUpgrade: onUpgrade,
+            ),
+        ],
+      ),
     );
   }
 }

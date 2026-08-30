@@ -85,16 +85,13 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Practice'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(AppRoutes.home);
-            }
-          },
-        ),
+        automaticallyImplyLeading: false,
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
         actions: [
           IconButton(
             tooltip: 'Refresh',

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,6 +19,8 @@ import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
 import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
+import '../../core/widgets/app_shell.dart';
+import 'app_page.dart';
 import 'app_routes.dart';
 import 'go_router_refresh_stream.dart';
 
@@ -54,57 +57,86 @@ GoRouter goRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.signup,
         builder: (context, state) => const SignupScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.practice,
-        builder: (context, state) {
-          final extra = state.extra;
-          final draft = extra is PracticeBuilderDraft ? extra : null;
-          return PracticeBuilderScreen(initialDraft: draft);
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.testList,
-        builder: (context, state) => const TestListScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              fadeGoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              fadeGoRoute(
+                path: AppRoutes.practice,
+                builder: (context, state) {
+                  final extra = state.extra;
+                  final draft = extra is PracticeBuilderDraft ? extra : null;
+                  return PracticeBuilderScreen(
+                    key: ValueKey(draft?.hashCode ?? 0),
+                    initialDraft: draft,
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              fadeGoRoute(
+                path: AppRoutes.testList,
+                builder: (context, state) => const TestListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              fadeGoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       // More specific `/play` route before bare `:testId` so paths match correctly.
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.testPlayer,
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestPlayerScreen(testId: testId);
         },
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.testDetail,
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestInstructionsScreen(testId: testId);
         },
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.solutionReview,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
           return SolutionReviewScreen(attemptId: attemptId);
         },
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.results,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
@@ -117,15 +149,11 @@ GoRouter goRouter(Ref ref) {
           );
         },
       ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.bookmarks,
         builder: (context, state) => const BookmarksScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
+      fadeGoRoute(
         path: AppRoutes.upgrade,
         builder: (context, state) {
           final planParam = state.uri.queryParameters['plan'];

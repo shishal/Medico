@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/widgets/auth_hero.dart';
 import '../../data/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,7 +40,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await ref.read(authRepositoryProvider).signIn(
+    final result = await ref
+        .read(authRepositoryProvider)
+        .signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -59,64 +62,68 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Welcome back',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: Spacing.md),
-              if (_errorMessage != null) ...[
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                const SizedBox(height: Spacing.lg),
+                const AuthHero(
+                  title: 'Welcome back',
+                  subtitle: 'Sign in to continue your NEET-PG prep',
+                ),
+                const SizedBox(height: Spacing.xl),
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  textInputAction: TextInputAction.next,
+                  enabled: !_isLoading,
+                  validator: AuthValidators.email,
                 ),
                 const SizedBox(height: Spacing.md),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.password],
+                  textInputAction: TextInputAction.done,
+                  enabled: !_isLoading,
+                  onFieldSubmitted: (_) => _submit(),
+                  validator: AuthValidators.password,
+                ),
+                const SizedBox(height: Spacing.xl),
+                FilledButton(
+                  onPressed: _isLoading ? null : _submit,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Sign in'),
+                ),
+                const SizedBox(height: Spacing.md),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => context.go(AppRoutes.signup),
+                  child: const Text('Create an account'),
+                ),
               ],
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                autofillHints: const [AutofillHints.email],
-                textInputAction: TextInputAction.next,
-                enabled: !_isLoading,
-                validator: AuthValidators.email,
-              ),
-              const SizedBox(height: Spacing.md),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                autofillHints: const [AutofillHints.password],
-                textInputAction: TextInputAction.done,
-                enabled: !_isLoading,
-                onFieldSubmitted: (_) => _submit(),
-                validator: AuthValidators.password,
-              ),
-              const SizedBox(height: Spacing.lg),
-              FilledButton(
-                onPressed: _isLoading ? null : _submit,
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Sign in'),
-              ),
-              const SizedBox(height: Spacing.md),
-              TextButton(
-                onPressed:
-                    _isLoading ? null : () => context.go(AppRoutes.signup),
-                child: const Text('Create an account'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

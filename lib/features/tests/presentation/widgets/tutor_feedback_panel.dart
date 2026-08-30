@@ -23,7 +23,7 @@ class TutorFeedbackPanel extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(Spacing.sm),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: color),
         ),
         child: Padding(

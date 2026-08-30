@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/app_card.dart';
 import '../../domain/player_session_state.dart';
 import '../../domain/question_option.dart';
 import 'option_list.dart';
@@ -109,12 +110,19 @@ class TestPlayerView extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
               children: [
-                Text(
-                  question.questionText,
-                  style: Theme.of(context).textTheme.titleMedium,
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        question.questionText,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: Spacing.md),
+                      OptionList(session: session, onSelect: onSelectOption),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: Spacing.md),
-                OptionList(session: session, onSelect: onSelectOption),
                 if (reveal != null) ...[
                   const SizedBox(height: Spacing.md),
                   TutorFeedbackPanel(reveal: reveal),

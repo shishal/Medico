@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy policy — Medico</title>
+    <meta
+      name="description"
+      content="Privacy policy for the Medico NEET-PG app and website. What we collect, why, and how to request deletion."
+    />
+    <link rel="canonical" href="https://medico.shishal.com/privacy/" />
+    <meta name="theme-color" content="#0D7377" />
+    <link rel="icon" href="/img/icon-512.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/img/icon-512.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/site.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/">
+          <img src="/img/icon-512.png" width="32" height="32" alt="" />
+          Medico
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">
+          Menu
+        </button>
+        <nav id="nav-links" class="nav-links">
+          <a href="/#features">Features</a>
+          <a href="/#plans">Plans</a>
+          <a href="/privacy/">Privacy</a>
+          <a href="/account/">Account</a>
+          <a href="mailto:support@medico.shishal.com">Support</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="wrap prose">
+      <p class="meta">Effective 30 August 2026 · Last updated 30 August 2026</p>
+      <h1>Privacy policy</h1>
+      <p>
+        This policy describes how <strong>Medico</strong> (the Android app
+        <code>com.shishal.medico</code> and this website at
+        medico.shishal.com) handles personal data. Medico is operated by
+        <strong>Shishal</strong> (“we”, “us”).
+      </p>
+      <p>
+        Medico is an education QBank for NEET-PG. It is not a clinical product
+        and is intended for people 18 and older.
+      </p>
+
+      <h2>Who this applies to</h2>
+      <p>
+        People who create a Medico account, use the app, or visit this website.
+        If you do not agree with this policy, do not create an account.
+      </p>
+
+      <h2>Data we collect</h2>
+      <p>
+        We collect only what the product needs. We do not show ads. We do not
+        sell your data.
+      </p>
+      <ul>
+        <li>
+          <strong>Email</strong> — required to sign in (Supabase Auth). Used for
+          account, support, and (when checkout is live) matching a payment to
+          your plan.
+        </li>
+        <li>
+          <strong>Name and phone</strong> — optional profile fields. Used in the
+          app as a faint watermark on test content so leaked screenshots can be
+          traced. You can leave them blank; the watermark then uses email.
+        </li>
+        <li>
+          <strong>App activity</strong> — tests you start, answers, scores,
+          percentiles, bookmarks, and practice filters. Required for the
+          product to work.
+        </li>
+        <li>
+          <strong>Plan status</strong> — Free, Pro, or Elite, and when a paid
+          window expires. Set by our servers after a verified payment, not by
+          the app sending us a “I paid” flag.
+        </li>
+        <li>
+          <strong>Screenshot events</strong> — if the app cannot block a
+          screenshot (typical on iOS), we may log that an event happened
+          against your account. We do not receive the screenshot image.
+        </li>
+        <li>
+          <strong>Payment details</strong> — when web checkout is enabled,
+          card/UPI data is handled by
+          <a href="https://razorpay.com/privacy/">Razorpay</a>. We receive
+          payment identifiers, amount, and status so we can grant the plan. We
+          do not store full card numbers.
+        </li>
+        <li>
+          <strong>This website</strong> — standard request logs on the machine
+          that hosts the site (IP, user agent, path). We do not run advertising
+          cookies or a marketing pixel.
+        </li>
+      </ul>
+      <p>We do <strong>not</strong> collect location, contacts, photos from your library, SMS, or financial information inside the Android app. The app’s sensitive permission is internet access only.</p>
+
+      <h2>Why we collect it</h2>
+      <ul>
+        <li>Provide the QBank, scoring, bookmarks, and plan-gated content.</li>
+        <li>Keep your session signed in and restore in-progress tests.</li>
+        <li>Apply a paid plan after a successful website checkout.</li>
+        <li>Respond to support, refund, and deletion requests.</li>
+        <li>Discourage sharing of paid question content (watermark / screenshot log).</li>
+      </ul>
+      <p>
+        We do not use this data for advertising or “personalization” in the
+        Play Store advertising sense. We do not share it with data brokers.
+      </p>
+
+      <h2>Where it is stored and who sees it</h2>
+      <p>
+        Account and QBank data live in our Supabase project (hosted Postgres +
+        Auth). Traffic to that backend is encrypted in transit (HTTPS).
+      </p>
+      <p>Processors we use to run the product:</p>
+      <ul>
+        <li>Supabase — authentication and database.</li>
+        <li>Google Play / Apple (when iOS ships) — app distribution.</li>
+        <li>Razorpay — payments, only when you pay on this website.</li>
+        <li>
+          Cloudflare — DNS and reverse proxy in front of this static site.
+        </li>
+      </ul>
+      <p>
+        We do not share your email, name, phone, or test activity with other
+        third parties for their marketing. We may disclose data if required by
+        law.
+      </p>
+
+      <h2>How long we keep it</h2>
+      <p>
+        Account and attempt history stay for as long as the account exists, so
+        you can reopen results and bookmarks. If you ask us to delete the
+        account, we delete or anonymize personal data we control, except records
+        we must keep for tax, fraud, or legal reasons (for example a payment
+        receipt). Website server logs are rotated in the ordinary course of
+        running the host.
+      </p>
+
+      <h2>Your choices</h2>
+      <ul>
+        <li>
+          <strong>Access / correction</strong> — you can edit name and phone in
+          the app profile. Email is your login; write to us to change it.
+        </li>
+        <li>
+          <strong>Account deletion</strong> — email
+          <a href="mailto:support@medico.shishal.com?subject=Delete%20Medico%20account"
+            >support@medico.shishal.com</a
+          >
+          from the address on the account. We will confirm and delete. Details:
+          <a href="/account/">Account, cancel &amp; refunds</a>.
+        </li>
+        <li>
+          <strong>Paid plan</strong> — access ends when the prepaid window
+          expires. See the account page for cancel / refund.
+        </li>
+      </ul>
+
+      <h2>Children</h2>
+      <p>
+        Medico is not directed at children. Do not create an account if you are
+        under 18.
+      </p>
+
+      <h2>This website and future checkout</h2>
+      <p>
+        The marketing and legal pages are static files. Checkout at
+        <a href="/checkout/">/checkout</a> will use the same Medico email login
+        when payments go live. That page will load our public backend keys only
+        (not payment secrets).
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        If this policy changes in a material way, we will update the date at
+        the top of this page. Continued use after that date means you accept
+        the update.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Privacy and data requests:
+        <a href="mailto:support@medico.shishal.com">support@medico.shishal.com</a
+        ><br />
+        Website: <a href="https://medico.shishal.com/">https://medico.shishal.com</a>
+      </p>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <p>
+          <a href="/">Home</a> ·
+          <a href="/privacy/">Privacy</a> ·
+          <a href="/terms/">Terms</a> ·
+          <a href="/account/">Account</a> ·
+          <a href="mailto:support@medico.shishal.com">Support</a>
+        </p>
+        <p class="foot-copy">© 2026 Shishal. Medico.</p>
+      </div>
+    </footer>
+    <script src="/js/site.js"></script>
+  </body>
+</html>

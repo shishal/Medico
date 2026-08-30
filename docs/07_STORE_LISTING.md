@@ -15,8 +15,9 @@ notes that first-time EdTech reviews often ask for a **privacy policy** and a
 visible way to **manage / cancel** a plan — publish those pages before you
 submit, even though billing is external.
 
-Placeholder URLs below (`https://example.com/...`) must be replaced with the
-real hosted pages before submission.
+Public site (host on your machine via `website/` + Cloudflare):
+https://medico.shishal.com — privacy, terms, and account/refund pages live
+there. Create the mailbox `support@medico.shishal.com` before a public listing.
 
 ---
 
@@ -54,8 +55,8 @@ Plans are purchased on our website in the device browser — not inside this app
 PRIVACY AND ACCOUNT
 You sign in with email. We do not show ads. See the privacy policy for what we store and why.
 
-Privacy policy: https://example.com/privacy
-Manage or cancel a plan: https://example.com/account
+Privacy policy: https://medico.shishal.com/privacy
+Manage or cancel a plan: https://medico.shishal.com/account
 ```
 
 ### Category
@@ -65,8 +66,8 @@ Education
 Education, Medical, Exam prep, NEET-PG
 
 ### Contact
-Support email: *(your support address)*
-Website: https://example.com
+Support email: support@medico.shishal.com
+Website: https://medico.shishal.com
 
 ### Graphics to upload
 | Slot | File | Size |
@@ -110,8 +111,8 @@ Practice on your terms: pick subject and topic, then tutor mode (answer as you g
 
 A Free plan is included. Pro and Elite unlock more tests, longer practice, and full explanations. Plans are bought on our website in Safari — this app does not charge inside the binary.
 
-Privacy policy: https://example.com/privacy
-Manage or cancel a plan: https://example.com/account
+Privacy policy: https://medico.shishal.com/privacy
+Manage or cancel a plan: https://medico.shishal.com/account
 ```
 
 ### Keywords (100 characters max, comma-separated, no spaces after commas preferred)
@@ -146,7 +147,7 @@ First release: catalog tests, practice builder, results, bookmarks, and plan com
 This app does not sell subscriptions or digital goods inside the binary. Tapping Upgrade opens our website checkout in the system browser (Razorpay). Sign in with the review account below to browse Free-tier tests without paying.
 
 Demo account: (create a Free-plan reviewer account and paste email/password here)
-Privacy policy: https://example.com/privacy
+Privacy policy: https://medico.shishal.com/privacy
 ```
 
 ---

@@ -1,0 +1,24 @@
+# Bind to loopback so the origin is not on the public internet.
+# Cloudflare Tunnel (or another reverse proxy) should be the only door.
+services:
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medico-site:local
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+
+  # Optional: `docker compose --profile tunnel up` after you add a token.
+  # Create a Cloudflare Tunnel named medico pointing at http://site:80
+  # (same Docker network) or http://127.0.0.1:8080 on the host.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - site

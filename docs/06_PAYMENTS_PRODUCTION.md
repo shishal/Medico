@@ -109,8 +109,9 @@ by `create-razorpay-order`.
 
 **Simple host options** (any of these is fine):
 
-- Cloudflare Pages / Netlify / GitHub Pages — point the project at `checkout/`
-- A folder on your existing domain, e.g. `https://pay.yourdomain.com`
+- Cloudflare Pages / Netlify / GitHub Pages — not needed; this project serves
+  the same hostname from Docker (`website/`)
+- Path on the existing domain: `https://medico.shishal.com/checkout`
 
 If the host can run a build command, generate `config.js` from env vars
 instead of uploading it by hand:
@@ -120,16 +121,17 @@ printf "window.CHECKOUT_CONFIG = { supabaseUrl: '%s', supabaseAnonKey: '%s' };\n
   "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > config.js
 ```
 
-Pick a final URL now, for example `https://pay.yourdomain.com`. You will paste
-it into Flutter, Razorpay, and (optionally) Supabase Auth.
+The public site is `https://medico.shishal.com`. Checkout should live at
+`https://medico.shishal.com/checkout` (placeholder is already there). You
+will paste that URL into Flutter, Razorpay, and Supabase Auth.
 
 ### 4. Allow the checkout origin in Supabase Auth
 
 Dashboard → **Authentication → URL configuration**:
 
 - **Site URL**: can stay the app / marketing site.
-- **Additional redirect URLs**: add `https://pay.yourdomain.com` (and
-  `https://pay.yourdomain.com/**` if the UI offers a wildcard).
+- **Additional redirect URLs**: add `https://medico.shishal.com` (and
+  `https://medico.shishal.com/**` if the UI offers a wildcard).
 
 Checkout login uses email + password (no OAuth redirect today). This still
 matters if you later add magic links or password reset from that page.
@@ -139,7 +141,7 @@ matters if you later add magic links or password reset from that page.
 In the **gitignored** `.env` that store / Codemagic builds use:
 
 ```
-CHECKOUT_URL=https://pay.yourdomain.com
+CHECKOUT_URL=https://medico.shishal.com/checkout
 ```
 
 Rules:

@@ -94,7 +94,9 @@ class ProfileRepository {
             ProfileColumns.collegeId: collegeId,
             ProfileColumns.batchYear: batchYear,
             ProfileColumns.mbbsPhaseId: mbbsPhaseId,
-            ProfileColumns.onboardingCompletedAt: DateTime.now().toUtc().toIso8601String(),
+            ProfileColumns.onboardingCompletedAt: DateTime.now()
+                .toUtc()
+                .toIso8601String(),
           })
           .eq(ProfileColumns.id, userId)
           .select()
@@ -105,6 +107,46 @@ class ProfileRepository {
         UserFacingError.from(
           e,
           fallback: 'Could not save your profile. Please try again.',
+        ),
+      );
+    }
+  }
+
+  /// Change year / college / batch after onboarding. Does not touch plan.
+  Future<Result<UserProfile>> updateAcademic({
+    String? fullName,
+    String? collegeId,
+    int? batchYear,
+    String? mbbsPhaseId,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    final patch = <String, dynamic>{
+      ProfileColumns.fullName: ?fullName,
+      ProfileColumns.collegeId: ?collegeId,
+      ProfileColumns.batchYear: ?batchYear,
+      ProfileColumns.mbbsPhaseId: ?mbbsPhaseId,
+    };
+    if (patch.isEmpty) {
+      return fetchOwnProfile();
+    }
+
+    try {
+      final row = await _client
+          .from(Tables.profiles)
+          .update(patch)
+          .eq(ProfileColumns.id, userId)
+          .select()
+          .single();
+      return Success(UserProfile.fromJson(row));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not update your course. Please try again.',
         ),
       );
     }

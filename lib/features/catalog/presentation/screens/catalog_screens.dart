@@ -20,9 +20,14 @@ import '../../../pyq/domain/pyq_models.dart';
 import '../../../pyq/presentation/providers/pyq_providers.dart';
 import '../../data/catalog_repository.dart';
 import '../providers/catalog_providers.dart';
+import '../widgets/catalog_row_card.dart';
 
 class SubjectListScreen extends ConsumerWidget {
-  const SubjectListScreen({super.key, required this.subjectId, required this.title});
+  const SubjectListScreen({
+    super.key,
+    required this.subjectId,
+    required this.title,
+  });
 
   final String subjectId;
   final String title;
@@ -40,7 +45,9 @@ class SubjectListScreen extends ConsumerWidget {
         ),
         data: (items) {
           if (items.isEmpty) {
-            return const AsyncEmptyView(message: 'No topics in this subject yet.');
+            return const AsyncEmptyView(
+              message: 'No topics in this subject yet.',
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.all(Spacing.md),
@@ -48,10 +55,11 @@ class SubjectListScreen extends ConsumerWidget {
             separatorBuilder: (_, _) => const SizedBox(height: Spacing.sm),
             itemBuilder: (context, i) {
               final topic = items[i];
-              return ListTile(
-                title: Text(topic.name),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push(AppRoutes.topicPath(topic.id, topic.name)),
+              return CatalogRowCard(
+                title: topic.name,
+                index: i,
+                onTap: () =>
+                    context.push(AppRoutes.topicPath(topic.id, topic.name)),
               );
             },
           );
@@ -62,7 +70,11 @@ class SubjectListScreen extends ConsumerWidget {
 }
 
 class TopicLessonsScreen extends ConsumerWidget {
-  const TopicLessonsScreen({super.key, required this.topicId, required this.title});
+  const TopicLessonsScreen({
+    super.key,
+    required this.topicId,
+    required this.title,
+  });
 
   final String topicId;
   final String title;
@@ -81,7 +93,9 @@ class TopicLessonsScreen extends ConsumerWidget {
         ),
         data: (items) {
           if (items.isEmpty) {
-            return const AsyncEmptyView(message: 'No lessons in this topic yet.');
+            return const AsyncEmptyView(
+              message: 'No lessons in this topic yet.',
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.all(Spacing.md),
@@ -90,9 +104,12 @@ class TopicLessonsScreen extends ConsumerWidget {
             itemBuilder: (context, i) {
               final lesson = items[i];
               final locked = !plan.covers(lesson.requiredPlan);
-              return ListTile(
-                title: Text(lesson.name),
-                trailing: Icon(locked ? Icons.lock_outline : Icons.chevron_right),
+              return CatalogRowCard(
+                title: lesson.name,
+                index: i,
+                trailing: Icon(
+                  locked ? Icons.lock_outline : Icons.chevron_right_rounded,
+                ),
                 onTap: () {
                   if (locked) {
                     context.push(AppRoutes.upgradePath(lesson.requiredPlan));
@@ -139,7 +156,9 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     }
     if (!_recordedOpen) {
       _recordedOpen = true;
-      await ref.read(catalogRepositoryProvider).recordOpenedLesson(widget.lessonId);
+      await ref
+          .read(catalogRepositoryProvider)
+          .recordOpenedLesson(widget.lessonId);
     }
   }
 
@@ -170,9 +189,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [
-          LessonBookmarkIconButton(lessonId: widget.lessonId),
-        ],
+        actions: [LessonBookmarkIconButton(lessonId: widget.lessonId)],
       ),
       body: pyqs.when(
         loading: () => const AsyncLoadingView(),
@@ -186,13 +203,18 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
             children: [
               FilledButton(
                 onPressed: () async {
-                  final catalog = await ref.read(practiceRepositoryProvider).fetchCatalog();
+                  final catalog = await ref
+                      .read(practiceRepositoryProvider)
+                      .fetchCatalog();
                   if (!context.mounted) return;
                   switch (catalog) {
                     case Failure(:final message):
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(message)));
                     case Success(:final value):
-                      final created = await ref.read(practiceRepositoryProvider).createSession(
+                      final created = await ref
+                          .read(practiceRepositoryProvider)
+                          .createSession(
                             draft: PracticeBuilderDraft(
                               questionCount: 10,
                               sourceFilter: QuestionSourceFilter.all,
@@ -206,7 +228,8 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                         case Success(:final value):
                           context.go(AppRoutes.testPlayerPath(value.testId));
                         case Failure(:final message):
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(message)));
                       }
                   }
                 },
@@ -223,39 +246,53 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                     Success() => 'Marked as learnt',
                     Failure(:final message) => message,
                   };
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message)));
                   ref.invalidate(trackerListProvider);
                 },
                 child: const Text('Mark lesson learnt'),
               ),
               if (_resources.isNotEmpty) ...[
                 const SizedBox(height: Spacing.lg),
-                Text('More on this topic', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  'More on this topic',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 for (final link in _resources)
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(link.isFree ? Icons.open_in_new : Icons.lock_outline),
+                    leading: Icon(
+                      link.isFree ? Icons.open_in_new : Icons.lock_outline,
+                    ),
                     title: Text(link.title),
-                    subtitle: link.sourceLabel == null ? null : Text(link.sourceLabel!),
+                    subtitle: link.sourceLabel == null
+                        ? null
+                        : Text(link.sourceLabel!),
                     onTap: () => _openLink(link, plan),
                   ),
               ],
               const SizedBox(height: Spacing.lg),
-              Text('Previous year questions', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Previous year questions',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: Spacing.sm),
               if (items.isEmpty)
                 const Text('No PYQs tagged to this lesson yet.')
               else
-                for (final q in items)
-                  ListTile(
-                    title: Text(q.questionText, maxLines: 3, overflow: TextOverflow.ellipsis),
-                    subtitle: Text(
-                      [
-                        if (q.marks != null) '${q.marks} marks',
-                        if (q.appearanceCount > 0) '${q.appearanceCount}× in papers',
+                for (var i = 0; i < items.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Spacing.sm),
+                    child: CatalogRowCard(
+                      title: items[i].questionText,
+                      index: i,
+                      subtitle: [
+                        if (items[i].marks != null) '${items[i].marks} marks',
+                        if (items[i].appearanceCount > 0)
+                          '${items[i].appearanceCount}× in papers',
                       ].join(' · '),
+                      onTap: () => context.push(AppRoutes.pyqPath(items[i].id)),
                     ),
-                    onTap: () => context.push(AppRoutes.pyqPath(q.id)),
                   ),
             ],
           );

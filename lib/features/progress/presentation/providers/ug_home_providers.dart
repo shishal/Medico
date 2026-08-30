@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/utils/result.dart';
 import '../../../progress/data/progress_repository.dart';
 import '../../../progress/domain/progress_models.dart';
-import '../../data/trackers_repository.dart';
+import '../../../trackers/data/trackers_repository.dart';
 
 part 'ug_home_providers.g.dart';
 

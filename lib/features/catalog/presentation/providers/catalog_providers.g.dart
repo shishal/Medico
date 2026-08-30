@@ -4,6 +4,113 @@ part of 'catalog_providers.dart';
 
 // ignore_for_file: type=lint, type=warning
 
+/// Year the student is browsing on Home. Null = follow the profile year.
+/// Tapping a year sticker writes here so subjects can change immediately.
+
+@ProviderFor(CatalogBrowsePhase)
+final catalogBrowsePhaseProvider = CatalogBrowsePhaseProvider._();
+
+/// Year the student is browsing on Home. Null = follow the profile year.
+/// Tapping a year sticker writes here so subjects can change immediately.
+final class CatalogBrowsePhaseProvider
+    extends $NotifierProvider<CatalogBrowsePhase, String?> {
+  /// Year the student is browsing on Home. Null = follow the profile year.
+  /// Tapping a year sticker writes here so subjects can change immediately.
+  CatalogBrowsePhaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'catalogBrowsePhaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$catalogBrowsePhaseHash();
+
+  @$internal
+  @override
+  CatalogBrowsePhase create() => CatalogBrowsePhase();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$catalogBrowsePhaseHash() => r'catalogbrowsephasehashplaceholder000001';
+
+/// Year the student is browsing on Home. Null = follow the profile year.
+/// Tapping a year sticker writes here so subjects can change immediately.
+
+abstract class _$CatalogBrowsePhase extends $Notifier<String?> {
+  String? build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<String?, String?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String?, String?>,
+              String?,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// Effective catalog year: explicit browse selection, else onboarding year.
+
+@ProviderFor(activePhaseId)
+final activePhaseIdProvider = ActivePhaseIdProvider._();
+
+/// Effective catalog year: explicit browse selection, else onboarding year.
+final class ActivePhaseIdProvider
+    extends $FunctionalProvider<String?, String?, String?>
+    with $Provider<String?> {
+  /// Effective catalog year: explicit browse selection, else onboarding year.
+  ActivePhaseIdProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'activePhaseIdProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$activePhaseIdHash();
+
+  @$internal
+  @override
+  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String? create(Ref ref) {
+    return activePhaseId(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$activePhaseIdHash() => r'activephaseidhashplaceholder00000000001';
+
 @ProviderFor(universities)
 final universitiesProvider = UniversitiesProvider._();
 

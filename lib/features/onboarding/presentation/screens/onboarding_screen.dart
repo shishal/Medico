@@ -3,10 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/widgets/comic_card.dart';
+import '../../../../core/widgets/comic_mascot.dart';
+import '../../../../core/widgets/comic_select_sheet.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
+import '../../../catalog/presentation/widgets/year_picker.dart';
 import '../../../profile/data/profile_repository.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 
@@ -61,7 +66,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _error = null;
     });
 
-    final result = await ref.read(profileRepositoryProvider).saveOnboarding(
+    final result = await ref
+        .read(profileRepositoryProvider)
+        .saveOnboarding(
           fullName: name,
           universityId: _universityId!,
           collegeId: _collegeId!,
@@ -95,36 +102,49 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
+          const Center(
+            child: ComicMascot(
+              asset: BrandAssets.mascotStudy,
+              size: 140,
+              heroTag: 'onboarding-docci',
+            ),
+          ),
+          const SizedBox(height: Spacing.md),
           Text(
-            'Tell us where you study',
-            style: Theme.of(context).textTheme.headlineSmall,
+            'Tell ${BrandAssets.mascotName} where you study',
+            style: Theme.of(context).textTheme.headlineSmall
+                ?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: Spacing.sm),
           Text(
-            'We use this to show KUHS subjects for your MBBS year.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+            'University is KUHS. Tap a year sticker — that unlocks that year’s subjects on Home.',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: Spacing.lg),
           TextField(
             controller: _nameController,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
+            decoration: const InputDecoration(labelText: 'Name'),
           ),
           const SizedBox(height: Spacing.md),
           universities.when(
             data: (items) {
               _applyUniversity(items);
-              return InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'University',
-                  border: OutlineInputBorder(),
+              return ComicCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'University',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const SizedBox(height: Spacing.xs),
+                    Text(
+                      _universityName ?? 'Loading…',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
-                child: Text(_universityName ?? 'Loading…'),
               );
             },
             loading: () => const LinearProgressIndicator(),
@@ -132,57 +152,64 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
           const SizedBox(height: Spacing.md),
           colleges.when(
-            data: (items) => DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
-              value: _collegeId,
-              decoration: const InputDecoration(
-                labelText: 'College',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                for (final c in items)
-                  DropdownMenuItem(value: c.id, child: Text(c.name)),
-              ],
-              onChanged: (id) => setState(() => _collegeId = id),
-            ),
+            data: (items) {
+              final selected = items.where((c) => c.id == _collegeId);
+              return ComicSelectField<College>(
+                label: 'College',
+                items: items,
+                value: selected.isEmpty ? null : selected.first,
+                labelOf: (c) => c.name,
+                onSelected: (c) => setState(() {
+                  _collegeId = c.id;
+                }),
+              );
+            },
             loading: () => const LinearProgressIndicator(),
             error: (e, _) => Text('$e'),
           ),
-          const SizedBox(height: Spacing.md),
+          const SizedBox(height: Spacing.lg),
+          Text(
+            'Current MBBS year',
+            style: Theme.of(context).textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: Spacing.sm),
           phases.when(
-            data: (items) => DropdownButtonFormField<String>(
-              // ignore: deprecated_member_use
-              value: _phaseId,
-              decoration: const InputDecoration(
-                labelText: 'Current MBBS year',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                for (final p in items)
-                  DropdownMenuItem(value: p.id, child: Text(p.name)),
-              ],
-              onChanged: (id) => setState(() => _phaseId = id),
-            ),
+            data: (items) {
+              return YearPickerRow(
+                phases: items,
+                selectedId: _phaseId,
+                onSelect: (id) {
+                  setState(() => _phaseId = id);
+                  ref.read(catalogBrowsePhaseProvider.notifier).select(id);
+                },
+                padding: EdgeInsets.zero,
+              );
+            },
             loading: () => const LinearProgressIndicator(),
             error: (e, _) => Text('$e'),
           ),
           const SizedBox(height: Spacing.md),
-          DropdownButtonFormField<int>(
-            // ignore: deprecated_member_use
-            value: _batchYear,
-            decoration: const InputDecoration(
-              labelText: 'Batch year',
-              border: OutlineInputBorder(),
-            ),
+          ComicSelectField<int>(
+            label: 'Batch year',
             items: [
-              for (var y = DateTime.now().year; y >= DateTime.now().year - 6; y--)
-                DropdownMenuItem(value: y, child: Text('$y')),
+              for (
+                var y = DateTime.now().year;
+                y >= DateTime.now().year - 6;
+                y--
+              )
+                y,
             ],
-            onChanged: (y) => setState(() => _batchYear = y ?? _batchYear),
+            value: _batchYear,
+            labelOf: (y) => '$y',
+            onSelected: (y) => setState(() => _batchYear = y),
           ),
           if (_error != null) ...[
             const SizedBox(height: Spacing.md),
-            Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ],
           const SizedBox(height: Spacing.lg),
           FilledButton(

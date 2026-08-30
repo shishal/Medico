@@ -26,6 +26,7 @@ import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import '../../features/trackers/presentation/screens/trackers_screen.dart';
 import 'app_routes.dart';
+import 'comic_page.dart';
 import 'go_router_refresh_stream.dart';
 
 part 'app_router.g.dart';
@@ -73,43 +74,43 @@ GoRouter goRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.signup,
         builder: (context, state) => const SignupScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.onboarding,
         builder: (context, state) => const OnboardingScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.search,
         builder: (context, state) => const SearchScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.progress,
         builder: (context, state) => const ProgressScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.trackerCreate,
         builder: (context, state) => const CreateTrackerScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.trackers,
         builder: (context, state) => const TrackersScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.subject,
         builder: (context, state) {
           final id = state.pathParameters['subjectId']!;
@@ -117,7 +118,7 @@ GoRouter goRouter(Ref ref) {
           return SubjectListScreen(subjectId: id, title: title);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.topic,
         builder: (context, state) {
           final id = state.pathParameters['topicId']!;
@@ -125,7 +126,7 @@ GoRouter goRouter(Ref ref) {
           return TopicLessonsScreen(topicId: id, title: title);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.lesson,
         builder: (context, state) {
           final id = state.pathParameters['lessonId']!;
@@ -133,14 +134,14 @@ GoRouter goRouter(Ref ref) {
           return LessonScreen(lessonId: id, title: title);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.pyq,
         builder: (context, state) {
           final id = state.pathParameters['questionId']!;
           return PyqReaderScreen(questionId: id);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.practice,
         builder: (context, state) {
           final extra = state.extra;
@@ -148,33 +149,33 @@ GoRouter goRouter(Ref ref) {
           return PracticeBuilderScreen(initialDraft: draft);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.testList,
         builder: (context, state) => const TestListScreen(),
       ),
       // More specific `/play` route before bare `:testId` so paths match correctly.
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.testPlayer,
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestPlayerScreen(testId: testId);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.testDetail,
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestInstructionsScreen(testId: testId);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.solutionReview,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
           return SolutionReviewScreen(attemptId: attemptId);
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.results,
         builder: (context, state) {
           final attemptId = state.pathParameters['attemptId']!;
@@ -187,15 +188,15 @@ GoRouter goRouter(Ref ref) {
           );
         },
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.bookmarks,
         builder: (context, state) => const BookmarksScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
-      GoRoute(
+      comicGoRoute(
         path: AppRoutes.upgrade,
         builder: (context, state) {
           final planParam = state.uri.queryParameters['plan'];

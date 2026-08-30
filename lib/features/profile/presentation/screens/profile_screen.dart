@@ -6,14 +6,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/support.dart';
+import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../providers/current_plan_provider.dart';
 import '../providers/user_profile_provider.dart';
+import '../widgets/academic_editor.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -66,7 +69,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
-          Text('Profile', style: Theme.of(context).textTheme.headlineSmall),
+          const Center(
+            child: ComicMascot(
+              asset: BrandAssets.mascotAvatar,
+              size: 96,
+              bounce: false,
+            ),
+          ),
           const SizedBox(height: Spacing.md),
           planAsync.when(
             data: (plan) => Text(
@@ -101,6 +110,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               );
             },
             loading: () => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: Spacing.lg),
+          profileAsync.when(
+            data: (profile) {
+              if (profile == null) return const SizedBox.shrink();
+              return AcademicEditor(profile: profile);
+            },
+            loading: () => const LinearProgressIndicator(),
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.lg),

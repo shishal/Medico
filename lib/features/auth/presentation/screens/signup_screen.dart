@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/supabase/supabase_provider.dart';
+import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -44,7 +46,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await ref.read(authRepositoryProvider).signUp(
+    final result = await ref
+        .read(authRepositoryProvider)
+        .signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -81,12 +85,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         padding: const EdgeInsets.all(Spacing.lg),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
+              const Center(
+                child: ComicMascot(asset: BrandAssets.mascotStudy, size: 120),
+              ),
+              const SizedBox(height: Spacing.md),
               Text(
                 'Create your account',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: Spacing.md),
               if (_errorMessage != null) ...[
@@ -136,8 +144,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: Spacing.md),
               TextButton(
-                onPressed:
-                    _isLoading ? null : () => context.go(AppRoutes.login),
+                onPressed: _isLoading
+                    ? null
+                    : () => context.go(AppRoutes.login),
                 child: const Text('Already have an account? Log in'),
               ),
             ],

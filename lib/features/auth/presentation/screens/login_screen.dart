@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,7 +41,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await ref.read(authRepositoryProvider).signIn(
+    final result = await ref
+        .read(authRepositoryProvider)
+        .signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -64,12 +68,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         padding: const EdgeInsets.all(Spacing.lg),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
+              const Center(
+                child: ComicMascot(
+                  asset: BrandAssets.mascotWave,
+                  size: 120,
+                  heroTag: BrandAssets.mascotHeroTag,
+                ),
+              ),
+              const SizedBox(height: Spacing.md),
               Text(
                 'Welcome back',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: Spacing.md),
               if (_errorMessage != null) ...[
@@ -112,8 +124,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: Spacing.md),
               TextButton(
-                onPressed:
-                    _isLoading ? null : () => context.go(AppRoutes.signup),
+                onPressed: _isLoading
+                    ? null
+                    : () => context.go(AppRoutes.signup),
                 child: const Text('Create an account'),
               ),
             ],

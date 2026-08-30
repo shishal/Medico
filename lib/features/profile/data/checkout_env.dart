@@ -5,6 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// Missing or placeholder values return null so the upgrade screen can explain
 /// instead of crashing. The page itself lives in `checkout/` (Phase 7.2).
 abstract final class CheckoutEnv {
+  /// When false, the Plans screen hides "Continue in browser" so the store
+  /// binary has no payment path. Flip to `true` after Play review to restore
+  /// the web checkout CTA.
+  static const webCheckoutEnabled = false;
+
   static Uri? get urlOrNull {
     try {
       final value = dotenv.env['CHECKOUT_URL'];

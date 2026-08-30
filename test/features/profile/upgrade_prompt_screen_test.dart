@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:medico/features/profile/data/checkout_env.dart';
 import 'package:medico/features/profile/data/checkout_launcher.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/profile/presentation/providers/current_plan_provider.dart';
@@ -47,7 +48,6 @@ void main() {
     expect(find.text('Pro'), findsWidgets);
     expect(find.text('Elite'), findsWidgets);
     expect(find.text('Full explanations'), findsNWidgets(3));
-    expect(find.textContaining('browser'), findsWidgets);
 
     expect(find.textContaining('Buy'), findsNothing);
     expect(find.textContaining('Purchase'), findsNothing);
@@ -57,9 +57,15 @@ void main() {
     expect(find.byType(TextFormField), findsNothing);
   });
 
-  testWidgets('Continue in browser opens checkout for that plan', (
+  testWidgets('Continue in browser is hidden while store checkout is paused', (
     tester,
   ) async {
+    expect(
+      CheckoutEnv.webCheckoutEnabled,
+      isFalse,
+      reason: 'Flip this test when restoring CheckoutEnv.webCheckoutEnabled',
+    );
+
     final opened = <Uri>[];
     await _pumpUpgrade(
       tester,
@@ -73,12 +79,8 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.text('Continue in browser — Elite'));
-    await tester.tap(find.text('Continue in browser — Elite'));
-    await tester.pumpAndSettle();
-
-    expect(opened, hasLength(1));
-    expect(opened.single.queryParameters['plan'], 'elite');
+    expect(find.textContaining('Continue in browser'), findsNothing);
+    expect(opened, isEmpty);
   });
 
   testWidgets('Free card has no checkout action', (tester) async {
@@ -92,7 +94,6 @@ void main() {
     );
 
     expect(find.text('Continue in browser — Free'), findsNothing);
-    expect(find.text('Continue in browser — Pro'), findsOneWidget);
   });
 
   testWidgets('current paid plan hides its own checkout button', (
@@ -110,6 +111,5 @@ void main() {
 
     expect(find.text('Current'), findsOneWidget);
     expect(find.text('Continue in browser — Pro'), findsNothing);
-    expect(find.text('Continue in browser — Elite'), findsOneWidget);
   });
 }

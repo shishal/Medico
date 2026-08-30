@@ -7,6 +7,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../data/checkout_env.dart';
 import '../../data/checkout_launcher.dart';
 import '../../domain/plan_offering.dart';
 import '../../domain/plan_tier.dart';
@@ -85,8 +86,11 @@ class _UpgradePromptScreenState extends ConsumerState<UpgradePromptScreen> {
           ),
           const SizedBox(height: Spacing.sm),
           Text(
-            'You will finish payment on our website in your browser. '
-            'This app never takes a card or shows a buy button.',
+            CheckoutEnv.webCheckoutEnabled
+                ? 'You will finish payment on our website in your browser. '
+                    'This app never takes a card or shows a buy button.'
+                : 'Paid checkout is paused during this beta. '
+                    'You can keep using the Free plan.',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -106,7 +110,9 @@ class _UpgradePromptScreenState extends ConsumerState<UpgradePromptScreen> {
               isRequired: required == offering.tier,
               isOpening: _openingPlan == offering.tier,
               onContinueInBrowser:
-                  offering.tier == PlanTier.free || currentPlan == offering.tier
+                  !CheckoutEnv.webCheckoutEnabled ||
+                      offering.tier == PlanTier.free ||
+                      currentPlan == offering.tier
                   ? null
                   : () => _openCheckout(offering.tier),
             ),

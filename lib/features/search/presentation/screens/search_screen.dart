@@ -7,6 +7,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../progress/data/progress_repository.dart';
 import '../../../progress/domain/progress_models.dart';
+import '../../../../core/widgets/comic_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -46,7 +47,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final hits = _hits;
-    final empty = hits != null &&
+    final empty =
+        hits != null &&
         hits.subjects.isEmpty &&
         hits.lessons.isEmpty &&
         hits.questions.isEmpty;
@@ -76,28 +78,59 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: ListView(
                   children: [
                     for (final s in hits.subjects)
-                      ListTile(
-                        leading: const Icon(Icons.book_outlined),
-                        title: Text(s.title),
-                        onTap: () =>
-                            context.push(AppRoutes.subjectPath(s.id, s.title)),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: Spacing.sm),
+                        child: ComicCard(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Spacing.sm,
+                            vertical: Spacing.xs,
+                          ),
+                          onTap: () => context.push(
+                            AppRoutes.subjectPath(s.id, s.title),
+                          ),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.book_outlined),
+                            title: Text(s.title),
+                          ),
+                        ),
                       ),
                     for (final l in hits.lessons)
-                      ListTile(
-                        leading: const Icon(Icons.article_outlined),
-                        title: Text(l.title),
-                        onTap: () =>
-                            context.push(AppRoutes.lessonPath(l.id, l.title)),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: Spacing.sm),
+                        child: ComicCard(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Spacing.sm,
+                            vertical: Spacing.xs,
+                          ),
+                          onTap: () =>
+                              context.push(AppRoutes.lessonPath(l.id, l.title)),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.article_outlined),
+                            title: Text(l.title),
+                          ),
+                        ),
                       ),
                     for (final q in hits.questions)
-                      ListTile(
-                        leading: const Icon(Icons.quiz_outlined),
-                        title: Text(
-                          q.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: Spacing.sm),
+                        child: ComicCard(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Spacing.sm,
+                            vertical: Spacing.xs,
+                          ),
+                          onTap: () => context.push(AppRoutes.pyqPath(q.id)),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.quiz_outlined),
+                            title: Text(
+                              q.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
-                        onTap: () => context.push(AppRoutes.pyqPath(q.id)),
                       ),
                   ],
                 ),

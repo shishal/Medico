@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../../practice/domain/practice_builder_draft.dart';
 import '../../../practice/domain/practice_enums.dart';
 import '../../data/bookmarks_repository.dart';
@@ -74,14 +76,15 @@ class BookmarksScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
+                  padding: const EdgeInsets.all(Spacing.md),
                   itemCount: visible.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: Spacing.sm),
                   itemBuilder: (context, index) {
-                    return _BookmarkTile(item: visible[index]);
+                    return _BookmarkTile(item: visible[index], index: index);
                   },
-                  ),
                 ),
+              ),
               if (unlocked > 0)
                 _PracticeBar(
                   count: unlocked,
@@ -104,30 +107,41 @@ class BookmarksScreen extends ConsumerWidget {
 }
 
 class _BookmarkTile extends StatelessWidget {
-  const _BookmarkTile({required this.item});
+  const _BookmarkTile({required this.item, required this.index});
 
   final BookmarkedQuestion item;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final comic = ComicColors.of(context);
     final subtitle = item.subtitle;
+    final tint = StickerFills.tintAt(index, Theme.of(context).brightness);
 
-    return ListTile(
-      leading: Icon(
-        item.isPlanLocked ? Icons.lock_outline : Icons.quiz_outlined,
-        color: item.isPlanLocked ? colorScheme.outline : colorScheme.primary,
+    return ComicCard(
+      color: Color.alphaBlend(tint.withValues(alpha: 0.35), comic.sticker),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.sm,
+        vertical: Spacing.xs,
       ),
-      title: Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: subtitle == null
-          ? (item.isPlanLocked
-                ? Text(
-                    'Upgrade to see this question.',
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
-                  )
-                : null)
-          : Text(subtitle),
-      trailing: BookmarkIconButton(questionId: item.questionId),
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Icon(
+          item.isPlanLocked ? Icons.lock_outline : Icons.quiz_outlined,
+          color: item.isPlanLocked ? colorScheme.outline : colorScheme.primary,
+        ),
+        title: Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        subtitle: subtitle == null
+            ? (item.isPlanLocked
+                  ? Text(
+                      'Upgrade to see this question.',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    )
+                  : null)
+            : Text(subtitle),
+        trailing: BookmarkIconButton(questionId: item.questionId),
+      ),
     );
   }
 }
@@ -175,15 +189,40 @@ class _LessonBookmarksState extends ConsumerState<_LessonBookmarks> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(Spacing.md, Spacing.md, Spacing.md, 0),
-            child: Text('Lessons', style: Theme.of(context).textTheme.titleSmall),
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.md,
+              Spacing.md,
+              Spacing.md,
+              0,
+            ),
+            child: Text(
+              'Lessons',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
           ),
           for (final item in _items)
-            ListTile(
-              leading: const Icon(Icons.article_outlined),
-              title: Text(item.name),
-              trailing: LessonBookmarkIconButton(lessonId: item.lessonId),
-              onTap: () => context.push(AppRoutes.lessonPath(item.lessonId, item.name)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Spacing.md,
+                Spacing.sm,
+                Spacing.md,
+                0,
+              ),
+              child: ComicCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.sm,
+                  vertical: Spacing.xs,
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.article_outlined),
+                  title: Text(item.name),
+                  trailing: LessonBookmarkIconButton(lessonId: item.lessonId),
+                  onTap: () => context.push(
+                    AppRoutes.lessonPath(item.lessonId, item.name),
+                  ),
+                ),
+              ),
             ),
         ],
       ),

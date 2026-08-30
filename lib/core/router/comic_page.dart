@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Shared “comic pop” transition: fade + slight scale + a short slide.
-///
-/// Used for catalog / onboarding / profile so year → subject → topic feels
-/// like flipping sticker pages, not a default Material slide.
+/// Quiet fade used instead of the comic sticker-flip (scale + slide).
 CustomTransitionPage<void> comicTransitionPage({
   required GoRouterState state,
   required Widget child,
@@ -13,34 +10,15 @@ CustomTransitionPage<void> comicTransitionPage({
     key: state.pageKey,
     name: state.name,
     child: child,
-    transitionDuration: const Duration(milliseconds: 420),
-    reverseTransitionDuration: const Duration(milliseconds: 280),
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       final curved = CurvedAnimation(
         parent: animation,
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       );
-      final outgoing = CurvedAnimation(
-        parent: secondaryAnimation,
-        curve: Curves.easeInCubic,
-      );
-      return FadeTransition(
-        opacity: curved,
-        child: FadeTransition(
-          opacity: Tween<double>(begin: 1, end: 0.72).animate(outgoing),
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.07, 0.03),
-              end: Offset.zero,
-            ).animate(curved),
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-              child: child,
-            ),
-          ),
-        ),
-      );
+      return FadeTransition(opacity: curved, child: child);
     },
   );
 }

@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../bookmarks/presentation/widgets/bookmark_icon_button.dart';
@@ -26,9 +28,7 @@ class PyqReaderScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('PYQ'),
-        actions: [
-          BookmarkIconButton(questionId: questionId),
-        ],
+        actions: [BookmarkIconButton(questionId: questionId)],
       ),
       body: detail.when(
         loading: () => const AsyncLoadingView(),
@@ -77,33 +77,51 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
   Widget build(BuildContext context) {
     final d = widget.detail;
     final plan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
-    final years = d.appearances.map((a) => '${a.year} ${a.paperName}').join(' · ');
+    final years = d.appearances
+        .map((a) => '${a.year} ${a.paperName}')
+        .join(' · ');
 
     return ListView(
       padding: const EdgeInsets.all(Spacing.lg),
       children: [
-        if (d.teaser.marks != null)
-          Text(
-            '${d.teaser.marks} marks'
-            '${d.teaser.appearanceCount > 0 ? ' · appeared ${d.teaser.appearanceCount}×' : ''}',
-            style: Theme.of(context).textTheme.labelLarge,
+        ComicCard(
+          color: Color.alphaBlend(
+            StickerFills.butter.withValues(alpha: 0.4),
+            ComicColors.of(context).sticker,
           ),
-        const SizedBox(height: Spacing.sm),
-        Text(d.teaser.questionText, style: Theme.of(context).textTheme.titleMedium),
-        if (years.isNotEmpty) ...[
-          const SizedBox(height: Spacing.sm),
-          Text(years, style: Theme.of(context).textTheme.bodySmall),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (d.teaser.marks != null)
+                Text(
+                  '${d.teaser.marks} marks'
+                  '${d.teaser.appearanceCount > 0 ? ' · appeared ${d.teaser.appearanceCount}×' : ''}',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              if (d.teaser.marks != null) const SizedBox(height: Spacing.sm),
+              Text(
+                d.teaser.questionText,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (years.isNotEmpty) ...[
+                const SizedBox(height: Spacing.sm),
+                Text(years, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ],
+          ),
+        ),
         const SizedBox(height: Spacing.lg),
         Text('Sample answer', style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: Spacing.sm),
         if (!d.canReadSample)
-          ListTile(
-            tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            leading: const Icon(Icons.lock_outline),
-            title: const Text('Show sample answer'),
-            subtitle: const Text('Included with Pro'),
+          ComicCard(
             onTap: () => context.push(AppRoutes.upgradePath(PlanTier.pro)),
+            child: const ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.lock_outline),
+              title: Text('Show sample answer'),
+              subtitle: Text('Included with Pro'),
+            ),
           )
         else if (d.sampleAnswer == null)
           const Text('No sample answer yet')
@@ -113,18 +131,27 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
             child: const Text('Show sample answer'),
           )
         else
-          Text(d.sampleAnswer!),
+          ComicCard(child: Text(d.sampleAnswer!)),
         if (d.textbookRefs.isNotEmpty) ...[
           const SizedBox(height: Spacing.lg),
           Text('Textbook pages', style: Theme.of(context).textTheme.titleSmall),
           for (final c in d.textbookRefs)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.menu_book_outlined),
-              title: Text(c.label),
+            ComicCard(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.sm,
+                vertical: Spacing.xs,
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.menu_book_outlined),
+                title: Text(c.label),
+              ),
             ),
         ],
-        ..._resourceSection('More on this topic', [...d.lessonResources, ...d.questionResources], plan),
+        ..._resourceSection('More on this topic', [
+          ...d.lessonResources,
+          ...d.questionResources,
+        ], plan),
         const SizedBox(height: Spacing.lg),
         FilledButton.tonal(
           onPressed: _learnt
@@ -138,7 +165,8 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
                     case Success():
                       setState(() => _learnt = true);
                     case Failure(:final message):
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(message)));
                   }
                 },
           child: Text(_learnt ? 'Marked as learnt' : 'Mark as learnt'),
@@ -147,18 +175,35 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
     );
   }
 
-  List<Widget> _resourceSection(String title, List<ResourceLink> links, PlanTier plan) {
+  List<Widget> _resourceSection(
+    String title,
+    List<ResourceLink> links,
+    PlanTier plan,
+  ) {
     if (links.isEmpty) return const [];
     return [
       const SizedBox(height: Spacing.lg),
       Text(title, style: Theme.of(context).textTheme.titleSmall),
       for (final link in links)
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(link.isFree ? Icons.open_in_new : Icons.lock_outline),
-          title: Text(link.title),
-          subtitle: link.sourceLabel == null ? null : Text(link.sourceLabel!),
-          onTap: () => _openLink(link, plan),
+        Padding(
+          padding: const EdgeInsets.only(top: Spacing.sm),
+          child: ComicCard(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.sm,
+              vertical: Spacing.xs,
+            ),
+            onTap: () => _openLink(link, plan),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                link.isFree ? Icons.open_in_new : Icons.lock_outline,
+              ),
+              title: Text(link.title),
+              subtitle: link.sourceLabel == null
+                  ? null
+                  : Text(link.sourceLabel!),
+            ),
+          ),
         ),
     ];
   }

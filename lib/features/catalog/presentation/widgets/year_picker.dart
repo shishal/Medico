@@ -7,8 +7,8 @@ import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/staggered_fade.dart';
 import '../../domain/catalog_models.dart';
 
-/// Horizontal year stickers. The parent owns selection so Home can browse,
-/// onboarding can save, and Profile can edit — all with the same control.
+/// Compact year chips with year art inside. Same [year-chip-*] keys as the
+/// taller stickers so Home tests still tap `year-chip-p2`.
 class YearPickerRow extends StatelessWidget {
   const YearPickerRow({
     super.key,
@@ -28,7 +28,7 @@ class YearPickerRow extends StatelessWidget {
     final brightness = Theme.of(context).brightness;
 
     return SizedBox(
-      height: 158,
+      height: 108,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: padding,
@@ -38,7 +38,7 @@ class YearPickerRow extends StatelessWidget {
           final phase = phases[i];
           return StaggeredFade(
             index: i,
-            child: _YearSticker(
+            child: _YearChip(
               phase: phase,
               selected: phase.id == selectedId,
               fill: StickerFills.yearFill(phase.displayOrder, brightness),
@@ -51,8 +51,8 @@ class YearPickerRow extends StatelessWidget {
   }
 }
 
-class _YearSticker extends StatelessWidget {
-  const _YearSticker({
+class _YearChip extends StatelessWidget {
+  const _YearChip({
     required this.phase,
     required this.selected,
     required this.fill,
@@ -66,48 +66,55 @@ class _YearSticker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
-      width: 132,
+      width: 96,
       child: ComicCard(
         key: ValueKey('year-chip-${phase.id}'),
         color: fill,
-        padding: const EdgeInsets.all(Spacing.sm),
+        padding: const EdgeInsets.all(Spacing.xs),
         semanticLabel: phase.name,
         onTap: onTap,
         child: Column(
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Image.asset(
-                        BrandAssets.yearArt(
-                          code: phase.code,
-                          name: phase.name,
-                          displayOrder: phase.displayOrder,
-                        ),
-                        fit: BoxFit.cover,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      BrandAssets.yearArt(
+                        code: phase.code,
+                        name: phase.name,
+                        displayOrder: phase.displayOrder,
                       ),
+                      fit: BoxFit.cover,
                     ),
-                  ),
-                  if (selected)
-                    const Positioned(
-                      right: 4,
-                      top: 4,
-                      child: Icon(Icons.check_circle, size: 22),
-                    ),
-                ],
+                    if (selected)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.check_circle_rounded,
+                            size: 18,
+                            color: scheme.primary,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: Spacing.xs),
             Text(
               phase.name,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelLarge
+              style: Theme.of(context).textTheme.labelMedium
                   ?.copyWith(fontWeight: FontWeight.w800),
             ),
           ],

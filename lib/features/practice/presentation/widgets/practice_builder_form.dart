@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../domain/plan_limits.dart';
 import '../../domain/practice_builder_draft.dart';
 import '../../domain/practice_catalog.dart';
@@ -64,8 +65,8 @@ class PracticeBuilderForm extends StatelessWidget {
               Text(
                 'No topics for the selected subjects yet.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               )
             else
               for (final topic in topics)
@@ -223,59 +224,46 @@ class _SourceCard extends StatelessWidget {
   final VoidCallback onTap;
 
   IconData get _icon => switch (filter) {
-        QuestionSourceFilter.unattempted => Icons.quiz_outlined,
-        QuestionSourceFilter.incorrect => Icons.replay,
-        QuestionSourceFilter.bookmarked => Icons.bookmark_outline,
-        QuestionSourceFilter.all => Icons.library_books_outlined,
-      };
+    QuestionSourceFilter.unattempted => Icons.quiz_outlined,
+    QuestionSourceFilter.incorrect => Icons.replay,
+    QuestionSourceFilter.bookmarked => Icons.bookmark_outline,
+    QuestionSourceFilter.all => Icons.library_books_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Material(
-      color: selected ? colorScheme.primaryContainer : colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Spacing.sm),
-        side: BorderSide(
-          color: selected ? colorScheme.primary : colorScheme.outlineVariant,
-          width: selected ? 2 : 1,
-        ),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(Spacing.sm),
-        child: Padding(
-          padding: const EdgeInsets.all(Spacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                _icon,
-                color: selected
-                    ? colorScheme.onPrimaryContainer
-                    : colorScheme.primary,
-              ),
-              const SizedBox(height: Spacing.sm),
-              Text(
-                filter.label,
-                style: textTheme.titleSmall?.copyWith(
-                  color: selected ? colorScheme.onPrimaryContainer : null,
-                ),
-              ),
-              const SizedBox(height: Spacing.xs),
-              Text(
-                filter.subtitle,
-                style: textTheme.bodySmall?.copyWith(
-                  color: selected
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
+    return ComicCard(
+      color: selected ? colorScheme.primaryContainer : null,
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            _icon,
+            color: selected
+                ? colorScheme.onPrimaryContainer
+                : colorScheme.primary,
           ),
-        ),
+          const SizedBox(height: Spacing.sm),
+          Text(
+            filter.label,
+            style: textTheme.titleSmall?.copyWith(
+              color: selected ? colorScheme.onPrimaryContainer : null,
+            ),
+          ),
+          const SizedBox(height: Spacing.xs),
+          Text(
+            filter.subtitle,
+            style: textTheme.bodySmall?.copyWith(
+              color: selected
+                  ? colorScheme.onPrimaryContainer
+                  : colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -302,41 +290,43 @@ class _ChipSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(child: Text(title, style: textTheme.titleMedium)),
-            if (locked)
-              Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
+    return ComicCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(title, style: textTheme.titleMedium)),
+              if (locked)
+                Icon(
+                  Icons.lock_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            ],
+          ),
+          if (helper != null && !locked) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              helper!,
+              style: textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
+            ),
           ],
-        ),
-        if (helper != null && !locked) ...[
-          const SizedBox(height: Spacing.xs),
-          Text(
-            helper!,
-            style: textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          const SizedBox(height: Spacing.sm),
+          Opacity(
+            opacity: locked ? 0.55 : 1,
+            child: Wrap(
+              spacing: Spacing.sm,
+              runSpacing: Spacing.sm,
+              children: children,
             ),
           ),
+          if (locked && upgradeHint != null)
+            _UpgradeHint(message: upgradeHint!, onUpgrade: onUpgrade),
         ],
-        const SizedBox(height: Spacing.sm),
-        Opacity(
-          opacity: locked ? 0.55 : 1,
-          child: Wrap(
-            spacing: Spacing.sm,
-            runSpacing: Spacing.sm,
-            children: children,
-          ),
-        ),
-        if (locked && upgradeHint != null)
-          _UpgradeHint(message: upgradeHint!, onUpgrade: onUpgrade),
-      ],
+      ),
     );
   }
 }
@@ -427,10 +417,7 @@ class _FeedbackTimingSection extends StatelessWidget {
         SegmentedButton<FeedbackTiming>(
           segments: [
             for (final timing in FeedbackTiming.values)
-              ButtonSegment(
-                value: timing,
-                label: Text(timing.label),
-              ),
+              ButtonSegment(value: timing, label: Text(timing.label)),
           ],
           selected: {selected},
           onSelectionChanged: (value) => onSelected(value.first),
@@ -568,8 +555,9 @@ class _TimerSection extends StatelessWidget {
               const Spacer(),
               IconButton(
                 tooltip: 'Fewer minutes',
-                onPressed:
-                    minutes > 1 ? () => onMinutesChanged(minutes - 1) : null,
+                onPressed: minutes > 1
+                    ? () => onMinutesChanged(minutes - 1)
+                    : null,
                 icon: const Icon(Icons.remove_circle_outline),
               ),
               Text('$minutes min', style: textTheme.titleSmall),

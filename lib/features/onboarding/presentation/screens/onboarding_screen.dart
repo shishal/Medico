@@ -98,131 +98,136 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         : ref.watch(collegesProvider(_universityId!));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Your course')),
-      body: ListView(
-        padding: const EdgeInsets.all(Spacing.lg),
-        children: [
-          const Center(
-            child: ComicMascot(
-              asset: BrandAssets.mascotStudy,
-              size: 140,
-              heroTag: 'onboarding-docci',
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(Spacing.lg),
+          children: [
+            const Center(
+              child: ComicMascot(
+                asset: BrandAssets.mascotStudy,
+                size: 140,
+                heroTag: 'onboarding-docci',
+              ),
             ),
-          ),
-          const SizedBox(height: Spacing.md),
-          Text(
-            'Tell ${BrandAssets.mascotName} where you study',
-            style: Theme.of(context).textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: Spacing.sm),
-          Text(
-            'University is KUHS. Tap a year sticker — that unlocks that year’s subjects on Home.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: Spacing.lg),
-          TextField(
-            controller: _nameController,
-            textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Name'),
-          ),
-          const SizedBox(height: Spacing.md),
-          universities.when(
-            data: (items) {
-              _applyUniversity(items);
-              return ComicCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'University',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    const SizedBox(height: Spacing.xs),
-                    Text(
-                      _universityName ?? 'Loading…',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              );
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text('$e'),
-          ),
-          const SizedBox(height: Spacing.md),
-          colleges.when(
-            data: (items) {
-              final selected = items.where((c) => c.id == _collegeId);
-              return ComicSelectField<College>(
-                label: 'College',
-                items: items,
-                value: selected.isEmpty ? null : selected.first,
-                labelOf: (c) => c.name,
-                onSelected: (c) => setState(() {
-                  _collegeId = c.id;
-                }),
-              );
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text('$e'),
-          ),
-          const SizedBox(height: Spacing.lg),
-          Text(
-            'Current MBBS year',
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: Spacing.sm),
-          phases.when(
-            data: (items) {
-              return YearPickerRow(
-                phases: items,
-                selectedId: _phaseId,
-                onSelect: (id) {
-                  setState(() => _phaseId = id);
-                  ref.read(catalogBrowsePhaseProvider.notifier).select(id);
-                },
-                padding: EdgeInsets.zero,
-              );
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text('$e'),
-          ),
-          const SizedBox(height: Spacing.md),
-          ComicSelectField<int>(
-            label: 'Batch year',
-            items: [
-              for (
-                var y = DateTime.now().year;
-                y >= DateTime.now().year - 6;
-                y--
-              )
-                y,
-            ],
-            value: _batchYear,
-            labelOf: (y) => '$y',
-            onSelected: (y) => setState(() => _batchYear = y),
-          ),
-          if (_error != null) ...[
             const SizedBox(height: Spacing.md),
             Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+              'Tell ${BrandAssets.mascotName} where you study',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: Spacing.sm),
+            Text(
+              'University is KUHS. Pick your year — that unlocks that year’s subjects on Home.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: Spacing.lg),
+            TextField(
+              controller: _nameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            const SizedBox(height: Spacing.md),
+            universities.when(
+              data: (items) {
+                _applyUniversity(items);
+                return ComicCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'University',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        _universityName ?? 'Loading…',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                );
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text('$e'),
+            ),
+            const SizedBox(height: Spacing.md),
+            colleges.when(
+              data: (items) {
+                final selected = items.where((c) => c.id == _collegeId);
+                return ComicSelectField<College>(
+                  label: 'College',
+                  items: items,
+                  value: selected.isEmpty ? null : selected.first,
+                  labelOf: (c) => c.name,
+                  onSelected: (c) => setState(() {
+                    _collegeId = c.id;
+                  }),
+                );
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text('$e'),
+            ),
+            const SizedBox(height: Spacing.lg),
+            Text(
+              'Current MBBS year',
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: Spacing.sm),
+            phases.when(
+              data: (items) {
+                return YearPickerRow(
+                  phases: items,
+                  selectedId: _phaseId,
+                  onSelect: (id) {
+                    setState(() => _phaseId = id);
+                    ref.read(catalogBrowsePhaseProvider.notifier).select(id);
+                  },
+                  padding: EdgeInsets.zero,
+                );
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text('$e'),
+            ),
+            const SizedBox(height: Spacing.md),
+            ComicSelectField<int>(
+              label: 'Batch year',
+              items: [
+                for (
+                  var y = DateTime.now().year;
+                  y >= DateTime.now().year - 6;
+                  y--
+                )
+                  y,
+              ],
+              value: _batchYear,
+              labelOf: (y) => '$y',
+              onSelected: (y) => setState(() => _batchYear = y),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: Spacing.md),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            const SizedBox(height: Spacing.lg),
+            FilledButton(
+              onPressed: _saving ? null : _submit,
+              child: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Continue'),
             ),
           ],
-          const SizedBox(height: Spacing.lg),
-          FilledButton(
-            onPressed: _saving ? null : _submit,
-            child: _saving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Continue'),
-          ),
-        ],
+        ),
       ),
     );
   }

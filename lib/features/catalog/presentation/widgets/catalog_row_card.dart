@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/staggered_fade.dart';
@@ -23,9 +24,13 @@ class CatalogRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final comic = ComicColors.of(context);
+    final tint = StickerFills.tintAt(index, Theme.of(context).brightness);
+
     return StaggeredFade(
       index: index,
       child: ComicCard(
+        color: Color.alphaBlend(tint.withValues(alpha: 0.38), comic.sticker),
         padding: const EdgeInsets.symmetric(
           horizontal: Spacing.md,
           vertical: Spacing.sm,

@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../theme/spacing.dart';
 
-/// Notebook-highlighter heading used on the home sticker sheet.
+/// Dashboard section heading: bold title, optional muted subtitle.
 class ComicSectionTitle extends StatelessWidget {
-  const ComicSectionTitle({
-    super.key,
-    required this.text,
-    required this.highlight,
-  });
+  const ComicSectionTitle({super.key, required this.title, this.subtitle});
 
-  final String text;
-  final Color highlight;
+  final String title;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         Spacing.lg,
@@ -22,29 +21,21 @@ class ComicSectionTitle extends StatelessWidget {
         Spacing.lg,
         Spacing.sm,
       ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Stack(
-          children: [
-            Positioned(
-              left: -4,
-              right: -4,
-              bottom: 3,
-              height: 12,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: highlight,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: Spacing.xs),
             Text(
-              text,
-              style: Theme.of(context).textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.w800),
+              subtitle!,
+              style: textTheme.bodyMedium?.copyWith(color: muted),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

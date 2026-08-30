@@ -5,22 +5,16 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_card.dart';
-import '../../../../core/widgets/staggered_fade.dart';
 
+/// Secondary shortcuts once the shell owns Practice / Trackers / Profile.
 class HomeQuickActions extends StatelessWidget {
   const HomeQuickActions({super.key});
 
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
+    final comic = ComicColors.of(context);
     final actions = [
-      (
-        'MCQ practice',
-        Icons.quiz_outlined,
-        AppRoutes.practice,
-        StickerFills.mint,
-      ),
-      ('Trackers', Icons.flag_outlined, AppRoutes.trackers, StickerFills.peach),
       (
         'Progress',
         Icons.local_fire_department_outlined,
@@ -37,46 +31,40 @@ class HomeQuickActions extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-      child: Column(
+      child: Row(
         children: [
-          for (var i = 0; i < actions.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: Spacing.sm),
-              child: StaggeredFade(
-                index: i,
-                child: ComicCard(
-                  color: brightness == Brightness.dark
-                      ? StickerFills.subjectDark[i %
-                            StickerFills.subjectDark.length]
-                      : actions[i].$4,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.md,
-                    vertical: Spacing.sm,
-                  ),
-                  onTap: () {
-                    if (actions[i].$3 == AppRoutes.bookmarks) {
-                      context.go(actions[i].$3);
-                    } else {
-                      context.push(actions[i].$3);
-                    }
-                  },
-                  child: Row(
-                    children: [
-                      Icon(actions[i].$2),
-                      const SizedBox(width: Spacing.sm),
-                      Expanded(
-                        child: Text(
-                          actions[i].$1,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
+          for (var i = 0; i < actions.length; i++) ...[
+            if (i > 0) const SizedBox(width: Spacing.sm),
+            Expanded(
+              child: ComicCard(
+                color: Color.alphaBlend(
+                  (brightness == Brightness.dark
+                          ? StickerFills.subjectDark[i]
+                          : actions[i].$4)
+                      .withValues(alpha: 0.55),
+                  comic.sticker,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.md,
+                  vertical: Spacing.md,
+                ),
+                onTap: () => context.push(actions[i].$3),
+                child: Row(
+                  children: [
+                    Icon(actions[i].$2),
+                    const SizedBox(width: Spacing.sm),
+                    Expanded(
+                      child: Text(
+                        actions[i].$1,
+                        style: Theme.of(context).textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w800),
                       ),
-                      const Icon(Icons.chevron_right_rounded),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
+          ],
         ],
       ),
     );

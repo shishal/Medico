@@ -8,6 +8,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../../bookmarks/presentation/widgets/lesson_bookmark_icon_button.dart';
 import '../../../practice/data/practice_repository.dart';
 import '../../../practice/domain/practice_builder_draft.dart';
@@ -259,16 +260,25 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 for (final link in _resources)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      link.isFree ? Icons.open_in_new : Icons.lock_outline,
+                  Padding(
+                    padding: const EdgeInsets.only(top: Spacing.sm),
+                    child: ComicCard(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Spacing.sm,
+                        vertical: Spacing.xs,
+                      ),
+                      onTap: () => _openLink(link, plan),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          link.isFree ? Icons.open_in_new : Icons.lock_outline,
+                        ),
+                        title: Text(link.title),
+                        subtitle: link.sourceLabel == null
+                            ? null
+                            : Text(link.sourceLabel!),
+                      ),
                     ),
-                    title: Text(link.title),
-                    subtitle: link.sourceLabel == null
-                        ? null
-                        : Text(link.sourceLabel!),
-                    onTap: () => _openLink(link, plan),
                   ),
               ],
               const SizedBox(height: Spacing.lg),

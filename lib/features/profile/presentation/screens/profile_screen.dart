@@ -7,10 +7,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/support.dart';
 import '../../../../core/theme/brand_assets.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/data/auth_repository.dart';
@@ -51,13 +53,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final planAsync = ref.watch(currentPlanProvider);
     final profileAsync = ref.watch(userProfileProvider);
 
+    final name = profileAsync.value?.fullName?.trim();
+    final comic = ComicColors.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
-        ),
         actions: [
           IconButton(
             tooltip: 'Refresh plan',
@@ -77,9 +78,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           const SizedBox(height: Spacing.md),
+          Text(
+            (name == null || name.isEmpty) ? 'Medico student' : name,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: Spacing.sm),
           planAsync.when(
             data: (plan) => Text(
               plan == null ? 'Plan: —' : 'Current plan: ${plan.label}',
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             loading: () => const Align(
@@ -104,6 +113,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 expires == null
                     ? 'No plan expiry set'
                     : 'Stored plan: ${profile.plan.label} · expires ${expires.toLocal()}',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -116,27 +126,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           profileAsync.when(
             data: (profile) {
               if (profile == null) return const SizedBox.shrink();
-              return AcademicEditor(profile: profile);
+              return ComicCard(child: AcademicEditor(profile: profile));
             },
             loading: () => const LinearProgressIndicator(),
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.lg),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.chat_outlined),
-            title: const Text('WhatsApp support'),
+          ComicCard(
+            color: Color.alphaBlend(
+              StickerFills.mint.withValues(alpha: 0.4),
+              comic.sticker,
+            ),
             onTap: () => launchUrl(
               Uri.parse(SupportLinks.whatsAppUrl),
               mode: LaunchMode.externalApplication,
             ),
+            child: const Row(
+              children: [
+                Icon(Icons.chat_outlined),
+                SizedBox(width: Spacing.md),
+                Expanded(child: Text('WhatsApp support')),
+                Icon(Icons.chevron_right_rounded),
+              ],
+            ),
           ),
-          FilledButton.tonal(
-            onPressed: () => context.go(AppRoutes.upgrade),
-            child: const Text('Compare plans'),
+          const SizedBox(height: Spacing.sm),
+          ComicCard(
+            color: Color.alphaBlend(
+              StickerFills.peach.withValues(alpha: 0.4),
+              comic.sticker,
+            ),
+            onTap: () => context.go(AppRoutes.upgrade),
+            child: const Row(
+              children: [
+                Icon(Icons.workspace_premium_outlined),
+                SizedBox(width: Spacing.md),
+                Expanded(child: Text('Compare plans')),
+                Icon(Icons.chevron_right_rounded),
+              ],
+            ),
           ),
-          const SizedBox(height: Spacing.md),
-          const ThemeModeToggleButton(),
+          const SizedBox(height: Spacing.sm),
+          const ComicCard(child: ThemeModeToggleButton()),
           const SizedBox(height: Spacing.md),
           TextButton(
             onPressed: _isSigningOut ? null : _signOut,

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,6 +26,7 @@ import '../../features/tests/presentation/screens/test_instructions_screen.dart'
 import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import '../../features/trackers/presentation/screens/trackers_screen.dart';
+import '../widgets/app_shell.dart';
 import 'app_routes.dart';
 import 'comic_page.dart';
 import 'go_router_refresh_stream.dart';
@@ -87,12 +89,53 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const SignupScreen(),
       ),
       comicGoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
-      comicGoRoute(
         path: AppRoutes.onboarding,
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              comicGoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              comicGoRoute(
+                path: AppRoutes.practice,
+                builder: (context, state) {
+                  final extra = state.extra;
+                  final draft = extra is PracticeBuilderDraft ? extra : null;
+                  return PracticeBuilderScreen(
+                    key: ValueKey(draft?.hashCode ?? 0),
+                    initialDraft: draft,
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              comicGoRoute(
+                path: AppRoutes.trackers,
+                builder: (context, state) => const TrackersScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              comicGoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       comicGoRoute(
         path: AppRoutes.search,
@@ -105,10 +148,6 @@ GoRouter goRouter(Ref ref) {
       comicGoRoute(
         path: AppRoutes.trackerCreate,
         builder: (context, state) => const CreateTrackerScreen(),
-      ),
-      comicGoRoute(
-        path: AppRoutes.trackers,
-        builder: (context, state) => const TrackersScreen(),
       ),
       comicGoRoute(
         path: AppRoutes.subject,
@@ -139,14 +178,6 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) {
           final id = state.pathParameters['questionId']!;
           return PyqReaderScreen(questionId: id);
-        },
-      ),
-      comicGoRoute(
-        path: AppRoutes.practice,
-        builder: (context, state) {
-          final extra = state.extra;
-          final draft = extra is PracticeBuilderDraft ? extra : null;
-          return PracticeBuilderScreen(initialDraft: draft);
         },
       ),
       comicGoRoute(
@@ -191,10 +222,6 @@ GoRouter goRouter(Ref ref) {
       comicGoRoute(
         path: AppRoutes.bookmarks,
         builder: (context, state) => const BookmarksScreen(),
-      ),
-      comicGoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
       ),
       comicGoRoute(
         path: AppRoutes.upgrade,

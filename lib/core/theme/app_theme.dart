@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'comic_colors.dart';
 import 'spacing.dart';
 
-/// Material 3 + comic sticker chrome. Seed stays deep teal (medical, not
-/// default purple). Urgent orange is reserved for timer/submit only.
+/// Material 3 + soft dashboard chrome, using the comic paper/pastel palette.
+/// Seed stays deep teal. Urgent orange is timer/submit only.
 abstract final class AppTheme {
   static const Color seedColor = Color(0xFF0D7377);
 
   /// Reserved for urgent actions only: timer running low, submit test, etc.
   static const Color accentUrgent = Color(0xFFE65100);
+
+  static const double cardRadius = 22;
 
   static ThemeData get light => _build(Brightness.light);
 
@@ -23,9 +25,6 @@ abstract final class AppTheme {
       seedColor: seedColor,
       brightness: brightness,
     ).copyWith(surface: comic.paper);
-
-    final ink = comic.ink;
-    final radius = BorderRadius.circular(18);
 
     return ThemeData(
       useMaterial3: true,
@@ -41,17 +40,17 @@ abstract final class AppTheme {
         foregroundColor: colorScheme.onSurface,
         titleTextStyle: TextStyle(
           fontSize: 22,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w700,
           color: colorScheme.onSurface,
-          letterSpacing: -0.3,
+          letterSpacing: -0.2,
         ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         color: comic.sticker,
+        shadowColor: comic.shadow,
         shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: BorderSide(color: ink, width: 2),
+          borderRadius: BorderRadius.circular(cardRadius),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -60,43 +59,48 @@ abstract final class AppTheme {
             horizontal: Spacing.lg,
             vertical: Spacing.md,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: radius,
-            side: BorderSide(color: ink, width: 2),
-          ),
+          shape: const StadiumBorder(),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: ink, width: 2),
-          shape: RoundedRectangleBorder(borderRadius: radius),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.lg,
+            vertical: Spacing.md,
+          ),
+          shape: const StadiumBorder(),
+          side: BorderSide(color: colorScheme.outlineVariant),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: BorderSide(color: ink, width: 2),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: comic.sticker,
         border: OutlineInputBorder(
-          borderRadius: radius,
-          borderSide: BorderSide(color: ink, width: 2),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: radius,
-          borderSide: BorderSide(color: ink, width: 2),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: radius,
-          borderSide: BorderSide(color: ink, width: 2.4),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: Spacing.md,
-          vertical: Spacing.sm,
+          vertical: Spacing.md,
         ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      ),
+      tabBarTheme: const TabBarThemeData(
+        dividerColor: Colors.transparent,
+        indicatorSize: TabBarIndicatorSize.label,
       ),
     );
   }

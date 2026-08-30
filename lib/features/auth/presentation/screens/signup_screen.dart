@@ -80,76 +80,86 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign up')),
-      body: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              const Center(
-                child: ComicMascot(asset: BrandAssets.mascotStudy, size: 120),
-              ),
-              const SizedBox(height: Spacing.md),
-              Text(
-                'Create your account',
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: Spacing.md),
-              if (_errorMessage != null) ...[
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: colorScheme.error),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                const SizedBox(height: Spacing.lg),
+                const Center(
+                  child: ComicMascot(asset: BrandAssets.mascotStudy, size: 140),
                 ),
                 const SizedBox(height: Spacing.md),
-              ],
-              if (_infoMessage != null) ...[
                 Text(
-                  _infoMessage!,
-                  style: TextStyle(color: colorScheme.primary),
+                  'Let’s start',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: Spacing.xs),
+                Text(
+                  'Create an account to study KUHS PYQs with ${BrandAssets.mascotName}.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: Spacing.xl),
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(color: colorScheme.error),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
+                if (_infoMessage != null) ...[
+                  Text(
+                    _infoMessage!,
+                    style: TextStyle(color: colorScheme.primary),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const [AutofillHints.email],
+                  textInputAction: TextInputAction.next,
+                  enabled: !_isLoading,
+                  validator: AuthValidators.email,
                 ),
                 const SizedBox(height: Spacing.md),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.done,
+                  enabled: !_isLoading,
+                  onFieldSubmitted: (_) => _submit(),
+                  validator: AuthValidators.password,
+                ),
+                const SizedBox(height: Spacing.xl),
+                FilledButton(
+                  onPressed: _isLoading ? null : _submit,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Create account'),
+                ),
+                const SizedBox(height: Spacing.md),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () => context.go(AppRoutes.login),
+                  child: const Text('Already have an account? Log in'),
+                ),
               ],
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                autofillHints: const [AutofillHints.email],
-                textInputAction: TextInputAction.next,
-                enabled: !_isLoading,
-                validator: AuthValidators.email,
-              ),
-              const SizedBox(height: Spacing.md),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                autofillHints: const [AutofillHints.newPassword],
-                textInputAction: TextInputAction.done,
-                enabled: !_isLoading,
-                onFieldSubmitted: (_) => _submit(),
-                validator: AuthValidators.password,
-              ),
-              const SizedBox(height: Spacing.lg),
-              FilledButton(
-                onPressed: _isLoading ? null : _submit,
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Sign up'),
-              ),
-              const SizedBox(height: Spacing.md),
-              TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () => context.go(AppRoutes.login),
-                child: const Text('Already have an account? Log in'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
 
-/// Comic-sticker extras on top of Material 3 [ColorScheme].
+/// Comic palette on a soft dashboard: warm paper, sticker fills, pastel tints.
 ///
-/// Ink is the thick outline color. Paper is the warm page behind cards.
-/// Sticker is the card fill (white in light, deep teal-black in dark).
+/// Canvas stays the comic paper (`#FBF4E6`), not a cool grey. Ink is for
+/// glyphs only — not card/button outlines.
 @immutable
 class ComicColors extends ThemeExtension<ComicColors> {
   const ComicColors({
     required this.ink,
     required this.paper,
     required this.sticker,
+    required this.shadow,
   });
 
   final Color ink;
   final Color paper;
   final Color sticker;
+  final Color shadow;
 
   static const light = ComicColors(
     ink: Color(0xFF1B2B2B),
     paper: Color(0xFFFBF4E6),
     sticker: Color(0xFFFFFDF8),
+    shadow: Color(0x1A1B2B2B),
   );
 
   static const dark = ComicColors(
     ink: Color(0xFFE7F2F0),
     paper: Color(0xFF121A1B),
     sticker: Color(0xFF1C2A2C),
+    shadow: Color(0x66000000),
   );
 
   static ComicColors of(BuildContext context) {
@@ -34,11 +38,17 @@ class ComicColors extends ThemeExtension<ComicColors> {
   }
 
   @override
-  ComicColors copyWith({Color? ink, Color? paper, Color? sticker}) {
+  ComicColors copyWith({
+    Color? ink,
+    Color? paper,
+    Color? sticker,
+    Color? shadow,
+  }) {
     return ComicColors(
       ink: ink ?? this.ink,
       paper: paper ?? this.paper,
       sticker: sticker ?? this.sticker,
+      shadow: shadow ?? this.shadow,
     );
   }
 
@@ -49,11 +59,12 @@ class ComicColors extends ThemeExtension<ComicColors> {
       ink: Color.lerp(ink, other.ink, t) ?? ink,
       paper: Color.lerp(paper, other.paper, t) ?? paper,
       sticker: Color.lerp(sticker, other.sticker, t) ?? sticker,
+      shadow: Color.lerp(shadow, other.shadow, t) ?? shadow,
     );
   }
 }
 
-/// Decorative fills for year / subject stickers (not the urgent accent).
+/// Decorative fills for year / subject cards (not the urgent accent).
 abstract final class StickerFills {
   static const mint = Color(0xFFB8E8E0);
   static const peach = Color(0xFFFFD6A8);
@@ -94,5 +105,10 @@ abstract final class StickerFills {
       h = 0x1fffffff & (h + c);
     }
     return palette[h % palette.length];
+  }
+
+  static Color tintAt(int index, Brightness brightness) {
+    final palette = brightness == Brightness.dark ? subjectDark : subjectLight;
+    return palette[index % palette.length];
   }
 }

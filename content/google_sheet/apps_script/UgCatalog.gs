@@ -16,6 +16,7 @@ function requireHttpsUrl_(raw, tab, row, field, errors) {
 }
 
 function validateUgCatalog_(errors, questionByExt, theoryByExt) {
+  ensureUgGlobals_();
   var empty = {
     universities: [],
     colleges: [],
@@ -379,9 +380,27 @@ function syncUgCatalog_(ug, subjectIdByKey, topicIdByKey, questionIdByExt) {
     paperIdByExt[normKey_(row.external_id)] = row.id;
   });
 
+  // Appearances / textbook refs / question resources need question UUIDs.
+  // performSync_ calls this once before questions exist (empty map) and once after.
+  var qids = questionIdByExt || {};
+  var hasQuestionIds = false;
+  for (var k in qids) {
+    if (Object.prototype.hasOwnProperty.call(qids, k)) {
+      hasQuestionIds = true;
+      break;
+    }
+  }
+  if (!hasQuestionIds) {
+    return {
+      universities: ug.universities.length,
+      lessons: lessonRows.length,
+      phaseIdByCode: phaseIdByCode,
+    };
+  }
+
   var appearanceRows = ug.appearances
     .map(function (a) {
-      var qid = questionIdByExt[normKey_(a.question_external_id)];
+      var qid = qids[normKey_(a.question_external_id)];
       var pid = paperIdByExt[normKey_(a.paper_external_id)];
       if (!qid || !pid) return null;
       return { question_id: qid, exam_paper_id: pid };
@@ -393,27 +412,46 @@ function syncUgCatalog_(ug, subjectIdByKey, topicIdByKey, questionIdByExt) {
     supabaseUpsert_('question_appearances', appearanceRows, 'question_id,exam_paper_id');
   }
 
-  var refRows = ug.textbookRefs.map(function (r) {
-    return {
-      question_id: questionIdByExt[normKey_(r.question_external_id)],
-      textbook_id: tbIdByKey[normKey_(r.textbook_key)],
+  var missingRef = [];
+  var refRows = [];
+  ug.textbookRefs.forEach(function (r) {
+    var qid = qids[normKey_(r.question_external_id)];
+    var tbid = tbIdByKey[normKey_(r.textbook_key)];
+    if (!qid || !tbid) {
+      missingRef.push(r.question_external_id || '(blank)');
+      return;
+    }
+    refRows.push({
+      question_id: qid,
+      textbook_id: tbid,
       page: r.page,
       section_heading: r.section_heading,
-    };
+    });
   });
+  if (missingRef.length) {
+    throw new Error(
+      'TextbookRefs: no question_id for ' +
+        missingRef.slice(0, 8).join(', ') +
+        (missingRef.length > 8 ? '…' : '') +
+        '. Those Questions.external_id values were not in the questions upsert return.'
+    );
+  }
   if (refRows.length) {
     supabaseUpsert_('question_textbook_refs', refRows, 'question_id,textbook_id,page');
   }
 
-  var qrRows = ug.questionResources.map(function (r) {
-    return {
-      question_id: questionIdByExt[normKey_(r.question_external_id)],
+  var qrRows = [];
+  ug.questionResources.forEach(function (r) {
+    var qid = qids[normKey_(r.question_external_id)];
+    if (!qid) return;
+    qrRows.push({
+      question_id: qid,
       title: r.title,
       url: r.url,
       source_label: r.source_label,
       display_order: r.display_order,
       is_free: r.is_free,
-    };
+    });
   });
   if (qrRows.length) supabaseUpsert_('question_resources', qrRows, 'question_id,url');
 

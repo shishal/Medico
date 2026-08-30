@@ -1,3 +1,301 @@
 lesson_external_id,title,url,source_label,display_order,is_free
-L-ANAT-UPPER-BRACHIAL,Brachial plexus overview,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
-L-ANAT-UPPER-HUMERUS,Humerus fracture lecture,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-UPPER-BRACHIAL,Brachial plexus — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-UPPER-BRACHIAL,Read more: Brachial plexus,https://en.wikipedia.org/wiki/Brachial_plexus,Wikipedia (open reference),2,TRUE
+L-ANAT-UPPER-HUMERUS,Humerus fractures — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-UPPER-HUMERUS,Read more: Humerus fractures,https://en.wikipedia.org/wiki/Humerus_fracture,Wikipedia (open reference),2,FALSE
+L-ANAT-HEAD-LARYNX,Larynx — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-HEAD-LARYNX,Read more: Larynx,https://en.wikipedia.org/wiki/Larynx,Wikipedia (open reference),2,TRUE
+L-ANAT-THYROID-GLAND-AND-TRIANGLES-OF-T,Thyroid gland and triangles of the neck — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-THYROID-GLAND-AND-TRIANGLES-OF-T,Read more: Thyroid gland and triangles of the neck,https://en.wikipedia.org/wiki/Thyroid,Wikipedia (open reference),2,FALSE
+L-ANAT-VISUAL-PATHWAY,Visual pathway — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-VISUAL-PATHWAY,Read more: Visual pathway,https://en.wikipedia.org/wiki/Visual_pathway,Wikipedia (open reference),2,TRUE
+L-ANAT-CIRCLE-OF-WILLIS-AND-CRANIAL-NER,Circle of Willis and cranial nerve nuclei — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-CIRCLE-OF-WILLIS-AND-CRANIAL-NER,Read more: Circle of Willis and cranial nerve nuclei,https://en.wikipedia.org/wiki/Circle_of_Willis,Wikipedia (open reference),2,FALSE
+L-ANAT-GASTRULATION-AND-NOTOCHORD,Gastrulation and notochord — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-GASTRULATION-AND-NOTOCHORD,Read more: Gastrulation and notochord,https://en.wikipedia.org/wiki/Gastrulation,Wikipedia (open reference),2,TRUE
+L-ANAT-PHARYNGEAL-ARCHES-AND-FETAL-CIRC,Pharyngeal arches and fetal circulation — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-PHARYNGEAL-ARCHES-AND-FETAL-CIRC,Read more: Pharyngeal arches and fetal circulation,https://en.wikipedia.org/wiki/Pharyngeal_arch,Wikipedia (open reference),2,FALSE
+L-ANAT-HEART-AND-CORONARY-ARTERIES,Heart and coronary arteries — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-HEART-AND-CORONARY-ARTERIES,Read more: Heart and coronary arteries,https://en.wikipedia.org/wiki/Coronary_circulation,Wikipedia (open reference),2,TRUE
+L-ANAT-BRONCHOPULMONARY-SEGMENTS-AND-ME,Bronchopulmonary segments and mediastinum — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-BRONCHOPULMONARY-SEGMENTS-AND-ME,Read more: Bronchopulmonary segments and mediastinum,https://en.wikipedia.org/wiki/Bronchopulmonary_segment,Wikipedia (open reference),2,FALSE
+L-ANAT-INGUINAL-CANAL-AND-HERNIA,Inguinal canal and hernia — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-INGUINAL-CANAL-AND-HERNIA,Read more: Inguinal canal and hernia,https://en.wikipedia.org/wiki/Inguinal_canal,Wikipedia (open reference),2,TRUE
+L-ANAT-PORTAL-VEIN-AND-EXTRAHEPATIC-BIL,Portal vein and extrahepatic biliary tree — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-PORTAL-VEIN-AND-EXTRAHEPATIC-BIL,Read more: Portal vein and extrahepatic biliary tree,https://en.wikipedia.org/wiki/Portal_vein,Wikipedia (open reference),2,FALSE
+L-ANAT-FEMORAL-TRIANGLE-AND-ADDUCTOR-CA,Femoral triangle and adductor canal — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-FEMORAL-TRIANGLE-AND-ADDUCTOR-CA,Read more: Femoral triangle and adductor canal,https://en.wikipedia.org/wiki/Femoral_triangle,Wikipedia (open reference),2,TRUE
+L-ANAT-SCIATIC-NERVE-AND-GLUTEAL-REGION,Sciatic nerve and gluteal region — KUHS topic page,https://medico.shishal.com/kuhs/anatomy/,Medico topic page,1,TRUE
+L-ANAT-SCIATIC-NERVE-AND-GLUTEAL-REGION,Read more: Sciatic nerve and gluteal region,https://en.wikipedia.org/wiki/Sciatic_nerve,Wikipedia (open reference),2,FALSE
+L-PHYS-CARDIAC-CYCLE-AND-HEART-SOUNDS,Cardiac cycle and heart sounds — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-CARDIAC-CYCLE-AND-HEART-SOUNDS,Read more: Cardiac cycle and heart sounds,https://en.wikipedia.org/wiki/Cardiac_cycle,Wikipedia (open reference),2,TRUE
+L-PHYS-JUGULAR-VENOUS-PULSE-AND-ECG-BAS,Jugular venous pulse and ECG basics — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-JUGULAR-VENOUS-PULSE-AND-ECG-BAS,Read more: Jugular venous pulse and ECG basics,https://en.wikipedia.org/wiki/Jugular_venous_pressure,Wikipedia (open reference),2,FALSE
+L-PHYS-LUNG-VOLUMES-AND-SPIROMETRY,Lung volumes and spirometry — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-LUNG-VOLUMES-AND-SPIROMETRY,Read more: Lung volumes and spirometry,https://en.wikipedia.org/wiki/Spirometry,Wikipedia (open reference),2,TRUE
+L-PHYS-OXYGEN-TRANSPORT-AND-HYPOXIA,Oxygen transport and hypoxia — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-OXYGEN-TRANSPORT-AND-HYPOXIA,Read more: Oxygen transport and hypoxia,https://en.wikipedia.org/wiki/Hypoxia,Wikipedia (open reference),2,FALSE
+L-PHYS-GFR-AND-CLEARANCE,GFR and clearance — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-GFR-AND-CLEARANCE,Read more: GFR and clearance,https://en.wikipedia.org/wiki/Renal_function,Wikipedia (open reference),2,TRUE
+L-PHYS-COUNTERCURRENT-MECHANISM-AND-ADH,Countercurrent mechanism and ADH — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-COUNTERCURRENT-MECHANISM-AND-ADH,Read more: Countercurrent mechanism and ADH,https://en.wikipedia.org/wiki/Countercurrent_multiplier_system,Wikipedia (open reference),2,FALSE
+L-PHYS-RESTING-MEMBRANE-POTENTIAL-AND-A,Resting membrane potential and action potential — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-RESTING-MEMBRANE-POTENTIAL-AND-A,Read more: Resting membrane potential and action potential,https://en.wikipedia.org/wiki/Action_potential,Wikipedia (open reference),2,TRUE
+L-PHYS-SYNAPTIC-TRANSMISSION-AND-NEUROM,Synaptic transmission and neuromuscular junction — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-SYNAPTIC-TRANSMISSION-AND-NEUROM,Read more: Synaptic transmission and neuromuscular junction,https://en.wikipedia.org/wiki/Neuromuscular_junction,Wikipedia (open reference),2,FALSE
+L-PHYS-HYPOTHALAMO-PITUITARY-AXIS,Hypothalamo-pituitary axis — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-HYPOTHALAMO-PITUITARY-AXIS,Read more: Hypothalamo-pituitary axis,https://en.wikipedia.org/wiki/Hypothalamic–pituitary–adrenal_axis,Wikipedia (open reference),2,TRUE
+L-PHYS-THYROID-HORMONE-SYNTHESIS-AND-CA,Thyroid hormone synthesis and calcium hormones — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-THYROID-HORMONE-SYNTHESIS-AND-CA,Read more: Thyroid hormone synthesis and calcium hormones,https://en.wikipedia.org/wiki/Thyroid_hormone,Wikipedia (open reference),2,FALSE
+L-PHYS-GASTRIC-SECRETION-AND-MOTILITY,Gastric secretion and motility — KUHS topic page,https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-GASTRIC-SECRETION-AND-MOTILITY,Read more: Gastric secretion and motility,https://en.wikipedia.org/wiki/Gastric_acid,Wikipedia (open reference),2,TRUE
+L-PHYS-BILE-PANCREAS-AND-SMALL-BOWEL-AB,"Bile, pancreas and small-bowel absorption — KUHS topic page",https://medico.shishal.com/kuhs/physiology/,Medico topic page,1,TRUE
+L-PHYS-BILE-PANCREAS-AND-SMALL-BOWEL-AB,"Read more: Bile, pancreas and small-bowel absorption",https://en.wikipedia.org/wiki/Bile,Wikipedia (open reference),2,FALSE
+L-BIOC-GLYCOLYSIS-AND-GLUCONEOGENESIS,Glycolysis and gluconeogenesis — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-GLYCOLYSIS-AND-GLUCONEOGENESIS,Read more: Glycolysis and gluconeogenesis,https://en.wikipedia.org/wiki/Glycolysis,Wikipedia (open reference),2,TRUE
+L-BIOC-GLYCOGEN-STORAGE-DISEASES-AND-PP,Glycogen storage diseases and PPP — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-GLYCOGEN-STORAGE-DISEASES-AND-PP,Read more: Glycogen storage diseases and PPP,https://en.wikipedia.org/wiki/Glycogen_storage_disease,Wikipedia (open reference),2,FALSE
+L-BIOC-UREA-CYCLE-AND-HYPERAMMONEMIA,Urea cycle and hyperammonemia — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-UREA-CYCLE-AND-HYPERAMMONEMIA,Read more: Urea cycle and hyperammonemia,https://en.wikipedia.org/wiki/Urea_cycle,Wikipedia (open reference),2,TRUE
+L-BIOC-PHENYLALANINE-TYROSINE-AND-BRANC,"Phenylalanine, tyrosine and branched-chain amino acids — KUHS topic page",https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-PHENYLALANINE-TYROSINE-AND-BRANC,"Read more: Phenylalanine, tyrosine and branched-chain amino acids",https://en.wikipedia.org/wiki/Phenylketonuria,Wikipedia (open reference),2,FALSE
+L-BIOC-DNA-REPLICATION-AND-REPAIR,DNA replication and repair — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-DNA-REPLICATION-AND-REPAIR,Read more: DNA replication and repair,https://en.wikipedia.org/wiki/DNA_replication,Wikipedia (open reference),2,TRUE
+L-BIOC-TRANSCRIPTION-TRANSLATION-AND-BL,"Transcription, translation and blotting — KUHS topic page",https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-TRANSCRIPTION-TRANSLATION-AND-BL,"Read more: Transcription, translation and blotting",https://en.wikipedia.org/wiki/Southern_blot,Wikipedia (open reference),2,FALSE
+L-BIOC-WATER-SOLUBLE-VITAMINS,Water-soluble vitamins — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-WATER-SOLUBLE-VITAMINS,Read more: Water-soluble vitamins,https://en.wikipedia.org/wiki/Vitamin,Wikipedia (open reference),2,TRUE
+L-BIOC-FAT-SOLUBLE-VITAMINS-AND-PEM,Fat-soluble vitamins and PEM — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-FAT-SOLUBLE-VITAMINS-AND-PEM,Read more: Fat-soluble vitamins and PEM,https://en.wikipedia.org/wiki/Vitamin_A_deficiency,Wikipedia (open reference),2,FALSE
+L-BIOC-BETA-OXIDATION-AND-KETONE-BODIES,Beta-oxidation and ketone bodies — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-BETA-OXIDATION-AND-KETONE-BODIES,Read more: Beta-oxidation and ketone bodies,https://en.wikipedia.org/wiki/Beta_oxidation,Wikipedia (open reference),2,TRUE
+L-BIOC-CHOLESTEROL-SYNTHESIS-AND-LIPOPR,Cholesterol synthesis and lipoproteins — KUHS topic page,https://medico.shishal.com/kuhs/biochemistry/,Medico topic page,1,TRUE
+L-BIOC-CHOLESTEROL-SYNTHESIS-AND-LIPOPR,Read more: Cholesterol synthesis and lipoproteins,https://en.wikipedia.org/wiki/Lipoprotein,Wikipedia (open reference),2,FALSE
+L-PATH-CELL-INJURY-NECROSIS-AND-APOPTOS,"Cell injury, necrosis and apoptosis — KUHS topic page",https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-CELL-INJURY-NECROSIS-AND-APOPTOS,"Read more: Cell injury, necrosis and apoptosis",https://en.wikipedia.org/wiki/Necrosis,Wikipedia (open reference),2,TRUE
+L-PATH-INFLAMMATION-HEALING-AND-HEMODYN,"Inflammation, healing and hemodynamic disorders — KUHS topic page",https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-INFLAMMATION-HEALING-AND-HEMODYN,"Read more: Inflammation, healing and hemodynamic disorders",https://en.wikipedia.org/wiki/Inflammation,Wikipedia (open reference),2,FALSE
+L-PATH-ANEMIAS-AND-MEGALOBLASTIC-CHANGE,Anemias and megaloblastic change — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-ANEMIAS-AND-MEGALOBLASTIC-CHANGE,Read more: Anemias and megaloblastic change,https://en.wikipedia.org/wiki/Megaloblastic_anemia,Wikipedia (open reference),2,TRUE
+L-PATH-LEUKEMIAS-AND-LYMPHOMAS,Leukemias and lymphomas — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-LEUKEMIAS-AND-LYMPHOMAS,Read more: Leukemias and lymphomas,https://en.wikipedia.org/wiki/Leukemia,Wikipedia (open reference),2,FALSE
+L-PATH-CARDIOVASCULAR-AND-RENAL-PATHOLO,Cardiovascular and renal pathology — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-CARDIOVASCULAR-AND-RENAL-PATHOLO,Read more: Cardiovascular and renal pathology,https://en.wikipedia.org/wiki/Rheumatic_fever,Wikipedia (open reference),2,TRUE
+L-PATH-HEPATIC-AND-PULMONARY-PATHOLOGY,Hepatic and pulmonary pathology — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-HEPATIC-AND-PULMONARY-PATHOLOGY,Read more: Hepatic and pulmonary pathology,https://en.wikipedia.org/wiki/Cirrhosis,Wikipedia (open reference),2,FALSE
+L-PATH-CARCINOGENESIS-AND-TUMOUR-MARKER,Carcinogenesis and tumour markers — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-CARCINOGENESIS-AND-TUMOUR-MARKER,Read more: Carcinogenesis and tumour markers,https://en.wikipedia.org/wiki/Carcinogenesis,Wikipedia (open reference),2,TRUE
+L-PATH-COMMON-CANCERS-AND-PARANEOPLASTI,Common cancers and paraneoplastic syndromes — KUHS topic page,https://medico.shishal.com/kuhs/pathology/,Medico topic page,1,TRUE
+L-PATH-COMMON-CANCERS-AND-PARANEOPLASTI,Read more: Common cancers and paraneoplastic syndromes,https://en.wikipedia.org/wiki/Paraneoplastic_syndrome,Wikipedia (open reference),2,FALSE
+L-MICR-GRAM-POSITIVE-PATHOGENS-AND-MYCO,Gram-positive pathogens and mycobacteria — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-GRAM-POSITIVE-PATHOGENS-AND-MYCO,Read more: Gram-positive pathogens and mycobacteria,https://en.wikipedia.org/wiki/Mycobacterium_tuberculosis,Wikipedia (open reference),2,TRUE
+L-MICR-GRAM-NEGATIVE-AND-ANAEROBIC-BACT,Gram-negative and anaerobic bacteria — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-GRAM-NEGATIVE-AND-ANAEROBIC-BACT,Read more: Gram-negative and anaerobic bacteria,https://en.wikipedia.org/wiki/Vibrio_cholerae,Wikipedia (open reference),2,FALSE
+L-MICR-HEPATITIS-VIRUSES-AND-HIV,Hepatitis viruses and HIV — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-HEPATITIS-VIRUSES-AND-HIV,Read more: Hepatitis viruses and HIV,https://en.wikipedia.org/wiki/Hepatitis_B,Wikipedia (open reference),2,TRUE
+L-MICR-HERPESVIRUSES-RABIES-AND-RESPIRA,"Herpesviruses, rabies and respiratory viruses — KUHS topic page",https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-HERPESVIRUSES-RABIES-AND-RESPIRA,"Read more: Herpesviruses, rabies and respiratory viruses",https://en.wikipedia.org/wiki/Rabies,Wikipedia (open reference),2,FALSE
+L-MICR-MALARIA-AND-LEISHMANIASIS,Malaria and leishmaniasis — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-MALARIA-AND-LEISHMANIASIS,Read more: Malaria and leishmaniasis,https://en.wikipedia.org/wiki/Malaria,Wikipedia (open reference),2,TRUE
+L-MICR-INTESTINAL-HELMINTHS-AND-HYDATID,Intestinal helminths and hydatid disease — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-INTESTINAL-HELMINTHS-AND-HYDATID,Read more: Intestinal helminths and hydatid disease,https://en.wikipedia.org/wiki/Echinococcosis,Wikipedia (open reference),2,FALSE
+L-MICR-HYPERSENSITIVITY-AND-ANTIBODIES,Hypersensitivity and antibodies — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-HYPERSENSITIVITY-AND-ANTIBODIES,Read more: Hypersensitivity and antibodies,https://en.wikipedia.org/wiki/Hypersensitivity,Wikipedia (open reference),2,TRUE
+L-MICR-PRIMARY-IMMUNODEFICIENCIES-AND-T,Primary immunodeficiencies and transplant — KUHS topic page,https://medico.shishal.com/kuhs/microbiology/,Medico topic page,1,TRUE
+L-MICR-PRIMARY-IMMUNODEFICIENCIES-AND-T,Read more: Primary immunodeficiencies and transplant,https://en.wikipedia.org/wiki/DiGeorge_syndrome,Wikipedia (open reference),2,FALSE
+L-PHAR-CHOLINERGIC-AND-ANTICHOLINERGIC,Cholinergic and anticholinergic drugs — KUHS topic page,https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-CHOLINERGIC-AND-ANTICHOLINERGIC,Read more: Cholinergic and anticholinergic drugs,https://en.wikipedia.org/wiki/Atropine,Wikipedia (open reference),2,TRUE
+L-PHAR-ADRENERGIC-AGONISTS-BLOCKERS-AND,"Adrenergic agonists, blockers and NMJ drugs — KUHS topic page",https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ADRENERGIC-AGONISTS-BLOCKERS-AND,"Read more: Adrenergic agonists, blockers and NMJ drugs",https://en.wikipedia.org/wiki/Neuromuscular-blocking_drug,Wikipedia (open reference),2,FALSE
+L-PHAR-ANTIHYPERTENSIVES-AND-HEART-FAIL,Antihypertensives and heart-failure drugs — KUHS topic page,https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ANTIHYPERTENSIVES-AND-HEART-FAIL,Read more: Antihypertensives and heart-failure drugs,https://en.wikipedia.org/wiki/ACE_inhibitor,Wikipedia (open reference),2,TRUE
+L-PHAR-ANTIARRHYTHMICS-AND-ANTICOAGULAN,Antiarrhythmics and anticoagulants — KUHS topic page,https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ANTIARRHYTHMICS-AND-ANTICOAGULAN,Read more: Antiarrhythmics and anticoagulants,https://en.wikipedia.org/wiki/Adenosine,Wikipedia (open reference),2,FALSE
+L-PHAR-BETA-LACTAMS-VANCOMYCIN-AND-ANTI,"Beta-lactams, vancomycin and anti-TB drugs — KUHS topic page",https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-BETA-LACTAMS-VANCOMYCIN-AND-ANTI,"Read more: Beta-lactams, vancomycin and anti-TB drugs",https://en.wikipedia.org/wiki/Isoniazid,Wikipedia (open reference),2,TRUE
+L-PHAR-ANTIMALARIALS-ANTIFUNGALS-AND-ST,"Antimalarials, antifungals and stewardship — KUHS topic page",https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ANTIMALARIALS-ANTIFUNGALS-AND-ST,"Read more: Antimalarials, antifungals and stewardship",https://en.wikipedia.org/wiki/Artemisinin,Wikipedia (open reference),2,FALSE
+L-PHAR-ANTIEPILEPTICS-AND-BENZODIAZEPIN,Antiepileptics and benzodiazepines — KUHS topic page,https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ANTIEPILEPTICS-AND-BENZODIAZEPIN,Read more: Antiepileptics and benzodiazepines,https://en.wikipedia.org/wiki/Ethosuximide,Wikipedia (open reference),2,TRUE
+L-PHAR-ANTIDEPRESSANTS-LITHIUM-AND-ANTI,"Antidepressants, lithium and antipsychotics — KUHS topic page",https://medico.shishal.com/kuhs/pharmacology/,Medico topic page,1,TRUE
+L-PHAR-ANTIDEPRESSANTS-LITHIUM-AND-ANTI,"Read more: Antidepressants, lithium and antipsychotics",https://en.wikipedia.org/wiki/Lithium_(medication),Wikipedia (open reference),2,FALSE
+L-FMT-EARLY-SIGNS-OF-DEATH-AND-RIGOR-M,Early signs of death and rigor mortis — KUHS topic page,https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-EARLY-SIGNS-OF-DEATH-AND-RIGOR-M,Read more: Early signs of death and rigor mortis,https://en.wikipedia.org/wiki/Rigor_mortis,Wikipedia (open reference),2,TRUE
+L-FMT-POSTMORTEM-STAINING-COOLING-AND,"Postmortem staining, cooling and injuries — KUHS topic page",https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-POSTMORTEM-STAINING-COOLING-AND,"Read more: Postmortem staining, cooling and injuries",https://en.wikipedia.org/wiki/Livor_mortis,Wikipedia (open reference),2,FALSE
+L-FMT-CORROSIVES-PESTICIDES-AND-PLANT,"Corrosives, pesticides and plant poisons — KUHS topic page",https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-CORROSIVES-PESTICIDES-AND-PLANT,"Read more: Corrosives, pesticides and plant poisons",https://en.wikipedia.org/wiki/Organophosphate_poisoning,Wikipedia (open reference),2,TRUE
+L-FMT-ASPHYXIANTS-METALS-AND-ALCOHOL,"Asphyxiants, metals and alcohol — KUHS topic page",https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-ASPHYXIANTS-METALS-AND-ALCOHOL,"Read more: Asphyxiants, metals and alcohol",https://en.wikipedia.org/wiki/Carbon_monoxide_poisoning,Wikipedia (open reference),2,FALSE
+L-FMT-CONSENT-NEGLIGENCE-AND-INQUEST,"Consent, negligence and inquest — KUHS topic page",https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-CONSENT-NEGLIGENCE-AND-INQUEST,"Read more: Consent, negligence and inquest",https://en.wikipedia.org/wiki/Informed_consent,Wikipedia (open reference),2,TRUE
+L-FMT-INJURY-DYING-DECLARATION-AND-IPC,"Injury, dying declaration and IPC sections — KUHS topic page",https://medico.shishal.com/kuhs/forensic-medicine/,Medico topic page,1,TRUE
+L-FMT-INJURY-DYING-DECLARATION-AND-IPC,"Read more: Injury, dying declaration and IPC sections",https://en.wikipedia.org/wiki/Dying_declaration,Wikipedia (open reference),2,FALSE
+L-PSM-MEASURES-OF-DISEASE-FREQUENCY-AN,Measures of disease frequency and study designs — KUHS topic page,https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-MEASURES-OF-DISEASE-FREQUENCY-AN,Read more: Measures of disease frequency and study designs,https://en.wikipedia.org/wiki/Incidence_(epidemiology),Wikipedia (open reference),2,TRUE
+L-PSM-SCREENING-BIAS-AND-OUTBREAK-INVE,"Screening, bias and outbreak investigation — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-SCREENING-BIAS-AND-OUTBREAK-INVE,"Read more: Screening, bias and outbreak investigation",https://en.wikipedia.org/wiki/Sensitivity_and_specificity,Wikipedia (open reference),2,FALSE
+L-PSM-NORMAL-DISTRIBUTION-P-VALUE-AND,"Normal distribution, p-value and tests of significance — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-NORMAL-DISTRIBUTION-P-VALUE-AND,"Read more: Normal distribution, p-value and tests of significance",https://en.wikipedia.org/wiki/P-value,Wikipedia (open reference),2,TRUE
+L-PSM-SAMPLING-ERRORS-AND-CONFIDENCE-I,"Sampling, errors and confidence intervals — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-SAMPLING-ERRORS-AND-CONFIDENCE-I,"Read more: Sampling, errors and confidence intervals",https://en.wikipedia.org/wiki/Confidence_interval,Wikipedia (open reference),2,FALSE
+L-PSM-NTEP-NVBDCP-AND-NATIONAL-DISEASE,"NTEP, NVBDCP and national disease control — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-NTEP-NVBDCP-AND-NATIONAL-DISEASE,"Read more: NTEP, NVBDCP and national disease control",https://en.wikipedia.org/wiki/National_Tuberculosis_Elimination_Program,Wikipedia (open reference),2,TRUE
+L-PSM-RCH-RKSK-AND-NATIONAL-HEALTH-MIS,"RCH, RKSK and National Health Mission — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-RCH-RKSK-AND-NATIONAL-HEALTH-MIS,"Read more: RCH, RKSK and National Health Mission",https://en.wikipedia.org/wiki/National_Health_Mission,Wikipedia (open reference),2,FALSE
+L-PSM-UIP-SCHEDULE-AND-VACCINE-TYPES,UIP schedule and vaccine types — KUHS topic page,https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-UIP-SCHEDULE-AND-VACCINE-TYPES,Read more: UIP schedule and vaccine types,https://en.wikipedia.org/wiki/Universal_Immunization_Programme,Wikipedia (open reference),2,TRUE
+L-PSM-AEFI-COLD-CHAIN-AND-SPECIAL-SITU,"AEFI, cold chain and special situations — KUHS topic page",https://medico.shishal.com/kuhs/community-medicine/,Medico topic page,1,TRUE
+L-PSM-AEFI-COLD-CHAIN-AND-SPECIAL-SITU,"Read more: AEFI, cold chain and special situations",https://en.wikipedia.org/wiki/Vaccine_hesitancy,Wikipedia (open reference),2,FALSE
+L-MED-ACUTE-CORONARY-SYNDROMES-AND-HEA,Acute coronary syndromes and heart failure — KUHS topic page,https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-ACUTE-CORONARY-SYNDROMES-AND-HEA,Read more: Acute coronary syndromes and heart failure,https://en.wikipedia.org/wiki/Myocardial_infarction,Wikipedia (open reference),2,TRUE
+L-MED-VALVULAR-DISEASE-ENDOCARDITIS-AN,"Valvular disease, endocarditis and tamponade — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-VALVULAR-DISEASE-ENDOCARDITIS-AN,"Read more: Valvular disease, endocarditis and tamponade",https://en.wikipedia.org/wiki/Cardiac_tamponade,Wikipedia (open reference),2,FALSE
+L-MED-COPD-ASTHMA-AND-PNEUMONIA,"COPD, asthma and pneumonia — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-COPD-ASTHMA-AND-PNEUMONIA,"Read more: COPD, asthma and pneumonia",https://en.wikipedia.org/wiki/Chronic_obstructive_pulmonary_disease,Wikipedia (open reference),2,TRUE
+L-MED-PLEURAL-DISEASE-TB-AND-INTERSTIT,"Pleural disease, TB and interstitial lung disease — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-PLEURAL-DISEASE-TB-AND-INTERSTIT,"Read more: Pleural disease, TB and interstitial lung disease",https://en.wikipedia.org/wiki/Pleural_effusion,Wikipedia (open reference),2,FALSE
+L-MED-CIRRHOSIS-GI-BLEED-AND-HEPATITIS,"Cirrhosis, GI bleed and hepatitis — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-CIRRHOSIS-GI-BLEED-AND-HEPATITIS,"Read more: Cirrhosis, GI bleed and hepatitis",https://en.wikipedia.org/wiki/Cirrhosis,Wikipedia (open reference),2,TRUE
+L-MED-IBD-PANCREATITIS-AND-MALABSORPTI,"IBD, pancreatitis and malabsorption — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-IBD-PANCREATITIS-AND-MALABSORPTI,"Read more: IBD, pancreatitis and malabsorption",https://en.wikipedia.org/wiki/Pancreatitis,Wikipedia (open reference),2,FALSE
+L-MED-DIABETES-MELLITUS-AND-THYROID-DI,Diabetes mellitus and thyroid disorders — KUHS topic page,https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-DIABETES-MELLITUS-AND-THYROID-DI,Read more: Diabetes mellitus and thyroid disorders,https://en.wikipedia.org/wiki/Diabetic_ketoacidosis,Wikipedia (open reference),2,TRUE
+L-MED-ADRENAL-PITUITARY-AND-CALCIUM-DI,"Adrenal, pituitary and calcium disorders — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-ADRENAL-PITUITARY-AND-CALCIUM-DI,"Read more: Adrenal, pituitary and calcium disorders",https://en.wikipedia.org/wiki/Cushing's_syndrome,Wikipedia (open reference),2,FALSE
+L-MED-STROKE-AND-MENINGITIS,Stroke and meningitis — KUHS topic page,https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-STROKE-AND-MENINGITIS,Read more: Stroke and meningitis,https://en.wikipedia.org/wiki/Stroke,Wikipedia (open reference),2,TRUE
+L-MED-SEIZURES-GBS-AND-MOVEMENT-DISORD,"Seizures, GBS and movement disorders — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-SEIZURES-GBS-AND-MOVEMENT-DISORD,"Read more: Seizures, GBS and movement disorders",https://en.wikipedia.org/wiki/Guillain–Barré_syndrome,Wikipedia (open reference),2,FALSE
+L-MED-AKI-CKD-AND-NEPHRITIC-NEPHROTIC,"AKI, CKD and nephritic-nephrotic syndromes — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-AKI-CKD-AND-NEPHRITIC-NEPHROTIC,"Read more: AKI, CKD and nephritic-nephrotic syndromes",https://en.wikipedia.org/wiki/Acute_kidney_injury,Wikipedia (open reference),2,TRUE
+L-MED-ELECTROLYTES-ACID-BASE-AND-DIALY,"Electrolytes, acid-base and dialysis — KUHS topic page",https://medico.shishal.com/kuhs/medicine/,Medico topic page,1,TRUE
+L-MED-ELECTROLYTES-ACID-BASE-AND-DIALY,"Read more: Electrolytes, acid-base and dialysis",https://en.wikipedia.org/wiki/Metabolic_acidosis,Wikipedia (open reference),2,FALSE
+L-SUR-SHOCK-BURNS-AND-WOUND-HEALING,"Shock, burns and wound healing — KUHS topic page",https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-SHOCK-BURNS-AND-WOUND-HEALING,"Read more: Shock, burns and wound healing",https://en.wikipedia.org/wiki/Parkland_formula,Wikipedia (open reference),2,TRUE
+L-SUR-HERNIA-THYROID-AND-BREAST-SURGIC,"Hernia, thyroid and breast (surgical approach) — KUHS topic page",https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-HERNIA-THYROID-AND-BREAST-SURGIC,"Read more: Hernia, thyroid and breast (surgical approach)",https://en.wikipedia.org/wiki/Hernia,Wikipedia (open reference),2,FALSE
+L-SUR-PEPTIC-ULCER-GALLBLADDER-AND-PAN,"Peptic ulcer, gallbladder and pancreas — KUHS topic page",https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-PEPTIC-ULCER-GALLBLADDER-AND-PAN,"Read more: Peptic ulcer, gallbladder and pancreas",https://en.wikipedia.org/wiki/Peptic_ulcer_disease,Wikipedia (open reference),2,TRUE
+L-SUR-INTESTINAL-OBSTRUCTION-AND-APPEN,Intestinal obstruction and appendix — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-INTESTINAL-OBSTRUCTION-AND-APPEN,Read more: Intestinal obstruction and appendix,https://en.wikipedia.org/wiki/Appendicitis,Wikipedia (open reference),2,FALSE
+L-SUR-UROLITHIASIS-AND-BPH,Urolithiasis and BPH — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-UROLITHIASIS-AND-BPH,Read more: Urolithiasis and BPH,https://en.wikipedia.org/wiki/Kidney_stone,Wikipedia (open reference),2,TRUE
+L-SUR-TESTICULAR-TUMOURS-AND-HAEMATURI,Testicular tumours and haematuria — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-TESTICULAR-TUMOURS-AND-HAEMATURI,Read more: Testicular tumours and haematuria,https://en.wikipedia.org/wiki/Testicular_cancer,Wikipedia (open reference),2,FALSE
+L-SUR-HEAD-INJURY-AND-INTRACRANIAL-HAE,Head injury and intracranial haemorrhage — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-HEAD-INJURY-AND-INTRACRANIAL-HAE,Read more: Head injury and intracranial haemorrhage,https://en.wikipedia.org/wiki/Epidural_hematoma,Wikipedia (open reference),2,TRUE
+L-SUR-RAISED-ICP-HYDROCEPHALUS-AND-SPI,"Raised ICP, hydrocephalus and spinal trauma — KUHS topic page",https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-RAISED-ICP-HYDROCEPHALUS-AND-SPI,"Read more: Raised ICP, hydrocephalus and spinal trauma",https://en.wikipedia.org/wiki/Intracranial_pressure,Wikipedia (open reference),2,FALSE
+L-SUR-BREAST-CARCINOMA,Breast carcinoma — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-BREAST-CARCINOMA,Read more: Breast carcinoma,https://en.wikipedia.org/wiki/Breast_cancer,Wikipedia (open reference),2,TRUE
+L-SUR-THYROID-AND-PARATHYROID-SURGERY,Thyroid and parathyroid surgery — KUHS topic page,https://medico.shishal.com/kuhs/surgery/,Medico topic page,1,TRUE
+L-SUR-THYROID-AND-PARATHYROID-SURGERY,Read more: Thyroid and parathyroid surgery,https://en.wikipedia.org/wiki/Thyroid_nodule,Wikipedia (open reference),2,FALSE
+L-OBG-ANTENATAL-CARE-AND-ANAEMIA-IN-PR,Antenatal care and anaemia in pregnancy — KUHS topic page,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-ANTENATAL-CARE-AND-ANAEMIA-IN-PR,Read more: Antenatal care and anaemia in pregnancy,https://en.wikipedia.org/wiki/Prenatal_care,Wikipedia (open reference),2,TRUE
+L-OBG-HYPERTENSIVE-DISORDERS-AND-APH-P,Hypertensive disorders and APH/PPH — KUHS topic page,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-HYPERTENSIVE-DISORDERS-AND-APH-P,Read more: Hypertensive disorders and APH/PPH,https://en.wikipedia.org/wiki/Pre-eclampsia,Wikipedia (open reference),2,FALSE
+L-OBG-AUB-FIBROIDS-AND-ENDOMETRIOSIS,"AUB, fibroids and endometriosis — KUHS topic page",https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-AUB-FIBROIDS-AND-ENDOMETRIOSIS,"Read more: AUB, fibroids and endometriosis",https://en.wikipedia.org/wiki/Endometriosis,Wikipedia (open reference),2,TRUE
+L-OBG-OVARIAN-TUMOURS-AND-ENDOMETRIAL,Ovarian tumours and endometrial carcinoma — KUHS topic page,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-OVARIAN-TUMOURS-AND-ENDOMETRIAL,Read more: Ovarian tumours and endometrial carcinoma,https://en.wikipedia.org/wiki/Ovarian_cancer,Wikipedia (open reference),2,FALSE
+L-OBG-MECHANISM-OF-LABOUR-AND-PARTOGRA,Mechanism of labour and partograph — KUHS topic page,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-MECHANISM-OF-LABOUR-AND-PARTOGRA,Read more: Mechanism of labour and partograph,https://en.wikipedia.org/wiki/Childbirth,Wikipedia (open reference),2,TRUE
+L-OBG-OBSTRUCTED-LABOUR-APH-AND-THIRD,"Obstructed labour, APH and third stage — KUHS topic page",https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico topic page,1,TRUE
+L-OBG-OBSTRUCTED-LABOUR-APH-AND-THIRD,"Read more: Obstructed labour, APH and third stage",https://en.wikipedia.org/wiki/Obstructed_labour,Wikipedia (open reference),2,FALSE
+L-PED-NEONATAL-RESUSCITATION-AND-JAUND,Neonatal resuscitation and jaundice — KUHS topic page,https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-NEONATAL-RESUSCITATION-AND-JAUND,Read more: Neonatal resuscitation and jaundice,https://en.wikipedia.org/wiki/Neonatal_jaundice,Wikipedia (open reference),2,TRUE
+L-PED-RDS-TTN-AND-PERINATAL-ASPHYXIA,"RDS, TTN and perinatal asphyxia — KUHS topic page",https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-RDS-TTN-AND-PERINATAL-ASPHYXIA,"Read more: RDS, TTN and perinatal asphyxia",https://en.wikipedia.org/wiki/Infant_respiratory_distress_syndrome,Wikipedia (open reference),2,FALSE
+L-PED-MEASLES-IMNCI-AND-DIARRHOEA,"Measles, IMNCI and diarrhoea — KUHS topic page",https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-MEASLES-IMNCI-AND-DIARRHOEA,"Read more: Measles, IMNCI and diarrhoea",https://en.wikipedia.org/wiki/Measles,Wikipedia (open reference),2,TRUE
+L-PED-MALARIA-DENGUE-AND-TUBERCULOSIS,"Malaria, dengue and tuberculosis in children — KUHS topic page",https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-MALARIA-DENGUE-AND-TUBERCULOSIS,"Read more: Malaria, dengue and tuberculosis in children",https://en.wikipedia.org/wiki/Dengue_fever,Wikipedia (open reference),2,FALSE
+L-PED-GROWTH-CHARTS-MILESTONES-AND-PUB,"Growth charts, milestones and puberty — KUHS topic page",https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-GROWTH-CHARTS-MILESTONES-AND-PUB,"Read more: Growth charts, milestones and puberty",https://en.wikipedia.org/wiki/Child_development_stages,Wikipedia (open reference),2,TRUE
+L-PED-SAM-VITAMIN-DEFICIENCIES-AND-IMM,"SAM, vitamin deficiencies and immunization catch-up — KUHS topic page",https://medico.shishal.com/kuhs/pediatrics/,Medico topic page,1,TRUE
+L-PED-SAM-VITAMIN-DEFICIENCIES-AND-IMM,"Read more: SAM, vitamin deficiencies and immunization catch-up",https://en.wikipedia.org/wiki/Malnutrition,Wikipedia (open reference),2,FALSE
+L-OPH-CONJUNCTIVITIS-XEROPHTHALMIA-AND,"Conjunctivitis, xerophthalmia and keratitis — KUHS topic page",https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-CONJUNCTIVITIS-XEROPHTHALMIA-AND,"Read more: Conjunctivitis, xerophthalmia and keratitis",https://en.wikipedia.org/wiki/Xerophthalmia,Wikipedia (open reference),2,TRUE
+L-OPH-CATARACT-AND-CORNEAL-ULCERS,Cataract and corneal ulcers — KUHS topic page,https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-CATARACT-AND-CORNEAL-ULCERS,Read more: Cataract and corneal ulcers,https://en.wikipedia.org/wiki/Cataract,Wikipedia (open reference),2,FALSE
+L-OPH-PRIMARY-OPEN-ANGLE-GLAUCOMA,Primary open-angle glaucoma — KUHS topic page,https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-PRIMARY-OPEN-ANGLE-GLAUCOMA,Read more: Primary open-angle glaucoma,https://en.wikipedia.org/wiki/Glaucoma,Wikipedia (open reference),2,TRUE
+L-OPH-ACUTE-ANGLE-CLOSURE-GLAUCOMA,Acute angle-closure glaucoma — KUHS topic page,https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-ACUTE-ANGLE-CLOSURE-GLAUCOMA,Read more: Acute angle-closure glaucoma,https://en.wikipedia.org/wiki/Glaucoma,Wikipedia (open reference),2,FALSE
+L-OPH-DIABETIC-RETINOPATHY,Diabetic retinopathy — KUHS topic page,https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-DIABETIC-RETINOPATHY,Read more: Diabetic retinopathy,https://en.wikipedia.org/wiki/Diabetic_retinopathy,Wikipedia (open reference),2,TRUE
+L-OPH-RETINAL-VASCULAR-OCCLUSIONS-AND,Retinal vascular occlusions and ARMD — KUHS topic page,https://medico.shishal.com/kuhs/ophthalmology/,Medico topic page,1,TRUE
+L-OPH-RETINAL-VASCULAR-OCCLUSIONS-AND,Read more: Retinal vascular occlusions and ARMD,https://en.wikipedia.org/wiki/Central_retinal_artery_occlusion,Wikipedia (open reference),2,FALSE
+L-ENT-OTITIS-MEDIA-AND-CSOM,Otitis media and CSOM — KUHS topic page,https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-OTITIS-MEDIA-AND-CSOM,Read more: Otitis media and CSOM,https://en.wikipedia.org/wiki/Otitis_media,Wikipedia (open reference),2,TRUE
+L-ENT-HEARING-TESTS-CHOLESTEATOMA-AND,"Hearing tests, cholesteatoma and facial nerve — KUHS topic page",https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-HEARING-TESTS-CHOLESTEATOMA-AND,"Read more: Hearing tests, cholesteatoma and facial nerve",https://en.wikipedia.org/wiki/Cholesteatoma,Wikipedia (open reference),2,FALSE
+L-ENT-EPISTAXIS-AND-DNS,Epistaxis and DNS — KUHS topic page,https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-EPISTAXIS-AND-DNS,Read more: Epistaxis and DNS,https://en.wikipedia.org/wiki/Nosebleed,Wikipedia (open reference),2,TRUE
+L-ENT-SINUSITIS-POLYPS-AND-NASOPHARYNG,"Sinusitis, polyps and nasopharyngeal carcinoma — KUHS topic page",https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-SINUSITIS-POLYPS-AND-NASOPHARYNG,"Read more: Sinusitis, polyps and nasopharyngeal carcinoma",https://en.wikipedia.org/wiki/Nasal_polyp,Wikipedia (open reference),2,FALSE
+L-ENT-STRIDOR-AND-LARYNGOMALACIA,Stridor and laryngomalacia — KUHS topic page,https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-STRIDOR-AND-LARYNGOMALACIA,Read more: Stridor and laryngomalacia,https://en.wikipedia.org/wiki/Laryngomalacia,Wikipedia (open reference),2,TRUE
+L-ENT-VOCAL-CORD-PALSY-AND-CARCINOMA-L,Vocal cord palsy and carcinoma larynx — KUHS topic page,https://medico.shishal.com/kuhs/ent/,Medico topic page,1,TRUE
+L-ENT-VOCAL-CORD-PALSY-AND-CARCINOMA-L,Read more: Vocal cord palsy and carcinoma larynx,https://en.wikipedia.org/wiki/Recurrent_laryngeal_nerve,Wikipedia (open reference),2,FALSE
+L-ORT-COLLES-SCAPHOID-AND-NECK-OF-FEMU,"Colles, scaphoid and neck of femur — KUHS topic page",https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-COLLES-SCAPHOID-AND-NECK-OF-FEMU,"Read more: Colles, scaphoid and neck of femur",https://en.wikipedia.org/wiki/Colles'_fracture,Wikipedia (open reference),2,TRUE
+L-ORT-COMPARTMENT-SYNDROME-AND-FAT-EMB,Compartment syndrome and fat embolism — KUHS topic page,https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-COMPARTMENT-SYNDROME-AND-FAT-EMB,Read more: Compartment syndrome and fat embolism,https://en.wikipedia.org/wiki/Compartment_syndrome,Wikipedia (open reference),2,FALSE
+L-ORT-OSTEOMYELITIS-AND-SEPTIC-ARTHRIT,Osteomyelitis and septic arthritis — KUHS topic page,https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-OSTEOMYELITIS-AND-SEPTIC-ARTHRIT,Read more: Osteomyelitis and septic arthritis,https://en.wikipedia.org/wiki/Osteomyelitis,Wikipedia (open reference),2,TRUE
+L-ORT-POTT-SPINE-AND-SKELETAL-TB,Pott spine and skeletal TB — KUHS topic page,https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-POTT-SPINE-AND-SKELETAL-TB,Read more: Pott spine and skeletal TB,https://en.wikipedia.org/wiki/Pott_disease,Wikipedia (open reference),2,FALSE
+L-ORT-SCOLIOSIS-AND-IVDP,Scoliosis and IVDP — KUHS topic page,https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-SCOLIOSIS-AND-IVDP,Read more: Scoliosis and IVDP,https://en.wikipedia.org/wiki/Scoliosis,Wikipedia (open reference),2,TRUE
+L-ORT-CAUDA-EQUINA-AND-SPINAL-INJURIES,Cauda equina and spinal injuries — KUHS topic page,https://medico.shishal.com/kuhs/orthopedics/,Medico topic page,1,TRUE
+L-ORT-CAUDA-EQUINA-AND-SPINAL-INJURIES,Read more: Cauda equina and spinal injuries,https://en.wikipedia.org/wiki/Cauda_equina_syndrome,Wikipedia (open reference),2,FALSE
+L-DER-PSORIASIS-AND-LICHEN-PLANUS,Psoriasis and lichen planus — KUHS topic page,https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-PSORIASIS-AND-LICHEN-PLANUS,Read more: Psoriasis and lichen planus,https://en.wikipedia.org/wiki/Psoriasis,Wikipedia (open reference),2,TRUE
+L-DER-PITYRIASIS-ROSEA-AND-ECZEMA,Pityriasis rosea and eczema — KUHS topic page,https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-PITYRIASIS-ROSEA-AND-ECZEMA,Read more: Pityriasis rosea and eczema,https://en.wikipedia.org/wiki/Pityriasis_rosea,Wikipedia (open reference),2,FALSE
+L-DER-PYODERMA-AND-DERMATOPHYTES,Pyoderma and dermatophytes — KUHS topic page,https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-PYODERMA-AND-DERMATOPHYTES,Read more: Pyoderma and dermatophytes,https://en.wikipedia.org/wiki/Impetigo,Wikipedia (open reference),2,TRUE
+L-DER-LEPROSY-SCABIES-AND-VIRAL-EXANTH,"Leprosy, scabies and viral exanthems — KUHS topic page",https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-LEPROSY-SCABIES-AND-VIRAL-EXANTH,"Read more: Leprosy, scabies and viral exanthems",https://en.wikipedia.org/wiki/Leprosy,Wikipedia (open reference),2,FALSE
+L-DER-PEMPHIGUS-VULGARIS,Pemphigus vulgaris — KUHS topic page,https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-PEMPHIGUS-VULGARIS,Read more: Pemphigus vulgaris,https://en.wikipedia.org/wiki/Pemphigus_vulgaris,Wikipedia (open reference),2,TRUE
+L-DER-BULLOUS-PEMPHIGOID-AND-DERMATITI,Bullous pemphigoid and dermatitis herpetiformis — KUHS topic page,https://medico.shishal.com/kuhs/dermatology/,Medico topic page,1,TRUE
+L-DER-BULLOUS-PEMPHIGOID-AND-DERMATITI,Read more: Bullous pemphigoid and dermatitis herpetiformis,https://en.wikipedia.org/wiki/Bullous_pemphigoid,Wikipedia (open reference),2,FALSE
+L-PSY-MAJOR-DEPRESSION-AND-BIPOLAR-DIS,Major depression and bipolar disorder — KUHS topic page,https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-MAJOR-DEPRESSION-AND-BIPOLAR-DIS,Read more: Major depression and bipolar disorder,https://en.wikipedia.org/wiki/Major_depressive_disorder,Wikipedia (open reference),2,TRUE
+L-PSY-SUICIDE-RISK-ECT-AND-ANTIDEPRESS,"Suicide risk, ECT and antidepressants — KUHS topic page",https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-SUICIDE-RISK-ECT-AND-ANTIDEPRESS,"Read more: Suicide risk, ECT and antidepressants",https://en.wikipedia.org/wiki/Electroconvulsive_therapy,Wikipedia (open reference),2,FALSE
+L-PSY-CLINICAL-FEATURES-AND-FIRST-RANK,Clinical features and first-rank symptoms — KUHS topic page,https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-CLINICAL-FEATURES-AND-FIRST-RANK,Read more: Clinical features and first-rank symptoms,https://en.wikipedia.org/wiki/Schizophrenia,Wikipedia (open reference),2,TRUE
+L-PSY-ANTIPSYCHOTICS-AND-CLOZAPINE-MON,Antipsychotics and clozapine monitoring — KUHS topic page,https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-ANTIPSYCHOTICS-AND-CLOZAPINE-MON,Read more: Antipsychotics and clozapine monitoring,https://en.wikipedia.org/wiki/Clozapine,Wikipedia (open reference),2,FALSE
+L-PSY-ANXIETY-DISORDERS-AND-OCD,Anxiety disorders and OCD — KUHS topic page,https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-ANXIETY-DISORDERS-AND-OCD,Read more: Anxiety disorders and OCD,https://en.wikipedia.org/wiki/Obsessive–compulsive_disorder,Wikipedia (open reference),2,TRUE
+L-PSY-ALCOHOL-WITHDRAWAL-AND-CAGE,Alcohol withdrawal and CAGE — KUHS topic page,https://medico.shishal.com/kuhs/psychiatry/,Medico topic page,1,TRUE
+L-PSY-ALCOHOL-WITHDRAWAL-AND-CAGE,Read more: Alcohol withdrawal and CAGE,https://en.wikipedia.org/wiki/Delirium_tremens,Wikipedia (open reference),2,FALSE
+L-ANE-INDUCTION-AGENTS-AND-INHALATIONA,Induction agents and inhalational anaesthetics — KUHS topic page,https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-INDUCTION-AGENTS-AND-INHALATIONA,Read more: Induction agents and inhalational anaesthetics,https://en.wikipedia.org/wiki/Inhalational_anaesthetic,Wikipedia (open reference),2,TRUE
+L-ANE-MALIGNANT-HYPERTHERMIA-AND-MONIT,Malignant hyperthermia and monitoring — KUHS topic page,https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-MALIGNANT-HYPERTHERMIA-AND-MONIT,Read more: Malignant hyperthermia and monitoring,https://en.wikipedia.org/wiki/Malignant_hyperthermia,Wikipedia (open reference),2,FALSE
+L-ANE-SPINAL-AND-EPIDURAL-ANAESTHESIA,Spinal and epidural anaesthesia — KUHS topic page,https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-SPINAL-AND-EPIDURAL-ANAESTHESIA,Read more: Spinal and epidural anaesthesia,https://en.wikipedia.org/wiki/Spinal_anaesthesia,Wikipedia (open reference),2,TRUE
+L-ANE-LOCAL-ANAESTHETIC-SYSTEMIC-TOXIC,Local anaesthetic systemic toxicity — KUHS topic page,https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-LOCAL-ANAESTHETIC-SYSTEMIC-TOXIC,Read more: Local anaesthetic systemic toxicity,https://en.wikipedia.org/wiki/Local_anesthetic_systemic_toxicity,Wikipedia (open reference),2,FALSE
+L-ANE-MALLAMPATI-INTUBATION-AND-DIFFIC,"Mallampati, intubation and difficult airway — KUHS topic page",https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-MALLAMPATI-INTUBATION-AND-DIFFIC,"Read more: Mallampati, intubation and difficult airway",https://en.wikipedia.org/wiki/Mallampati_score,Wikipedia (open reference),2,TRUE
+L-ANE-LMA-RSI-AND-CANNOT-INTUBATE-CANN,"LMA, RSI and cannot-intubate cannot-oxygenate — KUHS topic page",https://medico.shishal.com/kuhs/anesthesia/,Medico topic page,1,TRUE
+L-ANE-LMA-RSI-AND-CANNOT-INTUBATE-CANN,"Read more: LMA, RSI and cannot-intubate cannot-oxygenate",https://en.wikipedia.org/wiki/Laryngeal_mask_airway,Wikipedia (open reference),2,FALSE
+L-RAD-SILHOUETTE-SIGN-PNEUMONIA-AND-PN,"Silhouette sign, pneumonia and pneumothorax — KUHS topic page",https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-SILHOUETTE-SIGN-PNEUMONIA-AND-PN,"Read more: Silhouette sign, pneumonia and pneumothorax",https://en.wikipedia.org/wiki/Silhouette_sign,Wikipedia (open reference),2,TRUE
+L-RAD-PULMONARY-EMBOLISM-IMAGING-AND-C,Pulmonary embolism imaging and collapse — KUHS topic page,https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-PULMONARY-EMBOLISM-IMAGING-AND-C,Read more: Pulmonary embolism imaging and collapse,https://en.wikipedia.org/wiki/CT_pulmonary_angiogram,Wikipedia (open reference),2,FALSE
+L-RAD-PNEUMOPERITONEUM-AND-BOWEL-OBSTR,Pneumoperitoneum and bowel obstruction — KUHS topic page,https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-PNEUMOPERITONEUM-AND-BOWEL-OBSTR,Read more: Pneumoperitoneum and bowel obstruction,https://en.wikipedia.org/wiki/Pneumoperitoneum,Wikipedia (open reference),2,TRUE
+L-RAD-APPENDICITIS-PANCREATITIS-AND-RE,"Appendicitis, pancreatitis and renal stones imaging — KUHS topic page",https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-APPENDICITIS-PANCREATITIS-AND-RE,"Read more: Appendicitis, pancreatitis and renal stones imaging",https://en.wikipedia.org/wiki/Abdominal_x-ray,Wikipedia (open reference),2,FALSE
+L-RAD-STROKE-CT-AND-HAEMORRHAGE-PATTER,Stroke CT and haemorrhage patterns — KUHS topic page,https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-STROKE-CT-AND-HAEMORRHAGE-PATTER,Read more: Stroke CT and haemorrhage patterns,https://en.wikipedia.org/wiki/Computed_tomography_of_the_head,Wikipedia (open reference),2,TRUE
+L-RAD-EDH-VS-SDH-AND-RAISED-ICP-SIGNS,EDH vs SDH and raised-ICP signs — KUHS topic page,https://medico.shishal.com/kuhs/radiology/,Medico topic page,1,TRUE
+L-RAD-EDH-VS-SDH-AND-RAISED-ICP-SIGNS,Read more: EDH vs SDH and raised-ICP signs,https://en.wikipedia.org/wiki/Epidural_hematoma,Wikipedia (open reference),2,FALSE

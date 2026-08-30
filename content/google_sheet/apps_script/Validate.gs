@@ -4,6 +4,7 @@
  */
 
 function validateAllTabs_() {
+  ensureUgGlobals_();
   var errors = [];
   var warnings = [];
 
@@ -197,7 +198,13 @@ function validateAllTabs_() {
     if (!questionText) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': question_text is required');
     }
-    var kind = trimStr_(row.kind).toLowerCase() || 'mcq';
+    var kind = trimStr_(row.kind).toLowerCase();
+    // Blank kind used to default to mcq, which rejected every theory PYQ when the
+    // Kind column was missing or named "Kind". Empty options → pyq_theory.
+    if (!kind) {
+      var noMcqFields = !optionA && !optionB && !optionC && !optionD && !correct;
+      kind = noMcqFields ? 'pyq_theory' : 'mcq';
+    }
     if (!QUESTION_KINDS[kind]) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': kind must be mcq or pyq_theory');
     }

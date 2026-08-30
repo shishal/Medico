@@ -20,7 +20,11 @@ A non-technical editor should only fill cells — no UUIDs, no SQL.
 5. Delete the unused default `Sheet1` if it is empty.
 6. (Optional) Add a non-synced `ReadMe` tab and paste the “Editor rules” section below for your content team.
 
-Leave the sample rows in place until you have confirmed every required DB field has a column (Phase 2.1 validation). Replace them with real content when you start authoring.
+The CSVs in `tabs/` are a **full KUHS seed** (every subject → topic → lesson has PYQs, MCQs, papers, textbook page refs, and resource links). Import them as-is, then edit in the Sheet. To regenerate from the Python catalog:
+
+```bash
+python3 scripts/generate_ug_seed_csvs.py
+```
 
 ## Tabs and columns
 

@@ -168,6 +168,11 @@ alter table public.questions alter column option_b drop not null;
 alter table public.questions alter column option_c drop not null;
 alter table public.questions alter column option_d drop not null;
 alter table public.questions alter column correct_option drop not null;
+-- Phase 1 CHECK only allowed A–D. Theory PYQs send NULL; keep that CHECK from
+-- rejecting them (SQL CHECK treats NULL as pass, but '' is not in A–D).
+alter table public.questions drop constraint if exists questions_correct_option_check;
+alter table public.questions add constraint questions_correct_option_check
+  check (correct_option is null or correct_option in ('A', 'B', 'C', 'D'));
 
 alter table public.questions drop constraint if exists questions_kind_shape;
 alter table public.questions add constraint questions_kind_shape check (

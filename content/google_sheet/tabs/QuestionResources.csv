@@ -1,2 +1,76 @@
 question_external_id,title,url,source_label,display_order,is_free
-Q-ANAT-PYQ-001,NMC competency AN12.1,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-001,NMC-aligned note: Brachial plexus,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-003,NMC-aligned note: Larynx,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-005,NMC-aligned note: Visual pathway,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-007,NMC-aligned note: Gastrulation and notochord,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-009,NMC-aligned note: Heart and coronary arteries,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-011,NMC-aligned note: Inguinal canal and hernia,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-ANAT-PYQ-013,NMC-aligned note: Femoral triangle and adductor canal,https://medico.shishal.com/kuhs/anatomy/,Medico,1,TRUE
+Q-PHYS-PYQ-001,NMC-aligned note: Cardiac cycle and heart sounds,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-PHYS-PYQ-003,NMC-aligned note: Lung volumes and spirometry,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-PHYS-PYQ-005,NMC-aligned note: GFR and clearance,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-PHYS-PYQ-007,NMC-aligned note: Resting membrane potential and action potential,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-PHYS-PYQ-009,NMC-aligned note: Hypothalamo-pituitary axis,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-PHYS-PYQ-011,NMC-aligned note: Gastric secretion and motility,https://medico.shishal.com/kuhs/physiology/,Medico,1,TRUE
+Q-BIOC-PYQ-001,NMC-aligned note: Glycolysis and gluconeogenesis,https://medico.shishal.com/kuhs/biochemistry/,Medico,1,TRUE
+Q-BIOC-PYQ-003,NMC-aligned note: Urea cycle and hyperammonemia,https://medico.shishal.com/kuhs/biochemistry/,Medico,1,TRUE
+Q-BIOC-PYQ-005,NMC-aligned note: DNA replication and repair,https://medico.shishal.com/kuhs/biochemistry/,Medico,1,TRUE
+Q-BIOC-PYQ-007,NMC-aligned note: Water-soluble vitamins,https://medico.shishal.com/kuhs/biochemistry/,Medico,1,TRUE
+Q-BIOC-PYQ-009,NMC-aligned note: Beta-oxidation and ketone bodies,https://medico.shishal.com/kuhs/biochemistry/,Medico,1,TRUE
+Q-PATH-PYQ-001,"NMC-aligned note: Cell injury, necrosis and apoptosis",https://medico.shishal.com/kuhs/pathology/,Medico,1,TRUE
+Q-PATH-PYQ-003,NMC-aligned note: Anemias and megaloblastic change,https://medico.shishal.com/kuhs/pathology/,Medico,1,TRUE
+Q-PATH-PYQ-005,NMC-aligned note: Cardiovascular and renal pathology,https://medico.shishal.com/kuhs/pathology/,Medico,1,TRUE
+Q-PATH-PYQ-007,NMC-aligned note: Carcinogenesis and tumour markers,https://medico.shishal.com/kuhs/pathology/,Medico,1,TRUE
+Q-MICR-PYQ-001,NMC-aligned note: Gram-positive pathogens and mycobacteria,https://medico.shishal.com/kuhs/microbiology/,Medico,1,TRUE
+Q-MICR-PYQ-003,NMC-aligned note: Hepatitis viruses and HIV,https://medico.shishal.com/kuhs/microbiology/,Medico,1,TRUE
+Q-MICR-PYQ-005,NMC-aligned note: Malaria and leishmaniasis,https://medico.shishal.com/kuhs/microbiology/,Medico,1,TRUE
+Q-MICR-PYQ-007,NMC-aligned note: Hypersensitivity and antibodies,https://medico.shishal.com/kuhs/microbiology/,Medico,1,TRUE
+Q-PHAR-PYQ-001,NMC-aligned note: Cholinergic and anticholinergic drugs,https://medico.shishal.com/kuhs/pharmacology/,Medico,1,TRUE
+Q-PHAR-PYQ-003,NMC-aligned note: Antihypertensives and heart-failure drugs,https://medico.shishal.com/kuhs/pharmacology/,Medico,1,TRUE
+Q-PHAR-PYQ-005,"NMC-aligned note: Beta-lactams, vancomycin and anti-TB drugs",https://medico.shishal.com/kuhs/pharmacology/,Medico,1,TRUE
+Q-PHAR-PYQ-007,NMC-aligned note: Antiepileptics and benzodiazepines,https://medico.shishal.com/kuhs/pharmacology/,Medico,1,TRUE
+Q-FMT-PYQ-001,NMC-aligned note: Early signs of death and rigor mortis,https://medico.shishal.com/kuhs/forensic-medicine/,Medico,1,TRUE
+Q-FMT-PYQ-003,"NMC-aligned note: Corrosives, pesticides and plant poisons",https://medico.shishal.com/kuhs/forensic-medicine/,Medico,1,TRUE
+Q-FMT-PYQ-005,"NMC-aligned note: Consent, negligence and inquest",https://medico.shishal.com/kuhs/forensic-medicine/,Medico,1,TRUE
+Q-PSM-PYQ-001,NMC-aligned note: Measures of disease frequency and study designs,https://medico.shishal.com/kuhs/community-medicine/,Medico,1,TRUE
+Q-PSM-PYQ-003,"NMC-aligned note: Normal distribution, p-value and tests of significance",https://medico.shishal.com/kuhs/community-medicine/,Medico,1,TRUE
+Q-PSM-PYQ-005,"NMC-aligned note: NTEP, NVBDCP and national disease control",https://medico.shishal.com/kuhs/community-medicine/,Medico,1,TRUE
+Q-PSM-PYQ-007,NMC-aligned note: UIP schedule and vaccine types,https://medico.shishal.com/kuhs/community-medicine/,Medico,1,TRUE
+Q-MED-PYQ-001,NMC-aligned note: Acute coronary syndromes and heart failure,https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-MED-PYQ-003,"NMC-aligned note: COPD, asthma and pneumonia",https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-MED-PYQ-005,"NMC-aligned note: Cirrhosis, GI bleed and hepatitis",https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-MED-PYQ-007,NMC-aligned note: Diabetes mellitus and thyroid disorders,https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-MED-PYQ-009,NMC-aligned note: Stroke and meningitis,https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-MED-PYQ-011,"NMC-aligned note: AKI, CKD and nephritic-nephrotic syndromes",https://medico.shishal.com/kuhs/medicine/,Medico,1,TRUE
+Q-SUR-PYQ-001,"NMC-aligned note: Shock, burns and wound healing",https://medico.shishal.com/kuhs/surgery/,Medico,1,TRUE
+Q-SUR-PYQ-003,"NMC-aligned note: Peptic ulcer, gallbladder and pancreas",https://medico.shishal.com/kuhs/surgery/,Medico,1,TRUE
+Q-SUR-PYQ-005,NMC-aligned note: Urolithiasis and BPH,https://medico.shishal.com/kuhs/surgery/,Medico,1,TRUE
+Q-SUR-PYQ-007,NMC-aligned note: Head injury and intracranial haemorrhage,https://medico.shishal.com/kuhs/surgery/,Medico,1,TRUE
+Q-SUR-PYQ-009,NMC-aligned note: Breast carcinoma,https://medico.shishal.com/kuhs/surgery/,Medico,1,TRUE
+Q-OBG-PYQ-001,NMC-aligned note: Antenatal care and anaemia in pregnancy,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico,1,TRUE
+Q-OBG-PYQ-003,"NMC-aligned note: AUB, fibroids and endometriosis",https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico,1,TRUE
+Q-OBG-PYQ-005,NMC-aligned note: Mechanism of labour and partograph,https://medico.shishal.com/kuhs/obstetrics-gynaecology/,Medico,1,TRUE
+Q-PED-PYQ-001,NMC-aligned note: Neonatal resuscitation and jaundice,https://medico.shishal.com/kuhs/pediatrics/,Medico,1,TRUE
+Q-PED-PYQ-003,"NMC-aligned note: Measles, IMNCI and diarrhoea",https://medico.shishal.com/kuhs/pediatrics/,Medico,1,TRUE
+Q-PED-PYQ-005,"NMC-aligned note: Growth charts, milestones and puberty",https://medico.shishal.com/kuhs/pediatrics/,Medico,1,TRUE
+Q-OPH-PYQ-001,"NMC-aligned note: Conjunctivitis, xerophthalmia and keratitis",https://medico.shishal.com/kuhs/ophthalmology/,Medico,1,TRUE
+Q-OPH-PYQ-003,NMC-aligned note: Primary open-angle glaucoma,https://medico.shishal.com/kuhs/ophthalmology/,Medico,1,TRUE
+Q-OPH-PYQ-005,NMC-aligned note: Diabetic retinopathy,https://medico.shishal.com/kuhs/ophthalmology/,Medico,1,TRUE
+Q-ENT-PYQ-001,NMC-aligned note: Otitis media and CSOM,https://medico.shishal.com/kuhs/ent/,Medico,1,TRUE
+Q-ENT-PYQ-003,NMC-aligned note: Epistaxis and DNS,https://medico.shishal.com/kuhs/ent/,Medico,1,TRUE
+Q-ENT-PYQ-005,NMC-aligned note: Stridor and laryngomalacia,https://medico.shishal.com/kuhs/ent/,Medico,1,TRUE
+Q-ORT-PYQ-001,"NMC-aligned note: Colles, scaphoid and neck of femur",https://medico.shishal.com/kuhs/orthopedics/,Medico,1,TRUE
+Q-ORT-PYQ-003,NMC-aligned note: Osteomyelitis and septic arthritis,https://medico.shishal.com/kuhs/orthopedics/,Medico,1,TRUE
+Q-ORT-PYQ-005,NMC-aligned note: Scoliosis and IVDP,https://medico.shishal.com/kuhs/orthopedics/,Medico,1,TRUE
+Q-DER-PYQ-001,NMC-aligned note: Psoriasis and lichen planus,https://medico.shishal.com/kuhs/dermatology/,Medico,1,TRUE
+Q-DER-PYQ-003,NMC-aligned note: Pyoderma and dermatophytes,https://medico.shishal.com/kuhs/dermatology/,Medico,1,TRUE
+Q-DER-PYQ-005,NMC-aligned note: Pemphigus vulgaris,https://medico.shishal.com/kuhs/dermatology/,Medico,1,TRUE
+Q-PSY-PYQ-001,NMC-aligned note: Major depression and bipolar disorder,https://medico.shishal.com/kuhs/psychiatry/,Medico,1,TRUE
+Q-PSY-PYQ-003,NMC-aligned note: Clinical features and first-rank symptoms,https://medico.shishal.com/kuhs/psychiatry/,Medico,1,TRUE
+Q-PSY-PYQ-005,NMC-aligned note: Anxiety disorders and OCD,https://medico.shishal.com/kuhs/psychiatry/,Medico,1,TRUE
+Q-ANE-PYQ-001,NMC-aligned note: Induction agents and inhalational anaesthetics,https://medico.shishal.com/kuhs/anesthesia/,Medico,1,TRUE
+Q-ANE-PYQ-003,NMC-aligned note: Spinal and epidural anaesthesia,https://medico.shishal.com/kuhs/anesthesia/,Medico,1,TRUE
+Q-ANE-PYQ-005,"NMC-aligned note: Mallampati, intubation and difficult airway",https://medico.shishal.com/kuhs/anesthesia/,Medico,1,TRUE
+Q-RAD-PYQ-001,"NMC-aligned note: Silhouette sign, pneumonia and pneumothorax",https://medico.shishal.com/kuhs/radiology/,Medico,1,TRUE
+Q-RAD-PYQ-003,NMC-aligned note: Pneumoperitoneum and bowel obstruction,https://medico.shishal.com/kuhs/radiology/,Medico,1,TRUE
+Q-RAD-PYQ-005,NMC-aligned note: Stroke CT and haemorrhage patterns,https://medico.shishal.com/kuhs/radiology/,Medico,1,TRUE

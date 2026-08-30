@@ -3,14 +3,20 @@ Anatomy,Upper Limb Anatomy,1
 Anatomy,Head and Neck Anatomy,2
 Anatomy,Neuroanatomy,3
 Anatomy,Embryology,4
+Anatomy,Thorax Anatomy,5
+Anatomy,Abdomen Anatomy,6
+Anatomy,Lower Limb Anatomy,7
 Physiology,Cardiovascular Physiology,1
 Physiology,Respiratory Physiology,2
 Physiology,Renal Physiology,3
 Physiology,Neurophysiology,4
+Physiology,Endocrine Physiology,5
+Physiology,Gastrointestinal Physiology,6
 Biochemistry,Carbohydrate Metabolism,1
 Biochemistry,Amino Acid Metabolism,2
 Biochemistry,Molecular Biology,3
 Biochemistry,Vitamins and Nutrition,4
+Biochemistry,Lipid Metabolism,5
 Pathology,General Pathology,1
 Pathology,Hematopathology,2
 Pathology,Systemic Pathology,3
@@ -35,10 +41,12 @@ Medicine,Pulmonology,2
 Medicine,Gastroenterology,3
 Medicine,Endocrinology,4
 Medicine,Neurology,5
+Medicine,Nephrology,6
 Surgery,General Surgery,1
 Surgery,GI Surgery,2
 Surgery,Urology,3
 Surgery,Neurosurgery,4
+Surgery,Breast and Endocrine Surgery,5
 Obstetrics & Gynaecology,Obstetrics,1
 Obstetrics & Gynaecology,Gynaecology,2
 Obstetrics & Gynaecology,Labour and Delivery,3

@@ -41,7 +41,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 
 ### Validation (includes Phase 2.2 required checks)
 
-- `kind` ∈ mcq / pyq_theory (blank = mcq)
+- `kind` ∈ mcq / pyq_theory. Blank kind: if all four options and `correct_option` are empty → `pyq_theory`, otherwise `mcq`. Column header is matched case-insensitively (`Kind` is fine).
 - MCQ: `correct_option` ∈ A/B/C/D and all four options non-empty
 - Theory: options not required; ≥1 Appearances row
 - resource `url` must start with `https://`

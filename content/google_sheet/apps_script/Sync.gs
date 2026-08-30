@@ -143,23 +143,29 @@ function performSync_(data) {
       // Should be impossible after validation — still fail loudly.
       throw new Error('Questions: no topic UUID for topic_name "' + q.topic_name + '" (sheet row ' + q.__row + ')');
     }
-    var isMcq = (q.kind || 'mcq') === 'mcq';
+    var optionA = emptyToNull_(q.option_a);
+    var optionB = emptyToNull_(q.option_b);
+    var optionC = emptyToNull_(q.option_c);
+    var optionD = emptyToNull_(q.option_d);
+    var correct = emptyToNull_(q.correct_option);
+    var noMcqFields = !optionA && !optionB && !optionC && !optionD && !correct;
+    var kind = q.kind || (noMcqFields ? 'pyq_theory' : 'mcq');
     return {
       external_id: q.external_id,
       topic_id: tid,
       lesson_id: q.lesson_external_id ? lessonIdByExt[normKey_(q.lesson_external_id)] || null : null,
-      kind: q.kind || 'mcq',
+      kind: kind,
       question_text: q.question_text,
-      option_a: isMcq ? q.option_a : emptyToNull_(q.option_a),
-      option_b: isMcq ? q.option_b : emptyToNull_(q.option_b),
-      option_c: isMcq ? q.option_c : emptyToNull_(q.option_c),
-      option_d: isMcq ? q.option_d : emptyToNull_(q.option_d),
-      correct_option: isMcq ? q.correct_option : emptyToNull_(q.correct_option),
-      explanation_text: q.explanation_text,
-      explanation_video_url: q.explanation_video_url,
-      image_url: q.image_url,
+      option_a: optionA,
+      option_b: optionB,
+      option_c: optionC,
+      option_d: optionD,
+      correct_option: correct,
+      explanation_text: emptyToNull_(q.explanation_text),
+      explanation_video_url: emptyToNull_(q.explanation_video_url),
+      image_url: emptyToNull_(q.image_url),
       difficulty: q.difficulty,
-      source: q.source,
+      source: emptyToNull_(q.source),
       marks: q.marks == null || q.marks === '' ? null : Number(q.marks),
       required_plan: q.required_plan,
       is_active: q.is_active,

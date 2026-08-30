@@ -2,3 +2,150 @@ external_id,topic_name,name,display_order,required_plan,is_active
 L-ANAT-UPPER-BRACHIAL,Upper Limb Anatomy,Brachial plexus,1,free,TRUE
 L-ANAT-UPPER-HUMERUS,Upper Limb Anatomy,Humerus fractures,2,free,TRUE
 L-ANAT-HEAD-LARYNX,Head and Neck Anatomy,Larynx,1,pro,TRUE
+L-ANAT-THYROID-GLAND-AND-TRIANGLES-OF-T,Head and Neck Anatomy,Thyroid gland and triangles of the neck,2,free,TRUE
+L-ANAT-VISUAL-PATHWAY,Neuroanatomy,Visual pathway,1,free,TRUE
+L-ANAT-CIRCLE-OF-WILLIS-AND-CRANIAL-NER,Neuroanatomy,Circle of Willis and cranial nerve nuclei,2,free,TRUE
+L-ANAT-GASTRULATION-AND-NOTOCHORD,Embryology,Gastrulation and notochord,1,free,TRUE
+L-ANAT-PHARYNGEAL-ARCHES-AND-FETAL-CIRC,Embryology,Pharyngeal arches and fetal circulation,2,free,TRUE
+L-ANAT-HEART-AND-CORONARY-ARTERIES,Thorax Anatomy,Heart and coronary arteries,1,free,TRUE
+L-ANAT-BRONCHOPULMONARY-SEGMENTS-AND-ME,Thorax Anatomy,Bronchopulmonary segments and mediastinum,2,pro,TRUE
+L-ANAT-INGUINAL-CANAL-AND-HERNIA,Abdomen Anatomy,Inguinal canal and hernia,1,free,TRUE
+L-ANAT-PORTAL-VEIN-AND-EXTRAHEPATIC-BIL,Abdomen Anatomy,Portal vein and extrahepatic biliary tree,2,free,TRUE
+L-ANAT-FEMORAL-TRIANGLE-AND-ADDUCTOR-CA,Lower Limb Anatomy,Femoral triangle and adductor canal,1,free,TRUE
+L-ANAT-SCIATIC-NERVE-AND-GLUTEAL-REGION,Lower Limb Anatomy,Sciatic nerve and gluteal region,2,free,TRUE
+L-PHYS-CARDIAC-CYCLE-AND-HEART-SOUNDS,Cardiovascular Physiology,Cardiac cycle and heart sounds,1,free,TRUE
+L-PHYS-JUGULAR-VENOUS-PULSE-AND-ECG-BAS,Cardiovascular Physiology,Jugular venous pulse and ECG basics,2,free,TRUE
+L-PHYS-LUNG-VOLUMES-AND-SPIROMETRY,Respiratory Physiology,Lung volumes and spirometry,1,free,TRUE
+L-PHYS-OXYGEN-TRANSPORT-AND-HYPOXIA,Respiratory Physiology,Oxygen transport and hypoxia,2,pro,TRUE
+L-PHYS-GFR-AND-CLEARANCE,Renal Physiology,GFR and clearance,1,free,TRUE
+L-PHYS-COUNTERCURRENT-MECHANISM-AND-ADH,Renal Physiology,Countercurrent mechanism and ADH,2,free,TRUE
+L-PHYS-RESTING-MEMBRANE-POTENTIAL-AND-A,Neurophysiology,Resting membrane potential and action potential,1,free,TRUE
+L-PHYS-SYNAPTIC-TRANSMISSION-AND-NEUROM,Neurophysiology,Synaptic transmission and neuromuscular junction,2,free,TRUE
+L-PHYS-HYPOTHALAMO-PITUITARY-AXIS,Endocrine Physiology,Hypothalamo-pituitary axis,1,free,TRUE
+L-PHYS-THYROID-HORMONE-SYNTHESIS-AND-CA,Endocrine Physiology,Thyroid hormone synthesis and calcium hormones,2,elite,TRUE
+L-PHYS-GASTRIC-SECRETION-AND-MOTILITY,Gastrointestinal Physiology,Gastric secretion and motility,1,free,TRUE
+L-PHYS-BILE-PANCREAS-AND-SMALL-BOWEL-AB,Gastrointestinal Physiology,"Bile, pancreas and small-bowel absorption",2,pro,TRUE
+L-BIOC-GLYCOLYSIS-AND-GLUCONEOGENESIS,Carbohydrate Metabolism,Glycolysis and gluconeogenesis,1,free,TRUE
+L-BIOC-GLYCOGEN-STORAGE-DISEASES-AND-PP,Carbohydrate Metabolism,Glycogen storage diseases and PPP,2,free,TRUE
+L-BIOC-UREA-CYCLE-AND-HYPERAMMONEMIA,Amino Acid Metabolism,Urea cycle and hyperammonemia,1,free,TRUE
+L-BIOC-PHENYLALANINE-TYROSINE-AND-BRANC,Amino Acid Metabolism,"Phenylalanine, tyrosine and branched-chain amino acids",2,free,TRUE
+L-BIOC-DNA-REPLICATION-AND-REPAIR,Molecular Biology,DNA replication and repair,1,free,TRUE
+L-BIOC-TRANSCRIPTION-TRANSLATION-AND-BL,Molecular Biology,"Transcription, translation and blotting",2,free,TRUE
+L-BIOC-WATER-SOLUBLE-VITAMINS,Vitamins and Nutrition,Water-soluble vitamins,1,free,TRUE
+L-BIOC-FAT-SOLUBLE-VITAMINS-AND-PEM,Vitamins and Nutrition,Fat-soluble vitamins and PEM,2,pro,TRUE
+L-BIOC-BETA-OXIDATION-AND-KETONE-BODIES,Lipid Metabolism,Beta-oxidation and ketone bodies,1,free,TRUE
+L-BIOC-CHOLESTEROL-SYNTHESIS-AND-LIPOPR,Lipid Metabolism,Cholesterol synthesis and lipoproteins,2,free,TRUE
+L-PATH-CELL-INJURY-NECROSIS-AND-APOPTOS,General Pathology,"Cell injury, necrosis and apoptosis",1,free,TRUE
+L-PATH-INFLAMMATION-HEALING-AND-HEMODYN,General Pathology,"Inflammation, healing and hemodynamic disorders",2,free,TRUE
+L-PATH-ANEMIAS-AND-MEGALOBLASTIC-CHANGE,Hematopathology,Anemias and megaloblastic change,1,free,TRUE
+L-PATH-LEUKEMIAS-AND-LYMPHOMAS,Hematopathology,Leukemias and lymphomas,2,free,TRUE
+L-PATH-CARDIOVASCULAR-AND-RENAL-PATHOLO,Systemic Pathology,Cardiovascular and renal pathology,1,free,TRUE
+L-PATH-HEPATIC-AND-PULMONARY-PATHOLOGY,Systemic Pathology,Hepatic and pulmonary pathology,2,pro,TRUE
+L-PATH-CARCINOGENESIS-AND-TUMOUR-MARKER,Neoplasia,Carcinogenesis and tumour markers,1,free,TRUE
+L-PATH-COMMON-CANCERS-AND-PARANEOPLASTI,Neoplasia,Common cancers and paraneoplastic syndromes,2,free,TRUE
+L-MICR-GRAM-POSITIVE-PATHOGENS-AND-MYCO,Bacteriology,Gram-positive pathogens and mycobacteria,1,free,TRUE
+L-MICR-GRAM-NEGATIVE-AND-ANAEROBIC-BACT,Bacteriology,Gram-negative and anaerobic bacteria,2,elite,TRUE
+L-MICR-HEPATITIS-VIRUSES-AND-HIV,Virology,Hepatitis viruses and HIV,1,free,TRUE
+L-MICR-HERPESVIRUSES-RABIES-AND-RESPIRA,Virology,"Herpesviruses, rabies and respiratory viruses",2,free,TRUE
+L-MICR-MALARIA-AND-LEISHMANIASIS,Parasitology,Malaria and leishmaniasis,1,free,TRUE
+L-MICR-INTESTINAL-HELMINTHS-AND-HYDATID,Parasitology,Intestinal helminths and hydatid disease,2,pro,TRUE
+L-MICR-HYPERSENSITIVITY-AND-ANTIBODIES,Immunology,Hypersensitivity and antibodies,1,free,TRUE
+L-MICR-PRIMARY-IMMUNODEFICIENCIES-AND-T,Immunology,Primary immunodeficiencies and transplant,2,free,TRUE
+L-PHAR-CHOLINERGIC-AND-ANTICHOLINERGIC,Autonomic Pharmacology,Cholinergic and anticholinergic drugs,1,free,TRUE
+L-PHAR-ADRENERGIC-AGONISTS-BLOCKERS-AND,Autonomic Pharmacology,"Adrenergic agonists, blockers and NMJ drugs",2,free,TRUE
+L-PHAR-ANTIHYPERTENSIVES-AND-HEART-FAIL,Cardiovascular Pharmacology,Antihypertensives and heart-failure drugs,1,free,TRUE
+L-PHAR-ANTIARRHYTHMICS-AND-ANTICOAGULAN,Cardiovascular Pharmacology,Antiarrhythmics and anticoagulants,2,free,TRUE
+L-PHAR-BETA-LACTAMS-VANCOMYCIN-AND-ANTI,Antimicrobial Pharmacology,"Beta-lactams, vancomycin and anti-TB drugs",1,free,TRUE
+L-PHAR-ANTIMALARIALS-ANTIFUNGALS-AND-ST,Antimicrobial Pharmacology,"Antimalarials, antifungals and stewardship",2,pro,TRUE
+L-PHAR-ANTIEPILEPTICS-AND-BENZODIAZEPIN,CNS Pharmacology,Antiepileptics and benzodiazepines,1,free,TRUE
+L-PHAR-ANTIDEPRESSANTS-LITHIUM-AND-ANTI,CNS Pharmacology,"Antidepressants, lithium and antipsychotics",2,free,TRUE
+L-FMT-EARLY-SIGNS-OF-DEATH-AND-RIGOR-M,Forensic Thanatology,Early signs of death and rigor mortis,1,free,TRUE
+L-FMT-POSTMORTEM-STAINING-COOLING-AND,Forensic Thanatology,"Postmortem staining, cooling and injuries",2,free,TRUE
+L-FMT-CORROSIVES-PESTICIDES-AND-PLANT,Forensic Toxicology,"Corrosives, pesticides and plant poisons",1,free,TRUE
+L-FMT-ASPHYXIANTS-METALS-AND-ALCOHOL,Forensic Toxicology,"Asphyxiants, metals and alcohol",2,free,TRUE
+L-FMT-CONSENT-NEGLIGENCE-AND-INQUEST,Medical Jurisprudence,"Consent, negligence and inquest",1,free,TRUE
+L-FMT-INJURY-DYING-DECLARATION-AND-IPC,Medical Jurisprudence,"Injury, dying declaration and IPC sections",2,pro,TRUE
+L-PSM-MEASURES-OF-DISEASE-FREQUENCY-AN,Epidemiology,Measures of disease frequency and study designs,1,free,TRUE
+L-PSM-SCREENING-BIAS-AND-OUTBREAK-INVE,Epidemiology,"Screening, bias and outbreak investigation",2,elite,TRUE
+L-PSM-NORMAL-DISTRIBUTION-P-VALUE-AND,Biostatistics,"Normal distribution, p-value and tests of significance",1,free,TRUE
+L-PSM-SAMPLING-ERRORS-AND-CONFIDENCE-I,Biostatistics,"Sampling, errors and confidence intervals",2,free,TRUE
+L-PSM-NTEP-NVBDCP-AND-NATIONAL-DISEASE,National Health Programs,"NTEP, NVBDCP and national disease control",1,free,TRUE
+L-PSM-RCH-RKSK-AND-NATIONAL-HEALTH-MIS,National Health Programs,"RCH, RKSK and National Health Mission",2,free,TRUE
+L-PSM-UIP-SCHEDULE-AND-VACCINE-TYPES,Immunization,UIP schedule and vaccine types,1,free,TRUE
+L-PSM-AEFI-COLD-CHAIN-AND-SPECIAL-SITU,Immunization,"AEFI, cold chain and special situations",2,pro,TRUE
+L-MED-ACUTE-CORONARY-SYNDROMES-AND-HEA,Cardiology,Acute coronary syndromes and heart failure,1,free,TRUE
+L-MED-VALVULAR-DISEASE-ENDOCARDITIS-AN,Cardiology,"Valvular disease, endocarditis and tamponade",2,free,TRUE
+L-MED-COPD-ASTHMA-AND-PNEUMONIA,Pulmonology,"COPD, asthma and pneumonia",1,free,TRUE
+L-MED-PLEURAL-DISEASE-TB-AND-INTERSTIT,Pulmonology,"Pleural disease, TB and interstitial lung disease",2,free,TRUE
+L-MED-CIRRHOSIS-GI-BLEED-AND-HEPATITIS,Gastroenterology,"Cirrhosis, GI bleed and hepatitis",1,free,TRUE
+L-MED-IBD-PANCREATITIS-AND-MALABSORPTI,Gastroenterology,"IBD, pancreatitis and malabsorption",2,free,TRUE
+L-MED-DIABETES-MELLITUS-AND-THYROID-DI,Endocrinology,Diabetes mellitus and thyroid disorders,1,free,TRUE
+L-MED-ADRENAL-PITUITARY-AND-CALCIUM-DI,Endocrinology,"Adrenal, pituitary and calcium disorders",2,pro,TRUE
+L-MED-STROKE-AND-MENINGITIS,Neurology,Stroke and meningitis,1,free,TRUE
+L-MED-SEIZURES-GBS-AND-MOVEMENT-DISORD,Neurology,"Seizures, GBS and movement disorders",2,free,TRUE
+L-MED-AKI-CKD-AND-NEPHRITIC-NEPHROTIC,Nephrology,"AKI, CKD and nephritic-nephrotic syndromes",1,free,TRUE
+L-MED-ELECTROLYTES-ACID-BASE-AND-DIALY,Nephrology,"Electrolytes, acid-base and dialysis",2,free,TRUE
+L-SUR-SHOCK-BURNS-AND-WOUND-HEALING,General Surgery,"Shock, burns and wound healing",1,free,TRUE
+L-SUR-HERNIA-THYROID-AND-BREAST-SURGIC,General Surgery,"Hernia, thyroid and breast (surgical approach)",2,free,TRUE
+L-SUR-PEPTIC-ULCER-GALLBLADDER-AND-PAN,GI Surgery,"Peptic ulcer, gallbladder and pancreas",1,free,TRUE
+L-SUR-INTESTINAL-OBSTRUCTION-AND-APPEN,GI Surgery,Intestinal obstruction and appendix,2,elite,TRUE
+L-SUR-UROLITHIASIS-AND-BPH,Urology,Urolithiasis and BPH,1,free,TRUE
+L-SUR-TESTICULAR-TUMOURS-AND-HAEMATURI,Urology,Testicular tumours and haematuria,2,free,TRUE
+L-SUR-HEAD-INJURY-AND-INTRACRANIAL-HAE,Neurosurgery,Head injury and intracranial haemorrhage,1,free,TRUE
+L-SUR-RAISED-ICP-HYDROCEPHALUS-AND-SPI,Neurosurgery,"Raised ICP, hydrocephalus and spinal trauma",2,free,TRUE
+L-SUR-BREAST-CARCINOMA,Breast and Endocrine Surgery,Breast carcinoma,1,free,TRUE
+L-SUR-THYROID-AND-PARATHYROID-SURGERY,Breast and Endocrine Surgery,Thyroid and parathyroid surgery,2,free,TRUE
+L-OBG-ANTENATAL-CARE-AND-ANAEMIA-IN-PR,Obstetrics,Antenatal care and anaemia in pregnancy,1,free,TRUE
+L-OBG-HYPERTENSIVE-DISORDERS-AND-APH-P,Obstetrics,Hypertensive disorders and APH/PPH,2,pro,TRUE
+L-OBG-AUB-FIBROIDS-AND-ENDOMETRIOSIS,Gynaecology,"AUB, fibroids and endometriosis",1,free,TRUE
+L-OBG-OVARIAN-TUMOURS-AND-ENDOMETRIAL,Gynaecology,Ovarian tumours and endometrial carcinoma,2,free,TRUE
+L-OBG-MECHANISM-OF-LABOUR-AND-PARTOGRA,Labour and Delivery,Mechanism of labour and partograph,1,free,TRUE
+L-OBG-OBSTRUCTED-LABOUR-APH-AND-THIRD,Labour and Delivery,"Obstructed labour, APH and third stage",2,free,TRUE
+L-PED-NEONATAL-RESUSCITATION-AND-JAUND,Neonatology,Neonatal resuscitation and jaundice,1,free,TRUE
+L-PED-RDS-TTN-AND-PERINATAL-ASPHYXIA,Neonatology,"RDS, TTN and perinatal asphyxia",2,free,TRUE
+L-PED-MEASLES-IMNCI-AND-DIARRHOEA,Pediatric Infectious Disease,"Measles, IMNCI and diarrhoea",1,free,TRUE
+L-PED-MALARIA-DENGUE-AND-TUBERCULOSIS,Pediatric Infectious Disease,"Malaria, dengue and tuberculosis in children",2,pro,TRUE
+L-PED-GROWTH-CHARTS-MILESTONES-AND-PUB,Pediatric Growth and Development,"Growth charts, milestones and puberty",1,free,TRUE
+L-PED-SAM-VITAMIN-DEFICIENCIES-AND-IMM,Pediatric Growth and Development,"SAM, vitamin deficiencies and immunization catch-up",2,free,TRUE
+L-OPH-CONJUNCTIVITIS-XEROPHTHALMIA-AND,Cornea and Conjunctiva,"Conjunctivitis, xerophthalmia and keratitis",1,free,TRUE
+L-OPH-CATARACT-AND-CORNEAL-ULCERS,Cornea and Conjunctiva,Cataract and corneal ulcers,2,free,TRUE
+L-OPH-PRIMARY-OPEN-ANGLE-GLAUCOMA,Glaucoma,Primary open-angle glaucoma,1,free,TRUE
+L-OPH-ACUTE-ANGLE-CLOSURE-GLAUCOMA,Glaucoma,Acute angle-closure glaucoma,2,elite,TRUE
+L-OPH-DIABETIC-RETINOPATHY,Retina,Diabetic retinopathy,1,free,TRUE
+L-OPH-RETINAL-VASCULAR-OCCLUSIONS-AND,Retina,Retinal vascular occlusions and ARMD,2,pro,TRUE
+L-ENT-OTITIS-MEDIA-AND-CSOM,Otology,Otitis media and CSOM,1,free,TRUE
+L-ENT-HEARING-TESTS-CHOLESTEATOMA-AND,Otology,"Hearing tests, cholesteatoma and facial nerve",2,free,TRUE
+L-ENT-EPISTAXIS-AND-DNS,Rhinology,Epistaxis and DNS,1,free,TRUE
+L-ENT-SINUSITIS-POLYPS-AND-NASOPHARYNG,Rhinology,"Sinusitis, polyps and nasopharyngeal carcinoma",2,free,TRUE
+L-ENT-STRIDOR-AND-LARYNGOMALACIA,Laryngology,Stridor and laryngomalacia,1,free,TRUE
+L-ENT-VOCAL-CORD-PALSY-AND-CARCINOMA-L,Laryngology,Vocal cord palsy and carcinoma larynx,2,free,TRUE
+L-ORT-COLLES-SCAPHOID-AND-NECK-OF-FEMU,Fracture Management,"Colles, scaphoid and neck of femur",1,free,TRUE
+L-ORT-COMPARTMENT-SYNDROME-AND-FAT-EMB,Fracture Management,Compartment syndrome and fat embolism,2,pro,TRUE
+L-ORT-OSTEOMYELITIS-AND-SEPTIC-ARTHRIT,Bone and Joint Infection,Osteomyelitis and septic arthritis,1,free,TRUE
+L-ORT-POTT-SPINE-AND-SKELETAL-TB,Bone and Joint Infection,Pott spine and skeletal TB,2,free,TRUE
+L-ORT-SCOLIOSIS-AND-IVDP,Spine Orthopedics,Scoliosis and IVDP,1,free,TRUE
+L-ORT-CAUDA-EQUINA-AND-SPINAL-INJURIES,Spine Orthopedics,Cauda equina and spinal injuries,2,free,TRUE
+L-DER-PSORIASIS-AND-LICHEN-PLANUS,Papulosquamous Disorders,Psoriasis and lichen planus,1,free,TRUE
+L-DER-PITYRIASIS-ROSEA-AND-ECZEMA,Papulosquamous Disorders,Pityriasis rosea and eczema,2,free,TRUE
+L-DER-PYODERMA-AND-DERMATOPHYTES,Cutaneous Infections,Pyoderma and dermatophytes,1,free,TRUE
+L-DER-LEPROSY-SCABIES-AND-VIRAL-EXANTH,Cutaneous Infections,"Leprosy, scabies and viral exanthems",2,pro,TRUE
+L-DER-PEMPHIGUS-VULGARIS,Bullous Disorders,Pemphigus vulgaris,1,free,TRUE
+L-DER-BULLOUS-PEMPHIGOID-AND-DERMATITI,Bullous Disorders,Bullous pemphigoid and dermatitis herpetiformis,2,free,TRUE
+L-PSY-MAJOR-DEPRESSION-AND-BIPOLAR-DIS,Mood Disorders,Major depression and bipolar disorder,1,free,TRUE
+L-PSY-SUICIDE-RISK-ECT-AND-ANTIDEPRESS,Mood Disorders,"Suicide risk, ECT and antidepressants",2,elite,TRUE
+L-PSY-CLINICAL-FEATURES-AND-FIRST-RANK,Schizophrenia Spectrum,Clinical features and first-rank symptoms,1,free,TRUE
+L-PSY-ANTIPSYCHOTICS-AND-CLOZAPINE-MON,Schizophrenia Spectrum,Antipsychotics and clozapine monitoring,2,free,TRUE
+L-PSY-ANXIETY-DISORDERS-AND-OCD,Anxiety and Substance Use,Anxiety disorders and OCD,1,free,TRUE
+L-PSY-ALCOHOL-WITHDRAWAL-AND-CAGE,Anxiety and Substance Use,Alcohol withdrawal and CAGE,2,pro,TRUE
+L-ANE-INDUCTION-AGENTS-AND-INHALATIONA,General Anesthesia,Induction agents and inhalational anaesthetics,1,free,TRUE
+L-ANE-MALIGNANT-HYPERTHERMIA-AND-MONIT,General Anesthesia,Malignant hyperthermia and monitoring,2,free,TRUE
+L-ANE-SPINAL-AND-EPIDURAL-ANAESTHESIA,Regional Anesthesia,Spinal and epidural anaesthesia,1,free,TRUE
+L-ANE-LOCAL-ANAESTHETIC-SYSTEMIC-TOXIC,Regional Anesthesia,Local anaesthetic systemic toxicity,2,free,TRUE
+L-ANE-MALLAMPATI-INTUBATION-AND-DIFFIC,Airway Management,"Mallampati, intubation and difficult airway",1,free,TRUE
+L-ANE-LMA-RSI-AND-CANNOT-INTUBATE-CANN,Airway Management,"LMA, RSI and cannot-intubate cannot-oxygenate",2,free,TRUE
+L-RAD-SILHOUETTE-SIGN-PNEUMONIA-AND-PN,Chest Radiology,"Silhouette sign, pneumonia and pneumothorax",1,free,TRUE
+L-RAD-PULMONARY-EMBOLISM-IMAGING-AND-C,Chest Radiology,Pulmonary embolism imaging and collapse,2,pro,TRUE
+L-RAD-PNEUMOPERITONEUM-AND-BOWEL-OBSTR,Abdominal Radiology,Pneumoperitoneum and bowel obstruction,1,free,TRUE
+L-RAD-APPENDICITIS-PANCREATITIS-AND-RE,Abdominal Radiology,"Appendicitis, pancreatitis and renal stones imaging",2,free,TRUE
+L-RAD-STROKE-CT-AND-HAEMORRHAGE-PATTER,Neuroradiology,Stroke CT and haemorrhage patterns,1,free,TRUE
+L-RAD-EDH-VS-SDH-AND-RAISED-ICP-SIGNS,Neuroradiology,EDH vs SDH and raised-ICP signs,2,free,TRUE

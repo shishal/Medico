@@ -1,4 +1,170 @@
 external_id,university_code,subject_name,exam_year,paper_name,exam_type
-EP-KUHS-ANAT-2024-P1,KUHS,Anatomy,2024,Paper I,university
-EP-KUHS-ANAT-2023-P1,KUHS,Anatomy,2023,Paper I,university
 EP-KUHS-ANAT-2021-P1,KUHS,Anatomy,2021,Paper I,university
+EP-KUHS-ANAT-2021-P2,KUHS,Anatomy,2021,Paper II,university
+EP-KUHS-ANAT-2022-P1,KUHS,Anatomy,2022,Paper I,university
+EP-KUHS-ANAT-2022-P2,KUHS,Anatomy,2022,Paper II,university
+EP-KUHS-ANAT-2023-P1,KUHS,Anatomy,2023,Paper I,university
+EP-KUHS-ANAT-2023-P2,KUHS,Anatomy,2023,Paper II,university
+EP-KUHS-ANAT-2024-P1,KUHS,Anatomy,2024,Paper I,university
+EP-KUHS-ANAT-2024-P2,KUHS,Anatomy,2024,Paper II,university
+EP-KUHS-ANAT-2025-P1,KUHS,Anatomy,2025,Paper I,university
+EP-KUHS-ANAT-2025-P2,KUHS,Anatomy,2025,Paper II,university
+EP-KUHS-ANAT-2024-INT,KUHS,Anatomy,2024,Internal assessment I,internal
+EP-KUHS-PHYS-2021-P1,KUHS,Physiology,2021,Paper I,university
+EP-KUHS-PHYS-2021-P2,KUHS,Physiology,2021,Paper II,university
+EP-KUHS-PHYS-2022-P1,KUHS,Physiology,2022,Paper I,university
+EP-KUHS-PHYS-2022-P2,KUHS,Physiology,2022,Paper II,university
+EP-KUHS-PHYS-2023-P1,KUHS,Physiology,2023,Paper I,university
+EP-KUHS-PHYS-2023-P2,KUHS,Physiology,2023,Paper II,university
+EP-KUHS-PHYS-2024-P1,KUHS,Physiology,2024,Paper I,university
+EP-KUHS-PHYS-2024-P2,KUHS,Physiology,2024,Paper II,university
+EP-KUHS-PHYS-2025-P1,KUHS,Physiology,2025,Paper I,university
+EP-KUHS-PHYS-2025-P2,KUHS,Physiology,2025,Paper II,university
+EP-KUHS-PHYS-2024-INT,KUHS,Physiology,2024,Internal assessment I,internal
+EP-KUHS-BIOC-2021-P1,KUHS,Biochemistry,2021,Paper I,university
+EP-KUHS-BIOC-2021-P2,KUHS,Biochemistry,2021,Paper II,university
+EP-KUHS-BIOC-2022-P1,KUHS,Biochemistry,2022,Paper I,university
+EP-KUHS-BIOC-2022-P2,KUHS,Biochemistry,2022,Paper II,university
+EP-KUHS-BIOC-2023-P1,KUHS,Biochemistry,2023,Paper I,university
+EP-KUHS-BIOC-2023-P2,KUHS,Biochemistry,2023,Paper II,university
+EP-KUHS-BIOC-2024-P1,KUHS,Biochemistry,2024,Paper I,university
+EP-KUHS-BIOC-2024-P2,KUHS,Biochemistry,2024,Paper II,university
+EP-KUHS-BIOC-2025-P1,KUHS,Biochemistry,2025,Paper I,university
+EP-KUHS-BIOC-2025-P2,KUHS,Biochemistry,2025,Paper II,university
+EP-KUHS-BIOC-2024-INT,KUHS,Biochemistry,2024,Internal assessment I,internal
+EP-KUHS-PATH-2021-P1,KUHS,Pathology,2021,Paper I,university
+EP-KUHS-PATH-2021-P2,KUHS,Pathology,2021,Paper II,university
+EP-KUHS-PATH-2022-P1,KUHS,Pathology,2022,Paper I,university
+EP-KUHS-PATH-2022-P2,KUHS,Pathology,2022,Paper II,university
+EP-KUHS-PATH-2023-P1,KUHS,Pathology,2023,Paper I,university
+EP-KUHS-PATH-2023-P2,KUHS,Pathology,2023,Paper II,university
+EP-KUHS-PATH-2024-P1,KUHS,Pathology,2024,Paper I,university
+EP-KUHS-PATH-2024-P2,KUHS,Pathology,2024,Paper II,university
+EP-KUHS-PATH-2025-P1,KUHS,Pathology,2025,Paper I,university
+EP-KUHS-PATH-2025-P2,KUHS,Pathology,2025,Paper II,university
+EP-KUHS-PATH-2024-INT,KUHS,Pathology,2024,Internal assessment I,internal
+EP-KUHS-MICR-2021-P1,KUHS,Microbiology,2021,Paper I,university
+EP-KUHS-MICR-2021-P2,KUHS,Microbiology,2021,Paper II,university
+EP-KUHS-MICR-2022-P1,KUHS,Microbiology,2022,Paper I,university
+EP-KUHS-MICR-2022-P2,KUHS,Microbiology,2022,Paper II,university
+EP-KUHS-MICR-2023-P1,KUHS,Microbiology,2023,Paper I,university
+EP-KUHS-MICR-2023-P2,KUHS,Microbiology,2023,Paper II,university
+EP-KUHS-MICR-2024-P1,KUHS,Microbiology,2024,Paper I,university
+EP-KUHS-MICR-2024-P2,KUHS,Microbiology,2024,Paper II,university
+EP-KUHS-MICR-2025-P1,KUHS,Microbiology,2025,Paper I,university
+EP-KUHS-MICR-2025-P2,KUHS,Microbiology,2025,Paper II,university
+EP-KUHS-MICR-2024-INT,KUHS,Microbiology,2024,Internal assessment I,internal
+EP-KUHS-PHAR-2021-P1,KUHS,Pharmacology,2021,Paper I,university
+EP-KUHS-PHAR-2021-P2,KUHS,Pharmacology,2021,Paper II,university
+EP-KUHS-PHAR-2022-P1,KUHS,Pharmacology,2022,Paper I,university
+EP-KUHS-PHAR-2022-P2,KUHS,Pharmacology,2022,Paper II,university
+EP-KUHS-PHAR-2023-P1,KUHS,Pharmacology,2023,Paper I,university
+EP-KUHS-PHAR-2023-P2,KUHS,Pharmacology,2023,Paper II,university
+EP-KUHS-PHAR-2024-P1,KUHS,Pharmacology,2024,Paper I,university
+EP-KUHS-PHAR-2024-P2,KUHS,Pharmacology,2024,Paper II,university
+EP-KUHS-PHAR-2025-P1,KUHS,Pharmacology,2025,Paper I,university
+EP-KUHS-PHAR-2025-P2,KUHS,Pharmacology,2025,Paper II,university
+EP-KUHS-PHAR-2024-INT,KUHS,Pharmacology,2024,Internal assessment I,internal
+EP-KUHS-FMT-2021-P1,KUHS,Forensic Medicine,2021,Paper I,university
+EP-KUHS-FMT-2022-P1,KUHS,Forensic Medicine,2022,Paper I,university
+EP-KUHS-FMT-2023-P1,KUHS,Forensic Medicine,2023,Paper I,university
+EP-KUHS-FMT-2024-P1,KUHS,Forensic Medicine,2024,Paper I,university
+EP-KUHS-FMT-2025-P1,KUHS,Forensic Medicine,2025,Paper I,university
+EP-KUHS-FMT-2024-INT,KUHS,Forensic Medicine,2024,Internal assessment I,internal
+EP-KUHS-PSM-2021-P1,KUHS,Community Medicine,2021,Paper I,university
+EP-KUHS-PSM-2021-P2,KUHS,Community Medicine,2021,Paper II,university
+EP-KUHS-PSM-2022-P1,KUHS,Community Medicine,2022,Paper I,university
+EP-KUHS-PSM-2022-P2,KUHS,Community Medicine,2022,Paper II,university
+EP-KUHS-PSM-2023-P1,KUHS,Community Medicine,2023,Paper I,university
+EP-KUHS-PSM-2023-P2,KUHS,Community Medicine,2023,Paper II,university
+EP-KUHS-PSM-2024-P1,KUHS,Community Medicine,2024,Paper I,university
+EP-KUHS-PSM-2024-P2,KUHS,Community Medicine,2024,Paper II,university
+EP-KUHS-PSM-2025-P1,KUHS,Community Medicine,2025,Paper I,university
+EP-KUHS-PSM-2025-P2,KUHS,Community Medicine,2025,Paper II,university
+EP-KUHS-PSM-2024-INT,KUHS,Community Medicine,2024,Internal assessment I,internal
+EP-KUHS-MED-2021-P1,KUHS,Medicine,2021,Paper I,university
+EP-KUHS-MED-2021-P2,KUHS,Medicine,2021,Paper II,university
+EP-KUHS-MED-2022-P1,KUHS,Medicine,2022,Paper I,university
+EP-KUHS-MED-2022-P2,KUHS,Medicine,2022,Paper II,university
+EP-KUHS-MED-2023-P1,KUHS,Medicine,2023,Paper I,university
+EP-KUHS-MED-2023-P2,KUHS,Medicine,2023,Paper II,university
+EP-KUHS-MED-2024-P1,KUHS,Medicine,2024,Paper I,university
+EP-KUHS-MED-2024-P2,KUHS,Medicine,2024,Paper II,university
+EP-KUHS-MED-2025-P1,KUHS,Medicine,2025,Paper I,university
+EP-KUHS-MED-2025-P2,KUHS,Medicine,2025,Paper II,university
+EP-KUHS-MED-2024-INT,KUHS,Medicine,2024,Internal assessment I,internal
+EP-KUHS-SUR-2021-P1,KUHS,Surgery,2021,Paper I,university
+EP-KUHS-SUR-2021-P2,KUHS,Surgery,2021,Paper II,university
+EP-KUHS-SUR-2022-P1,KUHS,Surgery,2022,Paper I,university
+EP-KUHS-SUR-2022-P2,KUHS,Surgery,2022,Paper II,university
+EP-KUHS-SUR-2023-P1,KUHS,Surgery,2023,Paper I,university
+EP-KUHS-SUR-2023-P2,KUHS,Surgery,2023,Paper II,university
+EP-KUHS-SUR-2024-P1,KUHS,Surgery,2024,Paper I,university
+EP-KUHS-SUR-2024-P2,KUHS,Surgery,2024,Paper II,university
+EP-KUHS-SUR-2025-P1,KUHS,Surgery,2025,Paper I,university
+EP-KUHS-SUR-2025-P2,KUHS,Surgery,2025,Paper II,university
+EP-KUHS-SUR-2024-INT,KUHS,Surgery,2024,Internal assessment I,internal
+EP-KUHS-OBG-2021-P1,KUHS,Obstetrics & Gynaecology,2021,Paper I,university
+EP-KUHS-OBG-2021-P2,KUHS,Obstetrics & Gynaecology,2021,Paper II,university
+EP-KUHS-OBG-2022-P1,KUHS,Obstetrics & Gynaecology,2022,Paper I,university
+EP-KUHS-OBG-2022-P2,KUHS,Obstetrics & Gynaecology,2022,Paper II,university
+EP-KUHS-OBG-2023-P1,KUHS,Obstetrics & Gynaecology,2023,Paper I,university
+EP-KUHS-OBG-2023-P2,KUHS,Obstetrics & Gynaecology,2023,Paper II,university
+EP-KUHS-OBG-2024-P1,KUHS,Obstetrics & Gynaecology,2024,Paper I,university
+EP-KUHS-OBG-2024-P2,KUHS,Obstetrics & Gynaecology,2024,Paper II,university
+EP-KUHS-OBG-2025-P1,KUHS,Obstetrics & Gynaecology,2025,Paper I,university
+EP-KUHS-OBG-2025-P2,KUHS,Obstetrics & Gynaecology,2025,Paper II,university
+EP-KUHS-OBG-2024-INT,KUHS,Obstetrics & Gynaecology,2024,Internal assessment I,internal
+EP-KUHS-PED-2021-P1,KUHS,Pediatrics,2021,Paper I,university
+EP-KUHS-PED-2021-P2,KUHS,Pediatrics,2021,Paper II,university
+EP-KUHS-PED-2022-P1,KUHS,Pediatrics,2022,Paper I,university
+EP-KUHS-PED-2022-P2,KUHS,Pediatrics,2022,Paper II,university
+EP-KUHS-PED-2023-P1,KUHS,Pediatrics,2023,Paper I,university
+EP-KUHS-PED-2023-P2,KUHS,Pediatrics,2023,Paper II,university
+EP-KUHS-PED-2024-P1,KUHS,Pediatrics,2024,Paper I,university
+EP-KUHS-PED-2024-P2,KUHS,Pediatrics,2024,Paper II,university
+EP-KUHS-PED-2025-P1,KUHS,Pediatrics,2025,Paper I,university
+EP-KUHS-PED-2025-P2,KUHS,Pediatrics,2025,Paper II,university
+EP-KUHS-PED-2024-INT,KUHS,Pediatrics,2024,Internal assessment I,internal
+EP-KUHS-OPH-2021-P1,KUHS,Ophthalmology,2021,Paper I,university
+EP-KUHS-OPH-2022-P1,KUHS,Ophthalmology,2022,Paper I,university
+EP-KUHS-OPH-2023-P1,KUHS,Ophthalmology,2023,Paper I,university
+EP-KUHS-OPH-2024-P1,KUHS,Ophthalmology,2024,Paper I,university
+EP-KUHS-OPH-2025-P1,KUHS,Ophthalmology,2025,Paper I,university
+EP-KUHS-OPH-2024-INT,KUHS,Ophthalmology,2024,Internal assessment I,internal
+EP-KUHS-ENT-2021-P1,KUHS,ENT,2021,Paper I,university
+EP-KUHS-ENT-2022-P1,KUHS,ENT,2022,Paper I,university
+EP-KUHS-ENT-2023-P1,KUHS,ENT,2023,Paper I,university
+EP-KUHS-ENT-2024-P1,KUHS,ENT,2024,Paper I,university
+EP-KUHS-ENT-2025-P1,KUHS,ENT,2025,Paper I,university
+EP-KUHS-ENT-2024-INT,KUHS,ENT,2024,Internal assessment I,internal
+EP-KUHS-ORT-2021-P1,KUHS,Orthopedics,2021,Paper I,university
+EP-KUHS-ORT-2022-P1,KUHS,Orthopedics,2022,Paper I,university
+EP-KUHS-ORT-2023-P1,KUHS,Orthopedics,2023,Paper I,university
+EP-KUHS-ORT-2024-P1,KUHS,Orthopedics,2024,Paper I,university
+EP-KUHS-ORT-2025-P1,KUHS,Orthopedics,2025,Paper I,university
+EP-KUHS-ORT-2024-INT,KUHS,Orthopedics,2024,Internal assessment I,internal
+EP-KUHS-DER-2021-P1,KUHS,Dermatology,2021,Paper I,university
+EP-KUHS-DER-2022-P1,KUHS,Dermatology,2022,Paper I,university
+EP-KUHS-DER-2023-P1,KUHS,Dermatology,2023,Paper I,university
+EP-KUHS-DER-2024-P1,KUHS,Dermatology,2024,Paper I,university
+EP-KUHS-DER-2025-P1,KUHS,Dermatology,2025,Paper I,university
+EP-KUHS-DER-2024-INT,KUHS,Dermatology,2024,Internal assessment I,internal
+EP-KUHS-PSY-2021-P1,KUHS,Psychiatry,2021,Paper I,university
+EP-KUHS-PSY-2022-P1,KUHS,Psychiatry,2022,Paper I,university
+EP-KUHS-PSY-2023-P1,KUHS,Psychiatry,2023,Paper I,university
+EP-KUHS-PSY-2024-P1,KUHS,Psychiatry,2024,Paper I,university
+EP-KUHS-PSY-2025-P1,KUHS,Psychiatry,2025,Paper I,university
+EP-KUHS-PSY-2024-INT,KUHS,Psychiatry,2024,Internal assessment I,internal
+EP-KUHS-ANE-2021-P1,KUHS,Anesthesia,2021,Paper I,university
+EP-KUHS-ANE-2022-P1,KUHS,Anesthesia,2022,Paper I,university
+EP-KUHS-ANE-2023-P1,KUHS,Anesthesia,2023,Paper I,university
+EP-KUHS-ANE-2024-P1,KUHS,Anesthesia,2024,Paper I,university
+EP-KUHS-ANE-2025-P1,KUHS,Anesthesia,2025,Paper I,university
+EP-KUHS-ANE-2024-INT,KUHS,Anesthesia,2024,Internal assessment I,internal
+EP-KUHS-RAD-2021-P1,KUHS,Radiology,2021,Paper I,university
+EP-KUHS-RAD-2022-P1,KUHS,Radiology,2022,Paper I,university
+EP-KUHS-RAD-2023-P1,KUHS,Radiology,2023,Paper I,university
+EP-KUHS-RAD-2024-P1,KUHS,Radiology,2024,Paper I,university
+EP-KUHS-RAD-2025-P1,KUHS,Radiology,2025,Paper I,university
+EP-KUHS-RAD-2024-INT,KUHS,Radiology,2024,Internal assessment I,internal

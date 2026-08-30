@@ -1,3 +1,151 @@
 question_external_id,textbook_key,page,section_heading
 Q-ANAT-PYQ-001,TB-BDCHAURASIA-VOL1-8,48,Brachial plexus
-Q-ANAT-PYQ-002,TB-BDCHAURASIA-VOL1-8,72,Surgical neck of humerus
+Q-ANAT-PYQ-002,TB-BDCHAURASIA-VOL1-8,60,Humerus fractures
+Q-ANAT-PYQ-003,TB-BDCHAURASIA-VOL3-8,210,Larynx
+Q-ANAT-PYQ-004,TB-BDCHAURASIA-VOL3-8,222,Thyroid gland and triangles of the neck
+Q-ANAT-PYQ-005,TB-BDCHAURASIA-VOL3-8,340,Visual pathway
+Q-ANAT-PYQ-006,TB-BDCHAURASIA-VOL3-8,352,Circle of Willis and cranial nerve nuclei
+Q-ANAT-PYQ-007,TB-SNELL-9,52,Gastrulation and notochord
+Q-ANAT-PYQ-008,TB-SNELL-9,64,Pharyngeal arches and fetal circulation
+Q-ANAT-PYQ-009,TB-BDCHAURASIA-VOL1-8,180,Heart and coronary arteries
+Q-ANAT-PYQ-010,TB-BDCHAURASIA-VOL1-8,192,Bronchopulmonary segments and mediastinum
+Q-ANAT-PYQ-011,TB-BDCHAURASIA-VOL2-8,120,Inguinal canal and hernia
+Q-ANAT-PYQ-012,TB-BDCHAURASIA-VOL2-8,132,Portal vein and extrahepatic biliary tree
+Q-ANAT-PYQ-013,TB-BDCHAURASIA-VOL2-8,28,Femoral triangle and adductor canal
+Q-ANAT-PYQ-014,TB-BDCHAURASIA-VOL2-8,40,Sciatic nerve and gluteal region
+Q-PHYS-PYQ-001,TB-GUYTON-14,109,Cardiac cycle and heart sounds
+Q-PHYS-PYQ-002,TB-GUYTON-14,121,Jugular venous pulse and ECG basics
+Q-PHYS-PYQ-003,TB-GUYTON-14,497,Lung volumes and spirometry
+Q-PHYS-PYQ-004,TB-GUYTON-14,509,Oxygen transport and hypoxia
+Q-PHYS-PYQ-005,TB-GUYTON-14,343,GFR and clearance
+Q-PHYS-PYQ-006,TB-GUYTON-14,355,Countercurrent mechanism and ADH
+Q-PHYS-PYQ-007,TB-GANONG-26,85,Resting membrane potential and action potential
+Q-PHYS-PYQ-008,TB-GANONG-26,97,Synaptic transmission and neuromuscular junction
+Q-PHYS-PYQ-009,TB-GUYTON-14,921,Hypothalamo-pituitary axis
+Q-PHYS-PYQ-010,TB-GUYTON-14,933,Thyroid hormone synthesis and calcium hormones
+Q-PHYS-PYQ-011,TB-GUYTON-14,797,Gastric secretion and motility
+Q-PHYS-PYQ-012,TB-GUYTON-14,809,"Bile, pancreas and small-bowel absorption"
+Q-BIOC-PYQ-001,TB-VASUDEVAN-9,112,Glycolysis and gluconeogenesis
+Q-BIOC-PYQ-002,TB-VASUDEVAN-9,124,Glycogen storage diseases and PPP
+Q-BIOC-PYQ-003,TB-VASUDEVAN-9,198,Urea cycle and hyperammonemia
+Q-BIOC-PYQ-004,TB-VASUDEVAN-9,210,"Phenylalanine, tyrosine and branched-chain amino acids"
+Q-BIOC-PYQ-005,TB-SATYANARAYANA-5,412,DNA replication and repair
+Q-BIOC-PYQ-006,TB-SATYANARAYANA-5,424,"Transcription, translation and blotting"
+Q-BIOC-PYQ-007,TB-VASUDEVAN-9,386,Water-soluble vitamins
+Q-BIOC-PYQ-008,TB-VASUDEVAN-9,398,Fat-soluble vitamins and PEM
+Q-BIOC-PYQ-009,TB-VASUDEVAN-9,156,Beta-oxidation and ketone bodies
+Q-BIOC-PYQ-010,TB-VASUDEVAN-9,168,Cholesterol synthesis and lipoproteins
+Q-PATH-PYQ-001,TB-ROBBINS-10,31,"Cell injury, necrosis and apoptosis"
+Q-PATH-PYQ-002,TB-ROBBINS-10,43,"Inflammation, healing and hemodynamic disorders"
+Q-PATH-PYQ-003,TB-HARSHMOHAN-8,280,Anemias and megaloblastic change
+Q-PATH-PYQ-004,TB-HARSHMOHAN-8,292,Leukemias and lymphomas
+Q-PATH-PYQ-005,TB-ROBBINS-10,523,Cardiovascular and renal pathology
+Q-PATH-PYQ-006,TB-ROBBINS-10,535,Hepatic and pulmonary pathology
+Q-PATH-PYQ-007,TB-ROBBINS-10,267,Carcinogenesis and tumour markers
+Q-PATH-PYQ-008,TB-ROBBINS-10,279,Common cancers and paraneoplastic syndromes
+Q-MICR-PYQ-001,TB-PANIKER-8,188,Gram-positive pathogens and mycobacteria
+Q-MICR-PYQ-002,TB-PANIKER-8,200,Gram-negative and anaerobic bacteria
+Q-MICR-PYQ-003,TB-PANIKER-8,440,Hepatitis viruses and HIV
+Q-MICR-PYQ-004,TB-PANIKER-8,452,"Herpesviruses, rabies and respiratory viruses"
+Q-MICR-PYQ-005,TB-PANIKER-8,612,Malaria and leishmaniasis
+Q-MICR-PYQ-006,TB-PANIKER-8,624,Intestinal helminths and hydatid disease
+Q-MICR-PYQ-007,TB-PANIKER-8,78,Hypersensitivity and antibodies
+Q-MICR-PYQ-008,TB-PANIKER-8,90,Primary immunodeficiencies and transplant
+Q-PHAR-PYQ-001,TB-KDTRPATHI-8,92,Cholinergic and anticholinergic drugs
+Q-PHAR-PYQ-002,TB-KDTRPATHI-8,104,"Adrenergic agonists, blockers and NMJ drugs"
+Q-PHAR-PYQ-003,TB-KDTRPATHI-8,521,Antihypertensives and heart-failure drugs
+Q-PHAR-PYQ-004,TB-KDTRPATHI-8,533,Antiarrhythmics and anticoagulants
+Q-PHAR-PYQ-005,TB-KDTRPATHI-8,688,"Beta-lactams, vancomycin and anti-TB drugs"
+Q-PHAR-PYQ-006,TB-KDTRPATHI-8,700,"Antimalarials, antifungals and stewardship"
+Q-PHAR-PYQ-007,TB-KDTRPATHI-8,401,Antiepileptics and benzodiazepines
+Q-PHAR-PYQ-008,TB-KDTRPATHI-8,413,"Antidepressants, lithium and antipsychotics"
+Q-FMT-PYQ-001,TB-REDDY-34,148,Early signs of death and rigor mortis
+Q-FMT-PYQ-002,TB-REDDY-34,160,"Postmortem staining, cooling and injuries"
+Q-FMT-PYQ-003,TB-REDDY-34,498,"Corrosives, pesticides and plant poisons"
+Q-FMT-PYQ-004,TB-REDDY-34,510,"Asphyxiants, metals and alcohol"
+Q-FMT-PYQ-005,TB-REDDY-34,42,"Consent, negligence and inquest"
+Q-FMT-PYQ-006,TB-REDDY-34,54,"Injury, dying declaration and IPC sections"
+Q-PSM-PYQ-001,TB-PARK-26,58,Measures of disease frequency and study designs
+Q-PSM-PYQ-002,TB-PARK-26,70,"Screening, bias and outbreak investigation"
+Q-PSM-PYQ-003,TB-PARK-26,786,"Normal distribution, p-value and tests of significance"
+Q-PSM-PYQ-004,TB-PARK-26,798,"Sampling, errors and confidence intervals"
+Q-PSM-PYQ-005,TB-PARK-26,412,"NTEP, NVBDCP and national disease control"
+Q-PSM-PYQ-006,TB-PARK-26,424,"RCH, RKSK and National Health Mission"
+Q-PSM-PYQ-007,TB-PARK-26,118,UIP schedule and vaccine types
+Q-PSM-PYQ-008,TB-PARK-26,130,"AEFI, cold chain and special situations"
+Q-MED-PYQ-001,TB-HARRISON-21,1760,Acute coronary syndromes and heart failure
+Q-MED-PYQ-002,TB-HARRISON-21,1772,"Valvular disease, endocarditis and tamponade"
+Q-MED-PYQ-003,TB-API-12,890,"COPD, asthma and pneumonia"
+Q-MED-PYQ-004,TB-API-12,902,"Pleural disease, TB and interstitial lung disease"
+Q-MED-PYQ-005,TB-HARRISON-21,2234,"Cirrhosis, GI bleed and hepatitis"
+Q-MED-PYQ-006,TB-HARRISON-21,2246,"IBD, pancreatitis and malabsorption"
+Q-MED-PYQ-007,TB-HARRISON-21,2654,Diabetes mellitus and thyroid disorders
+Q-MED-PYQ-008,TB-HARRISON-21,2666,"Adrenal, pituitary and calcium disorders"
+Q-MED-PYQ-009,TB-HARRISON-21,3050,Stroke and meningitis
+Q-MED-PYQ-010,TB-HARRISON-21,3062,"Seizures, GBS and movement disorders"
+Q-MED-PYQ-011,TB-API-12,712,"AKI, CKD and nephritic-nephrotic syndromes"
+Q-MED-PYQ-012,TB-API-12,724,"Electrolytes, acid-base and dialysis"
+Q-SUR-PYQ-001,TB-BAILEY-28,48,"Shock, burns and wound healing"
+Q-SUR-PYQ-002,TB-BAILEY-28,60,"Hernia, thyroid and breast (surgical approach)"
+Q-SUR-PYQ-003,TB-SRB-6,612,"Peptic ulcer, gallbladder and pancreas"
+Q-SUR-PYQ-004,TB-SRB-6,624,Intestinal obstruction and appendix
+Q-SUR-PYQ-005,TB-BAILEY-28,1398,Urolithiasis and BPH
+Q-SUR-PYQ-006,TB-BAILEY-28,1410,Testicular tumours and haematuria
+Q-SUR-PYQ-007,TB-BAILEY-28,612,Head injury and intracranial haemorrhage
+Q-SUR-PYQ-008,TB-BAILEY-28,624,"Raised ICP, hydrocephalus and spinal trauma"
+Q-SUR-PYQ-009,TB-SRB-6,428,Breast carcinoma
+Q-SUR-PYQ-010,TB-SRB-6,440,Thyroid and parathyroid surgery
+Q-OBG-PYQ-001,TB-DUTTA-9,112,Antenatal care and anaemia in pregnancy
+Q-OBG-PYQ-002,TB-DUTTA-9,124,Hypertensive disorders and APH/PPH
+Q-OBG-PYQ-003,TB-SHAW-17,88,"AUB, fibroids and endometriosis"
+Q-OBG-PYQ-004,TB-SHAW-17,100,Ovarian tumours and endometrial carcinoma
+Q-OBG-PYQ-005,TB-DUTTA-9,128,Mechanism of labour and partograph
+Q-OBG-PYQ-006,TB-DUTTA-9,140,"Obstructed labour, APH and third stage"
+Q-PED-PYQ-001,TB-GHAI-9,142,Neonatal resuscitation and jaundice
+Q-PED-PYQ-002,TB-GHAI-9,154,"RDS, TTN and perinatal asphyxia"
+Q-PED-PYQ-003,TB-GHAI-9,228,"Measles, IMNCI and diarrhoea"
+Q-PED-PYQ-004,TB-GHAI-9,240,"Malaria, dengue and tuberculosis in children"
+Q-PED-PYQ-005,TB-GHAI-9,12,"Growth charts, milestones and puberty"
+Q-PED-PYQ-006,TB-GHAI-9,24,"SAM, vitamin deficiencies and immunization catch-up"
+Q-OPH-PYQ-001,TB-KHURANA-7,88,"Conjunctivitis, xerophthalmia and keratitis"
+Q-OPH-PYQ-002,TB-KHURANA-7,100,Cataract and corneal ulcers
+Q-OPH-PYQ-003,TB-KHURANA-7,226,Primary open-angle glaucoma
+Q-OPH-PYQ-004,TB-KHURANA-7,238,Acute angle-closure glaucoma
+Q-OPH-PYQ-005,TB-KHURANA-7,278,Diabetic retinopathy
+Q-OPH-PYQ-006,TB-KHURANA-7,290,Retinal vascular occlusions and ARMD
+Q-ENT-PYQ-001,TB-DHINGRA-7,48,Otitis media and CSOM
+Q-ENT-PYQ-002,TB-DHINGRA-7,60,"Hearing tests, cholesteatoma and facial nerve"
+Q-ENT-PYQ-003,TB-DHINGRA-7,168,Epistaxis and DNS
+Q-ENT-PYQ-004,TB-DHINGRA-7,180,"Sinusitis, polyps and nasopharyngeal carcinoma"
+Q-ENT-PYQ-005,TB-DHINGRA-7,288,Stridor and laryngomalacia
+Q-ENT-PYQ-006,TB-DHINGRA-7,300,Vocal cord palsy and carcinoma larynx
+Q-ORT-PYQ-001,TB-MAHESHWARI-6,82,"Colles, scaphoid and neck of femur"
+Q-ORT-PYQ-002,TB-MAHESHWARI-6,94,Compartment syndrome and fat embolism
+Q-ORT-PYQ-003,TB-MAHESHWARI-6,178,Osteomyelitis and septic arthritis
+Q-ORT-PYQ-004,TB-MAHESHWARI-6,190,Pott spine and skeletal TB
+Q-ORT-PYQ-005,TB-MAHESHWARI-6,248,Scoliosis and IVDP
+Q-ORT-PYQ-006,TB-MAHESHWARI-6,260,Cauda equina and spinal injuries
+Q-DER-PYQ-001,TB-NEENAKHANNA-5,42,Psoriasis and lichen planus
+Q-DER-PYQ-002,TB-NEENAKHANNA-5,54,Pityriasis rosea and eczema
+Q-DER-PYQ-003,TB-NEENAKHANNA-5,88,Pyoderma and dermatophytes
+Q-DER-PYQ-004,TB-NEENAKHANNA-5,100,"Leprosy, scabies and viral exanthems"
+Q-DER-PYQ-005,TB-NEENAKHANNA-5,126,Pemphigus vulgaris
+Q-DER-PYQ-006,TB-NEENAKHANNA-5,138,Bullous pemphigoid and dermatitis herpetiformis
+Q-PSY-PYQ-001,TB-AHUJA-8,78,Major depression and bipolar disorder
+Q-PSY-PYQ-002,TB-AHUJA-8,90,"Suicide risk, ECT and antidepressants"
+Q-PSY-PYQ-003,TB-AHUJA-8,52,Clinical features and first-rank symptoms
+Q-PSY-PYQ-004,TB-AHUJA-8,64,Antipsychotics and clozapine monitoring
+Q-PSY-PYQ-005,TB-AHUJA-8,112,Anxiety disorders and OCD
+Q-PSY-PYQ-006,TB-AHUJA-8,124,Alcohol withdrawal and CAGE
+Q-ANE-PYQ-001,TB-MORGAN-6,148,Induction agents and inhalational anaesthetics
+Q-ANE-PYQ-002,TB-MORGAN-6,160,Malignant hyperthermia and monitoring
+Q-ANE-PYQ-003,TB-MORGAN-6,918,Spinal and epidural anaesthesia
+Q-ANE-PYQ-004,TB-MORGAN-6,930,Local anaesthetic systemic toxicity
+Q-ANE-PYQ-005,TB-MORGAN-6,308,"Mallampati, intubation and difficult airway"
+Q-ANE-PYQ-006,TB-MORGAN-6,320,"LMA, RSI and cannot-intubate cannot-oxygenate"
+Q-RAD-PYQ-001,TB-SUTTON-7,48,"Silhouette sign, pneumonia and pneumothorax"
+Q-RAD-PYQ-002,TB-SUTTON-7,60,Pulmonary embolism imaging and collapse
+Q-RAD-PYQ-003,TB-SUTTON-7,612,Pneumoperitoneum and bowel obstruction
+Q-RAD-PYQ-004,TB-SUTTON-7,624,"Appendicitis, pancreatitis and renal stones imaging"
+Q-RAD-PYQ-005,TB-SUTTON-7,1488,Stroke CT and haemorrhage patterns
+Q-RAD-PYQ-006,TB-SUTTON-7,1500,EDH vs SDH and raised-ICP signs

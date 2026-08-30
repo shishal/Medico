@@ -648,3 +648,73 @@ Since you don't have real content yet, write a one-off SQL script (or a small Da
 6. Confirms `plan_limits` has its three seed rows from §7.2 — this table is populated by that section's `insert` statement directly, not by your seed script, but double-check it landed correctly before testing Practice Mode.
 
 **Validation for this step**: after seeding, manually query as an anonymous/free-tier test user and confirm you get back only `free`-tier questions and tests — this is your first real end-to-end proof the RLS policies work, before any Flutter code exists.
+
+---
+
+## 10. UG university catalog (additive)
+
+NEET-PG tables above stay. This section is the **current product schema**. Apply
+`supabase/migrations/20260830140000_ug_university_pivot.sql` — do not re-run
+sections 1–8 on a live project.
+
+v1 university: **KUHS**. See `docs/00_PRODUCT.md`.
+
+### 9.1 Enums and catalog
+
+```sql
+create type question_kind as enum ('pyq_theory', 'mcq');
+create type mbbs_phase_code as enum ('phase1', 'phase2', 'phase3_part1', 'phase3_part2');
+create type tracker_kind as enum ('university_window', 'custom');
+create type study_event_kind as enum (
+  'opened_lesson', 'opened_pyq', 'marked_learnt', 'answered_mcq', 'opened_resource'
+);
+```
+
+Tables: `universities`, `mbbs_phases`, `colleges`, `lessons` (sheet `external_id`),
+`textbooks`, `exam_papers`, `lesson_resources`, `question_resources`.
+`subjects` gains `mbbs_phase_id` and `required_plan`.
+
+### 9.2 Dual-kind questions
+
+`questions.kind` (`pyq_theory` | `mcq`), `lesson_id`, `marks`. MCQ options stay
+required only when `kind = 'mcq'` (nullable columns + a check constraint).
+
+**Sample answers are not a column on `questions`** — a free SELECT on a free
+PYQ would leak the model answer. They live in `question_sample_answers` with
+RLS `plan_rank(current_plan()) >= plan_rank('pro')`.
+
+Also: `question_appearances` (frequency = count), `question_textbook_refs`
+(citation only — never PDF bytes).
+
+View `pyq_teasers` (security_invoker = true so questions RLS still applies):
+stem, marks, lesson_id, required_plan, appearance_count — no sample answer,
+no MCQ keys.
+
+### 9.3 Profile academic fields + 4-day trial
+
+`profiles` gains `university_id`, `college_id`, `batch_year`, `mbbs_phase_id`,
+`onboarding_completed_at`. `handle_new_user` inserts `plan = 'pro'` with
+`plan_expires_at = now() + 4 days`. Authenticated GRANT update is limited to
+name/phone/academic fields — never `plan` / `plan_expires_at`.
+
+### 9.4 Progress and trackers
+
+`lesson_progress` / `question_progress` (learnt_at, last_viewed_at),
+`lesson_bookmarks`, append-only `study_events`.
+
+`trackers`: `custom` (owner_user_id required) or `university_window` (owner
+null, shared). `tracker_items` point at lessons/questions.
+`user_tracker_item_done` is per-user completion.
+
+### 9.5 RPCs (do not reimplement in Dart)
+
+| RPC | Returns |
+|---|---|
+| `get_study_progress()` | streak, 7/30-day counts, subject coverage |
+| `tracker_completion(p_tracker_id)` | `{done, total, percent}` |
+| `search_catalog(p_query)` | subjects, lessons, PYQ teasers |
+| `create_practice_session(..., p_lesson_ids uuid[] default null)` | MCQ-only + optional lesson filter |
+| `mark_lesson_learnt(p_lesson_id)` / `mark_question_learnt(p_question_id)` | progress + study_event |
+
+Lesson resources: visible if `is_free` OR the user's plan covers the parent
+lesson's `required_plan`.

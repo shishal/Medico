@@ -1,20 +1,20 @@
-name,display_order
-Anatomy,1
-Physiology,2
-Biochemistry,3
-Pathology,4
-Microbiology,5
-Pharmacology,6
-Forensic Medicine,7
-Community Medicine,8
-Medicine,9
-Surgery,10
-Obstetrics & Gynaecology,11
-Pediatrics,12
-Ophthalmology,13
-ENT,14
-Orthopedics,15
-Dermatology,16
-Psychiatry,17
-Anesthesia,18
-Radiology,19
+name,display_order,phase_code
+Anatomy,1,phase1
+Physiology,2,phase1
+Biochemistry,3,phase1
+Pathology,4,phase2
+Microbiology,5,phase2
+Pharmacology,6,phase2
+Forensic Medicine,7,phase2
+Community Medicine,8,phase3_part1
+Medicine,9,phase3_part2
+Surgery,10,phase3_part2
+Obstetrics & Gynaecology,11,phase3_part2
+Pediatrics,12,phase3_part2
+Ophthalmology,13,phase3_part1
+ENT,14,phase3_part1
+Orthopedics,15,phase3_part2
+Dermatology,16,phase3_part2
+Psychiatry,17,phase3_part2
+Anesthesia,18,phase3_part2
+Radiology,19,phase3_part2

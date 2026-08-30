@@ -57,7 +57,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'NEET-PG Prep',
+              'MBBS exam prep',
               style: Theme.of(context).textTheme.bodyLarge
                   ?.copyWith(color: onTeal.withValues(alpha: 0.82)),
             ),

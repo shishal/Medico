@@ -1,5 +1,13 @@
 # Project Foundation
 
+Read `docs/00_PRODUCT.md` first. This file is locked engineering decisions — if
+Cursor (or you) later suggests deviating from one of these, treat it as a flag
+to stop and think, not a default to accept.
+
+**Product:** MBBS university-exam companion (KUHS in v1). The stack below was
+chosen for a timer-driven MCQ player; that player is now **practice-only**. Do
+not reintroduce a NEET-PG catalog as the home screen.
+
 Read this before writing any code. These are locked decisions — if Cursor (or you) later suggests deviating from one of these, treat it as a flag to stop and think, not a default to accept.
 
 ## What "server-side" means in this stack (you're not hosting anything)
@@ -46,11 +54,35 @@ lib/
       data/                   # Repository: talks to Supabase Auth
       domain/                 # Models (User, Profile)
       presentation/           # Screens + Riverpod providers for this feature
-    tests/                    # "tests" as in exam tests, not unit tests
+    onboarding/
+      data/
+      domain/
+      presentation/
+    catalog/                  # Year → subject → topic → lesson browse
+      data/
+      domain/
+      presentation/
+    pyq/                      # Theory PYQ reader (sample answer, textbook page, links)
+      data/
+      domain/
+      presentation/
+    tests/                    # MCQ player (practice sessions). Not the home catalog.
       data/
       domain/
       presentation/
     results/
+      data/
+      domain/
+      presentation/
+    trackers/
+      data/
+      domain/
+      presentation/
+    progress/
+      data/
+      domain/
+      presentation/
+    search/
       data/
       domain/
       presentation/

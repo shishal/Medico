@@ -37,7 +37,7 @@ void main() {
     );
 
     expect(find.text('Medico'), findsOneWidget);
-    expect(find.text('NEET-PG Prep'), findsOneWidget);
+    expect(find.text('MBBS exam prep'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));

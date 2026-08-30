@@ -8,25 +8,33 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/theme_mode_toggle_button.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
+import '../../../catalog/presentation/providers/catalog_providers.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
+import '../../../progress/presentation/providers/ug_home_providers.dart';
 import '../providers/in_progress_attempts_provider.dart';
 import '../providers/pending_submit_sync_provider.dart';
 
-/// Landing screen after authentication (placeholder until Phase 4).
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final planAsync = ref.watch(currentPlanProvider);
-    // Completes pending_submit files after a force-quit or dropped connection.
+    final subjects = ref.watch(phaseSubjectsProvider);
+    final progress = ref.watch(studyProgressProvider);
+    final trackers = ref.watch(trackerListProvider);
     ref.watch(pendingSubmitSyncProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Medico'),
         actions: [
+          IconButton(
+            tooltip: 'Search',
+            onPressed: () => context.push(AppRoutes.search),
+            icon: const Icon(Icons.search),
+          ),
           IconButton(
             tooltip: 'Profile',
             onPressed: () => context.go(AppRoutes.profile),
@@ -37,64 +45,106 @@ class HomeScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
-          Text('Home', style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: Spacing.sm),
           planAsync.when(
             data: (plan) => Text(
               plan == null ? 'Plan: —' : 'Your plan: ${plan.label}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            loading: () => const Align(
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
+            loading: () => const SizedBox.shrink(),
             error: (error, _) => InlineErrorMessage(
               message: UserFacingError.display(error),
               onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
             ),
           ),
           const SizedBox(height: Spacing.sm),
-          Text(
-            'Placeholder shell — content screens arrive in later phases.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          progress.when(
+            data: (p) => Text(
+              'Streak ${p.streak} day${p.streak == 1 ? '' : 's'}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: Spacing.md),
+          const _ResumeBanner(),
+          const SizedBox(height: Spacing.md),
+          Text('This year', style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: Spacing.sm),
+          subjects.when(
+            data: (items) {
+              if (items.isEmpty) {
+                return const Text('No subjects for your year yet.');
+              }
+              return Column(
+                children: [
+                  for (final s in items)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(s.name),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push(AppRoutes.subjectPath(s.id, s.name)),
+                    ),
+                ],
+              );
+            },
+            loading: () => const LinearProgressIndicator(),
+            error: (e, _) => InlineErrorMessage(
+              message: UserFacingError.display(e),
+              onRetry: () => ref.invalidate(phaseSubjectsProvider),
             ),
           ),
           const SizedBox(height: Spacing.lg),
-          const _ResumeBanner(),
-          const SizedBox(height: Spacing.md),
-          FilledButton(
-            onPressed: () => context.go(AppRoutes.practice),
-            child: const Text('Practice'),
+          Text('Trackers', style: Theme.of(context).textTheme.titleSmall),
+          trackers.when(
+            data: (items) {
+              if (items.isEmpty) {
+                return TextButton(
+                  onPressed: () => context.push(AppRoutes.trackers),
+                  child: const Text('Create a custom tracker'),
+                );
+              }
+              return Column(
+                children: [
+                  for (final t in items.take(3))
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(t.title),
+                      trailing: Text('${t.percent}%'),
+                      onTap: () => context.push(AppRoutes.trackers),
+                    ),
+                  TextButton(
+                    onPressed: () => context.push(AppRoutes.trackers),
+                    child: const Text('All trackers'),
+                  ),
+                ],
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.md),
           FilledButton.tonal(
-            onPressed: () => context.go(AppRoutes.testList),
-            child: const Text('Browse tests'),
+            onPressed: () => context.push(AppRoutes.practice),
+            child: const Text('MCQ practice'),
           ),
-          const SizedBox(height: Spacing.md),
+          const SizedBox(height: Spacing.sm),
+          FilledButton.tonal(
+            onPressed: () => context.push(AppRoutes.progress),
+            child: const Text('7-day / 30-day progress'),
+          ),
+          const SizedBox(height: Spacing.sm),
           FilledButton.tonal(
             onPressed: () => context.go(AppRoutes.bookmarks),
-            child: const Text('My Bookmarks'),
-          ),
-          const SizedBox(height: Spacing.md),
-          OutlinedButton(
-            onPressed: () => context.go(AppRoutes.profile),
-            child: const Text('Profile'),
+            child: const Text('Bookmarks'),
           ),
           const SizedBox(height: Spacing.lg),
           const ThemeModeToggleButton(),
-          const SizedBox(height: Spacing.md),
           TextButton(
             onPressed: () {
               ref.read(authSessionProvider.notifier).signOut();
               context.go(AppRoutes.login);
             },
-            child: const Text('Sign out (stub)'),
+            child: const Text('Sign out'),
           ),
         ],
       ),
@@ -102,7 +152,6 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-/// Offers resume when a local/server in-progress attempt exists (spec §4).
 class _ResumeBanner extends ConsumerWidget {
   const _ResumeBanner();
 
@@ -134,7 +183,7 @@ class _ResumeBanner extends ConsumerWidget {
               child: ListTile(
                 leading: const Icon(Icons.play_circle_outline),
                 title: Text(item.title),
-                subtitle: const Text('In progress — tap to resume'),
+                subtitle: const Text('In-progress MCQ session — tap to resume'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.go(AppRoutes.testPlayerPath(item.testId)),
               ),

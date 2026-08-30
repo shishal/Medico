@@ -4,6 +4,96 @@ Work top to bottom. Don't start a phase until the previous phase's validation st
 
 Each task has: **Description**, **Expected Outcome** (what "done" means, testable), **Validation** (how you personally confirm it — not the AI's claim, your own check), and **Notes**.
 
+**Current work is UG-A onward.** Phases 0–9 below are the completed NEET-PG QBank; treat them as historical. Do not start new NEET-PG catalog tasks.
+
+---
+
+## UG-A — Product docs & university lock
+
+**UG-A.1 — Product identity**
+- Description: `docs/00_PRODUCT.md` is the source of truth: KUHS, Year→Subject→Topic→Lesson, dual question kinds, sample answers, reference links, 4-day trial.
+- Expected Outcome: AGENTS.md and foundation docs point at the UG product. NEET-PG specs are marked historical.
+- Validation: a new session reading AGENTS.md would not build a Grand Test as the home screen.
+
+**UG-A.2 — Schema + sheet docs**
+- Description: Document additive UG tables in `docs/02_DATABASE_SCHEMA.md` §10 and the Google Sheet tabs in `content/google_sheet/`.
+- Expected Outcome: An implementer can apply one migration and sync the new tabs without guessing column names.
+
+---
+
+## UG-B — Database (additive)
+
+**UG-B.1 — Apply `ug_university_pivot` migration**
+- Description: Run `supabase/migrations/20260830140000_ug_university_pivot.sql`.
+- Expected Outcome: universities, colleges, phases, lessons, appearances, textbook refs, sample-answer table, resources, progress, trackers, RPCs, 4-day trial on new profiles.
+- Validation: Table Editor lists the new tables; `select * from universities;` returns KUHS; signup as a test user yields `plan = pro` with `plan_expires_at` ~4 days out.
+
+**UG-B.2 — Practice generator is MCQ-only**
+- Description: `create_practice_session` only attaches `kind = 'mcq'` and accepts optional `p_lesson_ids`.
+- Validation: a lesson with only theory PYQs returns `NO_QUESTIONS_MATCH_FILTERS`.
+
+---
+
+## UG-C — Content pipeline
+
+**UG-C.1 — Sheet tabs**
+- Description: Universities, Colleges, Phases, Subjects (with `phase_code`), Topics, Lessons, LessonResources, Textbooks, ExamPapers, Questions (kind-aware + optional `sample_answer_text`), Appearances, TextbookRefs, QuestionResources. Tests/TestQuestions remain optional.
+- Validation: fill the sample CSV rows, run Apps Script validation against a missing `correct_option` on a theory row — it must pass. An MCQ row missing options must fail.
+
+**UG-C.2 — Sync script**
+- Description: Upsert in dependency order; sample answers go to `question_sample_answers` (not a column on `questions`). Resource URLs must be https.
+- Validation: sync twice with unchanged data — no duplicate lessons or appearances.
+
+---
+
+## UG-D — App information architecture
+
+**UG-D.1 — Onboarding**
+- Description: After signup, collect name, college, batch year, MBBS phase. University is KUHS (display, not a free-text field). Writes `profiles` academic columns + `onboarding_completed_at`.
+- Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects.
+
+**UG-D.2 — Catalog browse**
+- Description: Home lists subjects for the student’s phase. Subject → topics → lessons. Lesson lists PYQs + “Practice MCQs” + lesson resources.
+- Validation: empty catalog shows an empty state, not a crash. A `required_plan = pro` lesson the free user cannot open shows an upgrade prompt.
+
+**UG-D.3 — PYQ reader**
+- Description: Stem, marks, appearance years, textbook page citations, collapsed sample answer (text / Pro lock / “No sample answer yet”), “More on this topic” links, bookmark, mark as learnt.
+- Validation: as free user, sample-answer body is not in the network payload. Tapping a free `is_free` resource opens the URL. Tapping a locked resource goes to upgrade.
+
+**UG-D.4 — Lesson-scoped MCQ practice**
+- Description: From a lesson, start a practice session filtered to that lesson’s MCQs (existing player).
+- Validation: questions in the session all belong to that lesson and `kind = mcq`.
+
+**UG-D.5 — Search, learnt, bookmarks**
+- Description: Search subjects, lessons, PYQ stems. Lesson bookmarks use `lesson_bookmarks`. Mark-learnt writes progress + a `study_events` row via repository (RPC for streak reads).
+- Validation: bookmark a lesson, force-quit, reopen — still bookmarked.
+
+**UG-D.6 — Trackers**
+- Description: Custom tracker (pick lessons) + one published university-window tracker. Completion % from `tracker_completion` RPC.
+- Validation: marking a lesson learnt updates the tracker percent on refresh. Free user can use custom trackers on free lessons.
+
+**UG-D.7 — Progress**
+- Description: Home strip + progress screen: 7-day / 30-day activity, streak, subject coverage from `get_study_progress` RPC.
+- Validation: two study events on consecutive days show streak 2; skipping a day resets unless “yesterday” still counts as continuing (standard streak: last event today or yesterday).
+
+**UG-D.8 — Hide NEET-PG catalog**
+- Description: Home does not offer “Browse tests.” Test-player routes remain for practice.
+- Validation: walk every tab on Home — no Mini/Mock/Grand list.
+
+---
+
+## UG-E — Growth (after real PYQs exist)
+
+**UG-E.1 — KUHS SEO pages** on the existing static site (`/kuhs/`, `/kuhs/anatomy/`, important-questions).
+**UG-E.2 — WhatsApp support** link in the app profile and site header (number is an operator setting, not hardcoded to a competitor).
+**UG-E.3 — Ambassadors page** explaining college-tracker contribution. Do not build a CRM in v1.
+
+---
+
+## Historical — NEET-PG Phases 0–9 (complete)
+
+The original QBank phases follow. Do not extend them. Kept so migrations and old PRs still make sense.
+
 ---
 
 ## Phase 0 — Environment & Project Init

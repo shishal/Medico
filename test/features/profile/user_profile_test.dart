@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:medico/core/supabase/tables.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/profile/domain/user_profile.dart';
 
@@ -35,5 +36,34 @@ void main() {
   test('effectivePlan uses stored plan when expiry is null', () {
     final p = profile(plan: PlanTier.pro);
     expect(p.effectivePlan, PlanTier.pro);
+  });
+
+  test('needsOnboarding is true until onboarding_completed_at is set', () {
+    final incomplete = profile(plan: PlanTier.free);
+    expect(incomplete.needsOnboarding, isTrue);
+
+    final done = UserProfile(
+      id: 'user-1',
+      plan: PlanTier.pro,
+      createdAt: DateTime.utc(2026, 1, 1),
+      onboardingCompletedAt: DateTime.utc(2026, 8, 1),
+    );
+    expect(done.needsOnboarding, isFalse);
+  });
+
+  test('fromJson reads academic onboarding fields', () {
+    final p = UserProfile.fromJson({
+      ProfileColumns.id: 'user-1',
+      ProfileColumns.plan: 'pro',
+      ProfileColumns.createdAt: '2026-01-01T00:00:00Z',
+      ProfileColumns.universityId: 'uni-1',
+      ProfileColumns.collegeId: 'col-1',
+      ProfileColumns.batchYear: 2024,
+      ProfileColumns.mbbsPhaseId: 'phase-2',
+      ProfileColumns.onboardingCompletedAt: '2026-08-01T00:00:00Z',
+    });
+    expect(p.needsOnboarding, isFalse);
+    expect(p.batchYear, 2024);
+    expect(p.universityId, 'uni-1');
   });
 }

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/support.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
@@ -101,6 +104,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: Spacing.lg),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.chat_outlined),
+            title: const Text('WhatsApp support'),
+            onTap: () => launchUrl(
+              Uri.parse(SupportLinks.whatsAppUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+          ),
           FilledButton.tonal(
             onPressed: () => context.go(AppRoutes.upgrade),
             child: const Text('Compare plans'),

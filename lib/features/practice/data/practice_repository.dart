@@ -136,6 +136,9 @@ class PracticeRepository {
               draft.explanationLevel.dbValue,
           CreatePracticeSessionParams.timerMinutes: draft.resolvedTimerMinutes,
           CreatePracticeSessionParams.negativeMarking: draft.negativeMarking,
+          CreatePracticeSessionParams.lessonIds: draft.lessonIds.isEmpty
+              ? null
+              : draft.lessonIds.toList(),
         },
       );
 

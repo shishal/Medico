@@ -72,6 +72,43 @@ class ProfileRepository {
       );
     }
   }
+
+  Future<Result<UserProfile>> saveOnboarding({
+    required String fullName,
+    required String universityId,
+    required String collegeId,
+    required int batchYear,
+    required String mbbsPhaseId,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      return const Failure('Not signed in.');
+    }
+
+    try {
+      final row = await _client
+          .from(Tables.profiles)
+          .update({
+            ProfileColumns.fullName: fullName,
+            ProfileColumns.universityId: universityId,
+            ProfileColumns.collegeId: collegeId,
+            ProfileColumns.batchYear: batchYear,
+            ProfileColumns.mbbsPhaseId: mbbsPhaseId,
+            ProfileColumns.onboardingCompletedAt: DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq(ProfileColumns.id, userId)
+          .select()
+          .single();
+      return Success(UserProfile.fromJson(row));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(
+          e,
+          fallback: 'Could not save your profile. Please try again.',
+        ),
+      );
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

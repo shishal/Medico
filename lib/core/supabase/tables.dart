@@ -14,6 +14,25 @@ abstract final class Tables {
   static const attemptAnswers = 'attempt_answers';
   static const bookmarks = 'bookmarks';
   static const screenshotEvents = 'screenshot_events';
+  static const universities = 'universities';
+  static const mbbsPhases = 'mbbs_phases';
+  static const colleges = 'colleges';
+  static const lessons = 'lessons';
+  static const textbooks = 'textbooks';
+  static const examPapers = 'exam_papers';
+  static const lessonResources = 'lesson_resources';
+  static const questionResources = 'question_resources';
+  static const questionSampleAnswers = 'question_sample_answers';
+  static const questionAppearances = 'question_appearances';
+  static const questionTextbookRefs = 'question_textbook_refs';
+  static const pyqTeasers = 'pyq_teasers';
+  static const lessonProgress = 'lesson_progress';
+  static const questionProgress = 'question_progress';
+  static const lessonBookmarks = 'lesson_bookmarks';
+  static const studyEvents = 'study_events';
+  static const trackers = 'trackers';
+  static const trackerItems = 'tracker_items';
+  static const userTrackerItemDone = 'user_tracker_item_done';
 
   /// Safe metadata only (title/type/counts) — all authenticated users.
   /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
@@ -28,6 +47,11 @@ abstract final class ProfileColumns {
   static const planStartedAt = 'plan_started_at';
   static const planExpiresAt = 'plan_expires_at';
   static const createdAt = 'created_at';
+  static const universityId = 'university_id';
+  static const collegeId = 'college_id';
+  static const batchYear = 'batch_year';
+  static const mbbsPhaseId = 'mbbs_phase_id';
+  static const onboardingCompletedAt = 'onboarding_completed_at';
 }
 
 abstract final class TestColumns {
@@ -73,6 +97,9 @@ abstract final class QuestionColumns {
   static const difficulty = 'difficulty';
   static const requiredPlan = 'required_plan';
   static const isActive = 'is_active';
+  static const kind = 'kind';
+  static const lessonId = 'lesson_id';
+  static const marks = 'marks';
 
   /// PostgREST embed alias: `topic:topics(...)`.
   static const topicEmbed = 'topic';
@@ -92,6 +119,8 @@ abstract final class SubjectColumns {
   static const id = 'id';
   static const name = 'name';
   static const displayOrder = 'display_order';
+  static const mbbsPhaseId = 'mbbs_phase_id';
+  static const requiredPlan = 'required_plan';
 }
 
 abstract final class TopicColumns {
@@ -184,6 +213,12 @@ abstract final class RpcFunctions {
   static const serverNow = 'server_now';
   static const submitAttempt = 'submit_attempt';
   static const getAttemptResults = 'get_attempt_results';
+  static const markLessonLearnt = 'mark_lesson_learnt';
+  static const markQuestionLearnt = 'mark_question_learnt';
+  static const recordStudyEvent = 'record_study_event';
+  static const getStudyProgress = 'get_study_progress';
+  static const trackerCompletion = 'tracker_completion';
+  static const searchCatalog = 'search_catalog';
 }
 
 /// Named parameters for [RpcFunctions.currentPlan].
@@ -223,6 +258,7 @@ abstract final class CreatePracticeSessionParams {
   static const explanationLevel = 'p_explanation_level';
   static const timerMinutes = 'p_timer_minutes';
   static const negativeMarking = 'p_negative_marking';
+  static const lessonIds = 'p_lesson_ids';
 }
 
 /// Keys inside `tests.practice_filter_criteria` (written by `create_practice_session`).
@@ -235,4 +271,144 @@ abstract final class PracticeFilterCriteriaKeys {
   static const requestedExplanationLevel = 'requested_explanation_level';
   static const negativeMarking = 'negative_marking';
   static const timerMinutes = 'timer_minutes';
+  static const lessonIds = 'lesson_ids';
 }
+
+abstract final class UniversityColumns {
+  static const id = 'id';
+  static const code = 'code';
+  static const name = 'name';
+  static const state = 'state';
+  static const slug = 'slug';
+}
+
+abstract final class MbbsPhaseColumns {
+  static const id = 'id';
+  static const code = 'code';
+  static const name = 'name';
+  static const displayOrder = 'display_order';
+}
+
+abstract final class CollegeColumns {
+  static const id = 'id';
+  static const universityId = 'university_id';
+  static const name = 'name';
+}
+
+abstract final class LessonColumns {
+  static const id = 'id';
+  static const topicId = 'topic_id';
+  static const externalId = 'external_id';
+  static const name = 'name';
+  static const displayOrder = 'display_order';
+  static const requiredPlan = 'required_plan';
+  static const isActive = 'is_active';
+
+  /// PostgREST embed alias: `topic:topics(...)`.
+  static const topicEmbed = 'topic';
+}
+
+abstract final class PyqTeaserColumns {
+  static const id = 'id';
+  static const lessonId = 'lesson_id';
+  static const topicId = 'topic_id';
+  static const questionText = 'question_text';
+  static const marks = 'marks';
+  static const requiredPlan = 'required_plan';
+  static const isActive = 'is_active';
+  static const appearanceCount = 'appearance_count';
+}
+
+abstract final class ResourceColumns {
+  static const id = 'id';
+  static const lessonId = 'lesson_id';
+  static const questionId = 'question_id';
+  static const title = 'title';
+  static const url = 'url';
+  static const sourceLabel = 'source_label';
+  static const displayOrder = 'display_order';
+  static const isFree = 'is_free';
+}
+
+abstract final class SampleAnswerColumns {
+  static const questionId = 'question_id';
+  static const body = 'body';
+}
+
+abstract final class TextbookColumns {
+  static const id = 'id';
+  static const sheetKey = 'sheet_key';
+  static const title = 'title';
+  static const authors = 'authors';
+  static const edition = 'edition';
+}
+
+abstract final class TextbookRefColumns {
+  static const questionId = 'question_id';
+  static const textbookId = 'textbook_id';
+  static const page = 'page';
+  static const sectionHeading = 'section_heading';
+  static const textbookEmbed = 'textbook';
+}
+
+abstract final class AppearanceColumns {
+  static const questionId = 'question_id';
+  static const examPaperId = 'exam_paper_id';
+  static const examPaperEmbed = 'exam_paper';
+}
+
+abstract final class ExamPaperColumns {
+  static const id = 'id';
+  static const examYear = 'exam_year';
+  static const paperName = 'paper_name';
+}
+
+abstract final class TrackerColumns {
+  static const id = 'id';
+  static const ownerUserId = 'owner_user_id';
+  static const universityId = 'university_id';
+  static const kind = 'kind';
+  static const title = 'title';
+  static const startsOn = 'starts_on';
+  static const endsOn = 'ends_on';
+  static const isActive = 'is_active';
+  static const createdAt = 'created_at';
+}
+
+abstract final class TrackerItemColumns {
+  static const id = 'id';
+  static const trackerId = 'tracker_id';
+  static const lessonId = 'lesson_id';
+  static const questionId = 'question_id';
+  static const displayOrder = 'display_order';
+}
+
+abstract final class LessonBookmarkColumns {
+  static const userId = 'user_id';
+  static const lessonId = 'lesson_id';
+  static const createdAt = 'created_at';
+
+  /// PostgREST embed alias: `lesson:lessons(...)`.
+  static const lessonEmbed = 'lesson';
+}
+
+abstract final class StudyEventParams {
+  static const kind = 'p_kind';
+  static const lessonId = 'p_lesson_id';
+  static const questionId = 'p_question_id';
+}
+
+abstract final class MarkLearntParams {
+  static const lessonId = 'p_lesson_id';
+  static const questionId = 'p_question_id';
+}
+
+abstract final class TrackerCompletionParams {
+  static const trackerId = 'p_tracker_id';
+}
+
+abstract final class SearchCatalogParams {
+  static const query = 'p_query';
+}
+
+

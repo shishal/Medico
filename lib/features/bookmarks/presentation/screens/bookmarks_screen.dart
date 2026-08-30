@@ -8,9 +8,12 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../practice/domain/practice_builder_draft.dart';
 import '../../../practice/domain/practice_enums.dart';
+import '../../data/bookmarks_repository.dart';
+import '../../domain/bookmarked_lesson.dart';
 import '../../domain/bookmarked_question.dart';
 import '../providers/bookmarks_provider.dart';
 import '../widgets/bookmark_icon_button.dart';
+import '../widgets/lesson_bookmark_icon_button.dart';
 
 /// Saved questions for later practice. Data lives in Supabase `bookmarks`.
 class BookmarksScreen extends ConsumerWidget {
@@ -49,11 +52,18 @@ class BookmarksScreen extends ConsumerWidget {
               : items.where((item) => ids.contains(item.questionId)).toList();
 
           if (visible.isEmpty) {
-            return const AsyncEmptyView(
-              icon: Icons.bookmark_border,
-              message:
-                  'No bookmarks yet. Bookmark a question from solution review '
-                  'to practice it later.',
+            return Column(
+              children: [
+                const Expanded(
+                  child: AsyncEmptyView(
+                    icon: Icons.bookmark_border,
+                    message:
+                        'No question bookmarks yet. Bookmark a PYQ or a '
+                        'question from solution review.',
+                  ),
+                ),
+                const _LessonBookmarks(),
+              ],
             );
           }
 
@@ -69,8 +79,8 @@ class BookmarksScreen extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     return _BookmarkTile(item: visible[index]);
                   },
+                  ),
                 ),
-              ),
               if (unlocked > 0)
                 _PracticeBar(
                   count: unlocked,
@@ -83,6 +93,7 @@ class BookmarksScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
+              const _LessonBookmarks(),
             ],
           );
         },
@@ -116,6 +127,65 @@ class _BookmarkTile extends StatelessWidget {
                 : null)
           : Text(subtitle),
       trailing: BookmarkIconButton(questionId: item.questionId),
+    );
+  }
+}
+
+class _LessonBookmarks extends ConsumerStatefulWidget {
+  const _LessonBookmarks();
+
+  @override
+  ConsumerState<_LessonBookmarks> createState() => _LessonBookmarksState();
+}
+
+class _LessonBookmarksState extends ConsumerState<_LessonBookmarks> {
+  List<BookmarkedLesson> _items = const [];
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(_load);
+  }
+
+  Future<void> _load() async {
+    try {
+      final result = await ref.read(bookmarksRepositoryProvider).fetchLessons();
+      if (!mounted) return;
+      if (result case Success(:final value)) {
+        setState(() {
+          _items = value;
+          _loaded = true;
+        });
+      } else {
+        setState(() => _loaded = true);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loaded = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded || _items.isEmpty) return const SizedBox.shrink();
+    return SafeArea(
+      top: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Spacing.md, Spacing.md, Spacing.md, 0),
+            child: Text('Lessons', style: Theme.of(context).textTheme.titleSmall),
+          ),
+          for (final item in _items)
+            ListTile(
+              leading: const Icon(Icons.article_outlined),
+              title: Text(item.name),
+              trailing: LessonBookmarkIconButton(lessonId: item.lessonId),
+              onTap: () => context.push(AppRoutes.lessonPath(item.lessonId, item.name)),
+            ),
+        ],
+      ),
     );
   }
 }

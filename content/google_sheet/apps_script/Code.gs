@@ -11,7 +11,21 @@ var TAB = {
   QUESTIONS: 'Questions',
   TESTS: 'Tests',
   TEST_QUESTIONS: 'TestQuestions',
+  UNIVERSITIES: 'Universities',
+  COLLEGES: 'Colleges',
+  PHASES: 'Phases',
+  LESSONS: 'Lessons',
+  LESSON_RESOURCES: 'LessonResources',
+  TEXTBOOKS: 'Textbooks',
+  EXAM_PAPERS: 'ExamPapers',
+  APPEARANCES: 'Appearances',
+  TEXTBOOK_REFS: 'TextbookRefs',
+  QUESTION_RESOURCES: 'QuestionResources',
 };
+
+var QUESTION_KINDS = { pyq_theory: true, mcq: true };
+var PHASE_CODES = { phase1: true, phase2: true, phase3_part1: true, phase3_part2: true };
+var EXAM_TYPES = { university: true, internal: true };
 
 var PROP = {
   URL: 'SUPABASE_URL',

@@ -18,6 +18,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
    - `Code.gs`
    - `SheetReader.gs`
    - `Validate.gs`
+   - `UgCatalog.gs`
    - `SupabaseClient.gs`
    - `Sync.gs`
 4. (Optional) Project Settings → update timezone; `appsscript.json` uses `Asia/Kolkata`.
@@ -33,15 +34,17 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 
 ## What Sync does
 
-1. Reads `Subjects`, `Topics`, `Questions`, `Tests`, `TestQuestions`.
-2. Validates **all** rows (collects every error — does not stop at the first).
+1. Reads UG tabs (Universities, Colleges, Phases, Lessons, resources, papers, appearances, textbook refs) plus `Subjects`, `Topics`, `Questions`. `Tests` / `TestQuestions` are optional.
+2. Validates **all** rows (collects every error — does not stop at the first). Theory rows skip options; MCQ rows still require them. Sample answers over ~400 words are a warning, not a reject.
 3. If any error: popup lists them with **tab + row number**; **writes nothing**.
-4. If clean: upserts in order Subjects → Topics → Questions → Tests, then replaces `test_questions` for affected tests.
+4. If clean: upserts in order Universities → … → Lessons → Questions (sample answers to `question_sample_answers`) → Appearances → optional Tests.
 
 ### Validation (includes Phase 2.2 required checks)
 
-- `correct_option` ∈ A/B/C/D
-- all four options non-empty
+- `kind` ∈ mcq / pyq_theory (blank = mcq)
+- MCQ: `correct_option` ∈ A/B/C/D and all four options non-empty
+- Theory: options not required; ≥1 Appearances row
+- resource `url` must start with `https://`
 - `required_plan` ∈ free/pro/elite
 - `topic_name` must match a Topics tab row (**trim + case-insensitive**; fails loudly with row number)
 - plus header presence, enums, cross-links (`subject_name`, `test_title`, `question_external_id`), and `total_questions` vs link count
@@ -53,6 +56,16 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 | subjects | `name` |
 | topics | `subject_id,name` |
 | questions | `external_id` |
+| question_sample_answers | `question_id` |
+| universities | `code` |
+| colleges | `university_id,name` |
+| lessons | `external_id` |
+| lesson_resources | `lesson_id,url` |
+| textbooks | `sheet_key` |
+| exam_papers | `external_id` |
+| question_appearances | `question_id,exam_paper_id` |
+| question_textbook_refs | `question_id,textbook_id,page` |
+| question_resources | `question_id,url` |
 | tests | `sheet_key` (set from the sheet `title`; not a sheet column) |
 | test_questions | delete-by-test then insert (so removals/reorder apply) |
 

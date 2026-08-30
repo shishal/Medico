@@ -1,12 +1,16 @@
-# NEET-PG Prep App
+# Medico — MBBS university-exam companion
 
-Flutter app for NEET-PG test prep. Full planning docs live in `docs/` — read the
-relevant one before starting any task:
+Flutter app for **MBBS university exams** (PYQs, trackers, textbook page refs,
+MCQ practice). v1 university is **KUHS** — see `docs/00_PRODUCT.md`.
+
+Full planning docs live in `docs/` — read the relevant one before starting any
+task:
+- docs/00_PRODUCT.md — what the app is (read this always)
 - docs/01_PROJECT_FOUNDATION.md — tech stack, architecture, conventions (read this always)
-- docs/02_DATABASE_SCHEMA.md — Supabase schema, RLS policies, practice-mode generator
+- docs/02_DATABASE_SCHEMA.md — Supabase schema, RLS policies, UG catalog, practice generator
 - docs/03_BUILD_PLAN.md — phased tasks with acceptance criteria (work one phase at a time)
-- docs/04_TEST_ENGINE_SPEC.md — test-taking engine behavior
-- docs/05_PRACTICE_MODE_SPEC.md — practice mode behavior
+- docs/04_TEST_ENGINE_SPEC.md — **historical** NEET-PG test engine (MCQ player still uses this)
+- docs/05_PRACTICE_MODE_SPEC.md — practice mode behavior (MCQ only)
 
 ## Non-negotiable rules
 - Stack is locked: Flutter + Riverpod (codegen) + go_router + Supabase. Don't suggest

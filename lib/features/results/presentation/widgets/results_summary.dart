@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/comic_card.dart';
+import '../../../../core/widgets/coverage_ring.dart';
 import '../../domain/attempt_results.dart';
 
 /// Score, accuracy, percentile, time spent, and subject-wise counts.
@@ -54,25 +56,34 @@ class _ScoreHero extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final showScore = results.usesNeetStyleScore;
+    // Display fraction from server-stored score / max — not a new scoring pass.
+    final ringProgress = showScore
+        ? (results.maxScore == 0 ? 0.0 : results.totalScore / results.maxScore)
+        : results.accuracyPercent / 100;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.lg),
-        child: Column(
-          children: [
-            Text(
+    return ComicCard(
+      padding: const EdgeInsets.all(Spacing.lg),
+      child: Column(
+        children: [
+          CoverageRing(
+            progress: ringProgress.clamp(0.0, 1.0),
+            size: 132,
+            strokeWidth: 10,
+            child: Text(
               showScore ? results.scoreLabel : results.accuracyLabel,
-              style: textTheme.displaySmall,
-            ),
-            const SizedBox(height: Spacing.xs),
-            Text(
-              showScore ? 'Score out of ${results.maxScoreLabel}' : 'Accuracy',
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+              style: textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: Spacing.md),
+          Text(
+            showScore ? 'Score out of ${results.maxScoreLabel}' : 'Accuracy',
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -129,26 +140,24 @@ class _CountChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.sm,
-          vertical: Spacing.md,
-        ),
-        child: Column(
-          children: [
-            Text(
-              '$value',
-              style: textTheme.headlineSmall?.copyWith(color: color),
-            ),
-            const SizedBox(height: Spacing.xs),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: textTheme.labelMedium,
-            ),
-          ],
-        ),
+    return ComicCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.sm,
+        vertical: Spacing.md,
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$value',
+            style: textTheme.headlineSmall?.copyWith(color: color),
+          ),
+          const SizedBox(height: Spacing.xs),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: textTheme.labelMedium,
+          ),
+        ],
       ),
     );
   }
@@ -204,24 +213,22 @@ class _SubjectRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(row.subjectName, style: textTheme.titleMedium),
-            const SizedBox(height: Spacing.xs),
-            Text(
-              '${row.correctCount} correct · '
-              '${row.incorrectCount} incorrect · '
-              '${row.unattemptedCount} skipped',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+    return ComicCard(
+      padding: const EdgeInsets.all(Spacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(row.subjectName, style: textTheme.titleMedium),
+          const SizedBox(height: Spacing.xs),
+          Text(
+            '${row.correctCount} correct · '
+            '${row.incorrectCount} incorrect · '
+            '${row.unattemptedCount} skipped',
+            style: textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -23,6 +23,7 @@ class PracticeBuilderDraft {
     this.timerEnabled = true,
     this.timerMinutes = 10,
     this.negativeMarking = false,
+    this.lessonIds = const {},
   });
 
   /// Empty set = all subjects. [Set] so toggling a chip is O(1) contains-check.
@@ -37,6 +38,9 @@ class PracticeBuilderDraft {
   final bool timerEnabled;
   final int timerMinutes;
   final bool negativeMarking;
+
+  /// When set, the generator only picks MCQs on these lessons.
+  final Set<String> lessonIds;
 
   /// Rebuilds the form from a practice `tests` row.
   ///
@@ -89,6 +93,7 @@ class PracticeBuilderDraft {
       negativeMarking:
           criteria[PracticeFilterCriteriaKeys.negativeMarking] as bool? ??
               false,
+      lessonIds: _stringSet(criteria[PracticeFilterCriteriaKeys.lessonIds]),
     );
   }
 
@@ -221,6 +226,7 @@ class PracticeBuilderDraft {
     bool? timerEnabled,
     int? timerMinutes,
     bool? negativeMarking,
+    Set<String>? lessonIds,
   }) {
     return PracticeBuilderDraft(
       selectedSubjectIds: selectedSubjectIds ?? this.selectedSubjectIds,
@@ -234,6 +240,7 @@ class PracticeBuilderDraft {
       timerEnabled: timerEnabled ?? this.timerEnabled,
       timerMinutes: timerMinutes ?? this.timerMinutes,
       negativeMarking: negativeMarking ?? this.negativeMarking,
+      lessonIds: lessonIds ?? this.lessonIds,
     );
   }
 

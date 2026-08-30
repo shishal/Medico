@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/comic_mascot.dart';
 import '../providers/auth_session_provider.dart';
 
 /// Brief branded splash; navigates to login or home based on auth session.
@@ -26,7 +28,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _navigateAway() async {
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
     if (!mounted) return;
 
     final isAuthenticated = ref.read(authSessionProvider);
@@ -43,21 +45,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/branding/splash_logo.png',
-              width: 128,
-              height: 128,
-              filterQuality: FilterQuality.high,
+            const ComicMascot(
+              asset: BrandAssets.mascotWave,
+              size: 160,
+              heroTag: BrandAssets.mascotHeroTag,
             ),
             const SizedBox(height: Spacing.md),
             Text(
               'Medico',
               style: Theme.of(context).textTheme.headlineMedium
-                  ?.copyWith(color: onTeal),
+                  ?.copyWith(color: onTeal, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'NEET-PG Prep',
+              'MBBS exam prep',
               style: Theme.of(context).textTheme.bodyLarge
                   ?.copyWith(color: onTeal.withValues(alpha: 0.82)),
             ),

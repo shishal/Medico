@@ -37,12 +37,12 @@ void main() {
     );
 
     expect(find.text('Medico'), findsOneWidget);
-    expect(find.text('NEET-PG Prep'), findsOneWidget);
+    expect(find.text('MBBS exam prep'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, AppTheme.seedColor);
 
-    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump(const Duration(milliseconds: 1100));
   });
 }

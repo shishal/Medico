@@ -5,8 +5,17 @@ abstract final class AppRoutes {
   static const splash = '/splash';
   static const login = '/login';
   static const signup = '/signup';
+  static const onboarding = '/onboarding';
   static const home = '/home';
   static const practice = '/practice';
+  static const search = '/search';
+  static const progress = '/progress';
+  static const trackers = '/trackers';
+  static const trackerCreate = '/trackers/new';
+  static const subject = '/subjects/:subjectId';
+  static const topic = '/topics/:topicId';
+  static const lesson = '/lessons/:lessonId';
+  static const pyq = '/pyq/:questionId';
   static const testList = '/tests';
   static const testDetail = '/tests/:testId';
   static const testPlayer = '/tests/:testId/play';
@@ -15,6 +24,17 @@ abstract final class AppRoutes {
   static const bookmarks = '/bookmarks';
   static const profile = '/profile';
   static const upgrade = '/upgrade';
+
+  static String subjectPath(String id, String title) =>
+      Uri(path: '/subjects/$id', queryParameters: {'title': title}).toString();
+
+  static String topicPath(String id, String title) =>
+      Uri(path: '/topics/$id', queryParameters: {'title': title}).toString();
+
+  static String lessonPath(String id, String title) =>
+      Uri(path: '/lessons/$id', queryParameters: {'title': title}).toString();
+
+  static String pyqPath(String id) => '/pyq/$id';
 
   static String testDetailPath(String testId) => '/tests/$testId';
   static String testPlayerPath(String testId) => '/tests/$testId/play';

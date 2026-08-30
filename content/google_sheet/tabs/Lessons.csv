@@ -1,0 +1,4 @@
+external_id,topic_name,name,display_order,required_plan,is_active
+L-ANAT-UPPER-BRACHIAL,Upper Limb Anatomy,Brachial plexus,1,free,TRUE
+L-ANAT-UPPER-HUMERUS,Upper Limb Anatomy,Humerus fractures,2,free,TRUE
+L-ANAT-HEAD-LARYNX,Head and Neck Anatomy,Larynx,1,pro,TRUE

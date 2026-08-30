@@ -1,4 +1,10 @@
-# Test Engine Spec
+# Test Engine Spec (historical — MCQ player)
+
+> **Status:** Written for NEET-PG catalog tests. The UG product does **not**
+> surface Mini/Mock/Grand papers. The same player still runs **MCQ practice
+> sessions** (`is_ephemeral_practice`). Read this when changing timer, palette,
+> or submit behavior. Do not add new NEET-PG catalog features.
+
 
 This is the most detail-dense, highest-risk part of the app — get this wrong and either a student loses a real test attempt, or the scoring is exploitable. Read fully before implementing any part of Phase 5/6.
 

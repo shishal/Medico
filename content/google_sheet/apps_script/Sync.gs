@@ -49,6 +49,11 @@ function syncToApp() {
   try {
     getSupabaseConfig_(); // fail fast before writes if props missing
     var summary = performSync_(validated.data);
+    var warningBlock = '';
+    if (validated.warnings && validated.warnings.length) {
+      warningBlock =
+        '\n\nWarnings (sync still wrote):\n' + validated.warnings.slice(0, 15).join('\n');
+    }
     ui.alert(
       'Sync complete',
       'Upserted:\n' +
@@ -62,7 +67,8 @@ function syncToApp() {
         summary.tests +
         '\n• Test question links replaced for ' +
         summary.testsLinked +
-        ' test(s).\n\nRun Sync again with unchanged data — counts should stay the same (no duplicates).',
+        ' test(s).\n\nRun Sync again with unchanged data — counts should stay the same (no duplicates).' +
+        warningBlock,
       ui.ButtonSet.OK
     );
   } catch (e) {
@@ -76,9 +82,19 @@ function syncToApp() {
 }
 
 function performSync_(data) {
+  var phaseReturned = supabaseSelect_('mbbs_phases', '?select=id,code');
+  var phaseIdByCode = {};
+  (phaseReturned || []).forEach(function (row) {
+    phaseIdByCode[normKey_(row.code)] = row.id;
+  });
+
   // 1) Subjects
   var subjectRows = data.subjects.map(function (s) {
-    return { name: s.name, display_order: s.display_order };
+    var row = { name: s.name, display_order: s.display_order };
+    if (s.phase_code && phaseIdByCode[normKey_(s.phase_code)]) {
+      row.mbbs_phase_id = phaseIdByCode[normKey_(s.phase_code)];
+    }
+    return row;
   });
   var subjectReturned = supabaseUpsert_('subjects', subjectRows, 'name');
   var subjectIdByKey = {};
@@ -109,6 +125,17 @@ function performSync_(data) {
     }
   });
 
+  var lessonIdByExt = {};
+  if (data.ug && data.ug.lessons && data.ug.lessons.length) {
+    var preUg = syncUgCatalog_(data.ug, subjectIdByKey, topicIdByKey, {});
+    // Lessons exist; re-read ids for question.lesson_id
+    var lessonReturned = supabaseSelect_('lessons', '?select=id,external_id');
+    (lessonReturned || []).forEach(function (row) {
+      lessonIdByExt[normKey_(row.external_id)] = row.id;
+    });
+    phaseIdByCode = preUg.phaseIdByCode || phaseIdByCode;
+  }
+
   // 3) Questions
   var questionRows = data.questions.map(function (q) {
     var tid = topicIdByKey[normKey_(q.topic_name)];
@@ -116,20 +143,24 @@ function performSync_(data) {
       // Should be impossible after validation — still fail loudly.
       throw new Error('Questions: no topic UUID for topic_name "' + q.topic_name + '" (sheet row ' + q.__row + ')');
     }
+    var isMcq = (q.kind || 'mcq') === 'mcq';
     return {
       external_id: q.external_id,
       topic_id: tid,
+      lesson_id: q.lesson_external_id ? lessonIdByExt[normKey_(q.lesson_external_id)] || null : null,
+      kind: q.kind || 'mcq',
       question_text: q.question_text,
-      option_a: q.option_a,
-      option_b: q.option_b,
-      option_c: q.option_c,
-      option_d: q.option_d,
-      correct_option: q.correct_option,
+      option_a: isMcq ? q.option_a : emptyToNull_(q.option_a),
+      option_b: isMcq ? q.option_b : emptyToNull_(q.option_b),
+      option_c: isMcq ? q.option_c : emptyToNull_(q.option_c),
+      option_d: isMcq ? q.option_d : emptyToNull_(q.option_d),
+      correct_option: isMcq ? q.correct_option : emptyToNull_(q.correct_option),
       explanation_text: q.explanation_text,
       explanation_video_url: q.explanation_video_url,
       image_url: q.image_url,
       difficulty: q.difficulty,
       source: q.source,
+      marks: q.marks == null || q.marks === '' ? null : Number(q.marks),
       required_plan: q.required_plan,
       is_active: q.is_active,
     };
@@ -144,6 +175,22 @@ function performSync_(data) {
       throw new Error('Question upsert did not return id for external_id "' + q.external_id + '"');
     }
   });
+
+  var sampleRows = [];
+  data.questions.forEach(function (q) {
+    if (!q.sample_answer_text) return;
+    sampleRows.push({
+      question_id: questionIdByExt[normKey_(q.external_id)],
+      body: q.sample_answer_text,
+    });
+  });
+  if (sampleRows.length) {
+    supabaseUpsert_('question_sample_answers', sampleRows, 'question_id');
+  }
+
+  if (data.ug && data.ug.universities && data.ug.universities.length) {
+    syncUgCatalog_(data.ug, subjectIdByKey, topicIdByKey, questionIdByExt);
+  }
 
   // 4) Tests
   // sheet_key (not title) is the PostgREST conflict target. Phase 4B dropped

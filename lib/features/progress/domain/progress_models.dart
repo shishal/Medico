@@ -1,0 +1,152 @@
+import '../../../core/supabase/tables.dart';
+
+class DayCount {
+  const DayCount({required this.date, required this.count});
+
+  final String date;
+  final int count;
+
+  factory DayCount.fromJson(Map<String, dynamic> json) {
+    return DayCount(
+      date: json['date'] as String? ?? '',
+      count: _asInt(json['count']),
+    );
+  }
+}
+
+class SubjectCoverage {
+  const SubjectCoverage({
+    required this.id,
+    required this.name,
+    required this.learntLessons,
+    required this.totalLessons,
+  });
+
+  final String id;
+  final String name;
+  final int learntLessons;
+  final int totalLessons;
+
+  factory SubjectCoverage.fromJson(Map<String, dynamic> json) {
+    return SubjectCoverage(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      learntLessons: _asInt(json['learnt_lessons']),
+      totalLessons: _asInt(json['total_lessons']),
+    );
+  }
+}
+
+class StudyProgress {
+  const StudyProgress({
+    required this.streak,
+    required this.days7,
+    required this.days30,
+    required this.subjects,
+  });
+
+  final int streak;
+  final List<DayCount> days7;
+  final List<DayCount> days30;
+  final List<SubjectCoverage> subjects;
+
+  factory StudyProgress.fromJson(Map<String, dynamic> json) {
+    return StudyProgress(
+      streak: _asInt(json['streak']),
+      days7: _list(json['days7'], DayCount.fromJson),
+      days30: _list(json['days30'], DayCount.fromJson),
+      subjects: _list(json['subjects'], SubjectCoverage.fromJson),
+    );
+  }
+}
+
+List<T> _list<T>(Object? raw, T Function(Map<String, dynamic>) parse) {
+  if (raw is! List) return const [];
+  return [
+    for (final item in raw)
+      if (item is Map<String, dynamic>) parse(item),
+  ];
+}
+
+int _asInt(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString()) ?? 0;
+}
+
+class SearchHits {
+  const SearchHits({
+    required this.subjects,
+    required this.lessons,
+    required this.questions,
+  });
+
+  final List<SearchHit> subjects;
+  final List<SearchHit> lessons;
+  final List<SearchHit> questions;
+
+  factory SearchHits.fromJson(Map<String, dynamic> json) {
+    return SearchHits(
+      subjects: _hits(json['subjects'], 'subject'),
+      lessons: _hits(json['lessons'], 'lesson'),
+      questions: _hits(json['questions'], 'question'),
+    );
+  }
+}
+
+class SearchHit {
+  const SearchHit({
+    required this.id,
+    required this.title,
+    required this.kind,
+    this.lessonId,
+  });
+
+  final String id;
+  final String title;
+  final String kind;
+  final String? lessonId;
+}
+
+List<SearchHit> _hits(Object? raw, String kind) {
+  if (raw is! List) return const [];
+  return [
+    for (final item in raw)
+      if (item is Map<String, dynamic>)
+        SearchHit(
+          id: item['id'] as String? ?? '',
+          title: (item['name'] ?? item['question_text'] ?? '') as String,
+          kind: kind,
+          lessonId: item['lesson_id'] as String?,
+        ),
+  ];
+}
+
+class TrackerSummary {
+  const TrackerSummary({
+    required this.id,
+    required this.title,
+    required this.kind,
+    required this.done,
+    required this.total,
+    required this.percent,
+  });
+
+  final String id;
+  final String title;
+  final String kind;
+  final int done;
+  final int total;
+  final num percent;
+
+  factory TrackerSummary.fromRow(Map<String, dynamic> json, Map<String, dynamic> completion) {
+    return TrackerSummary(
+      id: json[TrackerColumns.id] as String,
+      title: json[TrackerColumns.title] as String,
+      kind: json[TrackerColumns.kind] as String,
+      done: _asInt(completion['done']),
+      total: _asInt(completion['total']),
+      percent: completion['percent'] as num? ?? 0,
+    );
+  }
+}

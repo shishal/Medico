@@ -11,6 +11,11 @@ class UserProfile {
     this.planStartedAt,
     this.planExpiresAt,
     required this.createdAt,
+    this.universityId,
+    this.collegeId,
+    this.batchYear,
+    this.mbbsPhaseId,
+    this.onboardingCompletedAt,
   });
 
   final String id;
@@ -22,6 +27,13 @@ class UserProfile {
   final DateTime? planStartedAt;
   final DateTime? planExpiresAt;
   final DateTime createdAt;
+  final String? universityId;
+  final String? collegeId;
+  final int? batchYear;
+  final String? mbbsPhaseId;
+  final DateTime? onboardingCompletedAt;
+
+  bool get needsOnboarding => onboardingCompletedAt == null;
 
   /// Effective plan for UI (lock icons, upgrade prompts).
   ///
@@ -45,7 +57,21 @@ class UserProfile {
       planStartedAt: _parseDate(json[ProfileColumns.planStartedAt]),
       planExpiresAt: _parseDate(json[ProfileColumns.planExpiresAt]),
       createdAt: _parseDate(json[ProfileColumns.createdAt]) ?? DateTime.now(),
+      universityId: json[ProfileColumns.universityId] as String?,
+      collegeId: json[ProfileColumns.collegeId] as String?,
+      batchYear: _asInt(json[ProfileColumns.batchYear]),
+      mbbsPhaseId: json[ProfileColumns.mbbsPhaseId] as String?,
+      onboardingCompletedAt: _parseDate(
+        json[ProfileColumns.onboardingCompletedAt],
+      ),
     );
+  }
+
+  static int? _asInt(Object? value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
   }
 
   static DateTime? _parseDate(Object? value) {

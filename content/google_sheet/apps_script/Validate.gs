@@ -5,16 +5,22 @@
 
 function validateAllTabs_() {
   var errors = [];
+  var warnings = [];
 
   var subjectsRaw = readTabObjects_(TAB.SUBJECTS);
   var topicsRaw = readTabObjects_(TAB.TOPICS);
   var questionsRaw = readTabObjects_(TAB.QUESTIONS);
-  var testsRaw = readTabObjects_(TAB.TESTS);
-  var tqRaw = readTabObjects_(TAB.TEST_QUESTIONS);
+  var testsRaw = sheetExists_(TAB.TESTS)
+    ? readTabObjects_(TAB.TESTS)
+    : { headers: [], rows: [] };
+  var tqRaw = sheetExists_(TAB.TEST_QUESTIONS)
+    ? readTabObjects_(TAB.TEST_QUESTIONS)
+    : { headers: [], rows: [] };
 
   var hdr;
   hdr = requireHeaders_(TAB.SUBJECTS, subjectsRaw.headers, ['name', 'display_order']);
   if (hdr) errors.push(hdr);
+  // phase_code is optional until the UG tabs are added; warn via per-row checks.
   hdr = requireHeaders_(TAB.TOPICS, topicsRaw.headers, ['subject_name', 'name', 'display_order']);
   if (hdr) errors.push(hdr);
   hdr = requireHeaders_(TAB.QUESTIONS, questionsRaw.headers, [
@@ -31,28 +37,32 @@ function validateAllTabs_() {
     'is_active',
   ]);
   if (hdr) errors.push(hdr);
-  hdr = requireHeaders_(TAB.TESTS, testsRaw.headers, [
-    'title',
-    'test_type',
-    'required_plan',
-    'is_sectional',
-    'section_count',
-    'total_duration_minutes',
-    'total_questions',
-    'correct_marks',
-    'incorrect_marks',
-    'unattempted_marks',
-    'is_live',
-    'is_active',
-  ]);
-  if (hdr) errors.push(hdr);
-  hdr = requireHeaders_(TAB.TEST_QUESTIONS, tqRaw.headers, [
-    'test_title',
-    'question_external_id',
-    'section_number',
-    'order_index',
-  ]);
-  if (hdr) errors.push(hdr);
+  if (testsRaw.headers.length) {
+    hdr = requireHeaders_(TAB.TESTS, testsRaw.headers, [
+      'title',
+      'test_type',
+      'required_plan',
+      'is_sectional',
+      'section_count',
+      'total_duration_minutes',
+      'total_questions',
+      'correct_marks',
+      'incorrect_marks',
+      'unattempted_marks',
+      'is_live',
+      'is_active',
+    ]);
+    if (hdr) errors.push(hdr);
+  }
+  if (tqRaw.headers.length) {
+    hdr = requireHeaders_(TAB.TEST_QUESTIONS, tqRaw.headers, [
+      'test_title',
+      'question_external_id',
+      'section_number',
+      'order_index',
+    ]);
+    if (hdr) errors.push(hdr);
+  }
 
   if (errors.length) {
     return { ok: false, errors: errors, data: null };
@@ -74,7 +84,18 @@ function validateAllTabs_() {
       return;
     }
     subjectByKey[key] = { name: name, display_order: displayOrder };
-    subjects.push({ name: name, display_order: displayOrder, __row: row.__row });
+    var phaseCode = optionalTrimmed_(row.phase_code)
+      ? trimStr_(row.phase_code).toLowerCase()
+      : null;
+    if (phaseCode && !PHASE_CODES[phaseCode]) {
+      errors.push(TAB.SUBJECTS + ' row ' + row.__row + ': phase_code must be phase1, phase2, phase3_part1, or phase3_part2');
+    }
+    subjects.push({
+      name: name,
+      display_order: displayOrder,
+      phase_code: phaseCode,
+      __row: row.__row,
+    });
   });
 
   // --- Topics ---
@@ -176,20 +197,42 @@ function validateAllTabs_() {
     if (!questionText) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': question_text is required');
     }
-    if (!optionA) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_a is required');
-    if (!optionB) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_b is required');
-    if (!optionC) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_c is required');
-    if (!optionD) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_d is required');
+    var kind = trimStr_(row.kind).toLowerCase() || 'mcq';
+    if (!QUESTION_KINDS[kind]) {
+      errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': kind must be mcq or pyq_theory');
+    }
 
-    if (!CORRECT_OPTIONS[correct]) {
-      errors.push(
-        TAB.QUESTIONS +
-          ' row ' +
-          row.__row +
-          ': correct_option must be exactly A, B, C, or D (got "' +
-          trimStr_(row.correct_option) +
-          '")'
-      );
+    if (kind === 'mcq') {
+      if (!optionA) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_a is required');
+      if (!optionB) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_b is required');
+      if (!optionC) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_c is required');
+      if (!optionD) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': option_d is required');
+
+      if (!CORRECT_OPTIONS[correct]) {
+        errors.push(
+          TAB.QUESTIONS +
+            ' row ' +
+            row.__row +
+            ': correct_option must be exactly A, B, C, or D (got "' +
+            trimStr_(row.correct_option) +
+            '")'
+        );
+      }
+    }
+
+    var sample = optionalTrimmed_(row.sample_answer_text);
+    if (sample) {
+      var wordCount = sample.split(/\s+/).filter(Boolean).length;
+      if (wordCount > 400) {
+        warnings.push(
+          TAB.QUESTIONS +
+            ' row ' +
+            row.__row +
+            ': sample_answer_text is ~' +
+            wordCount +
+            ' words (target ~250; over 400 is a warning, not a reject)'
+        );
+      }
     }
     if (!DIFFICULTIES[difficulty]) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': difficulty must be easy, medium, or hard');
@@ -216,6 +259,10 @@ function validateAllTabs_() {
       source: optionalTrimmed_(row.source),
       required_plan: plan,
       is_active: isActive,
+      kind: kind,
+      lesson_external_id: optionalTrimmed_(row.lesson_external_id),
+      marks: optionalTrimmed_(row.marks),
+      sample_answer_text: optionalTrimmed_(row.sample_answer_text),
       __row: row.__row,
     });
   });
@@ -401,19 +448,28 @@ function validateAllTabs_() {
     }
   });
 
+  var theoryByExt = {};
+  questions.forEach(function (q) {
+    if (q.kind === 'pyq_theory' && q.external_id) {
+      theoryByExt[normKey_(q.external_id)] = q.__row;
+    }
+  });
+  var ug = validateUgCatalog_(errors, questionByExt, theoryByExt);
   if (errors.length) {
-    return { ok: false, errors: errors, data: null };
+    return { ok: false, errors: errors, warnings: warnings, data: null };
   }
 
   return {
     ok: true,
     errors: [],
+    warnings: warnings,
     data: {
       subjects: subjects,
       topics: topics,
       questions: questions,
       tests: tests,
       testQuestions: testQuestions,
+      ug: ug,
     },
   };
 }

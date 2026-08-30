@@ -3,11 +3,15 @@
  * Row numbers are 1-based spreadsheet rows (header is row 1).
  */
 
+function sheetExists_(sheetName) {
+  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName) != null;
+}
+
 function readTabObjects_(sheetName) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
-    throw new Error('Missing tab "' + sheetName + '". Rename sheets to match Phase 2.1 exactly.');
+    throw new Error('Missing tab "' + sheetName + '". Rename sheets to match content/google_sheet/tabs/.');
   }
 
   var values = sheet.getDataRange().getValues();

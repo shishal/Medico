@@ -1,4 +1,9 @@
-# Practice Mode Spec
+# Practice Mode Spec (MCQ only)
+
+> Practice Mode is the UG app’s **rapid-fire MCQ** tool, scoped to a lesson or
+> topic. It does not apply to theory PYQs (those use the PYQ reader). Generator
+> must only attach `questions.kind = 'mcq'`.
+
 
 Read `04_TEST_ENGINE_SPEC.md` first — this file only documents what's *different* for Practice Mode. Everything not mentioned here (autosave, offline resilience, the anti-cheat wall-clock timer rule, server-side scoring) applies identically, because a practice session is just an ephemeral `tests` row running through the same engine — see `02_DATABASE_SCHEMA.md` §7 for how that's generated.
 

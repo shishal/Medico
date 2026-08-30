@@ -1,0 +1,6 @@
+# Run from the repo root:
+#   docker compose up --build -d
+#
+# Paths inside website/docker-compose.yml stay relative to that file.
+include:
+  - path: website/docker-compose.yml

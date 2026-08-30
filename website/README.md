@@ -22,15 +22,22 @@ there later without changing the hostname.
 Create the mailbox `support@medico.shishal.com` (or a forward to your real
 inbox) before you submit a public listing.
 
-## Run locally
+## Run with Docker Compose
 
-From this directory:
+From the **repo root** (same `docker-compose.yml` the host machine should use):
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
-Open http://127.0.0.1:8080
+Or from this directory:
+
+```bash
+docker compose up --build -d
+```
+
+Either way the site is at http://127.0.0.1:8080 (`medico-site` container).
+Change the host port with `MEDICO_SITE_PORT=8081` if 8080 is taken.
 
 Without Docker:
 
@@ -55,8 +62,7 @@ SSL/TLS mode:
 
 ### 2. Docker on the host
 
-Copy this repo (or at least `website/` + `store/play/` icons) onto the
-machine. From `website/`:
+Copy this repo onto the machine. From the **repo root**:
 
 ```bash
 docker compose up --build -d
@@ -72,17 +78,21 @@ Zero open inbound ports.
 1. Cloudflare Zero Trust → Networks → Tunnels → Create.
 2. Public hostname: `medico.shishal.com` → service `http://127.0.0.1:8080`
    (or `http://site:80` if cloudflared is on the same Compose network).
-3. Put the tunnel token in `website/.env` (gitignored at repo root as `.env`):
+3. Put the tunnel token in `.env` at the **repo root** (gitignored):
 
    ```
    CLOUDFLARE_TUNNEL_TOKEN=eyJ...
    ```
 
-4. Start the tunnel sidecar:
+4. Start the tunnel sidecar (same Compose file):
 
    ```bash
    docker compose --profile tunnel up -d
    ```
+
+   The tunnel container reaches nginx as `http://site:80`. In the Cloudflare
+   dashboard, set the public hostname `medico.shishal.com` to that origin
+   (not `127.0.0.1`) when cloudflared is on this Compose network.
 
 If you already run `cloudflared` as a host service, skip the Compose profile
 and point that tunnel at `http://127.0.0.1:8080`.

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
@@ -42,6 +43,9 @@ class HomeResumeBanner extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: Spacing.sm),
               child: ComicCard(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? StickerFills.subjectDark[5]
+                    : StickerFills.sky,
                 onTap: () => context.go(AppRoutes.testPlayerPath(item.testId)),
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,

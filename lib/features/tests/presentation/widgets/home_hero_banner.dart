@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_assets.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
@@ -20,9 +21,15 @@ class HomeHeroBanner extends ConsumerWidget {
     final name = profile?.fullName?.trim();
     final hello = (name == null || name.isEmpty) ? 'Hey intern' : 'Hey $name';
 
+    final comic = ComicColors.of(context);
+    final mint = Theme.of(context).brightness == Brightness.dark
+        ? StickerFills.yearDark[0]
+        : StickerFills.mint;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.sm, Spacing.lg, 0),
       child: ComicCard(
+        color: Color.alphaBlend(mint.withValues(alpha: 0.38), comic.sticker),
         padding: const EdgeInsets.all(Spacing.md),
         child: Row(
           children: [
@@ -51,8 +58,21 @@ class HomeHeroBanner extends ConsumerWidget {
                     spacing: Spacing.sm,
                     runSpacing: Spacing.xs,
                     children: [
-                      _Pill(text: 'Streak $streak'),
-                      if (plan != null) _Pill(text: plan.label),
+                      _Pill(
+                        text: 'Streak $streak',
+                        fill: StickerFills.yearFill(
+                          2,
+                          Theme.of(context).brightness,
+                        ),
+                      ),
+                      if (plan != null)
+                        _Pill(
+                          text: plan.label,
+                          fill: StickerFills.yearFill(
+                            3,
+                            Theme.of(context).brightness,
+                          ),
+                        ),
                     ],
                   ),
                 ],
@@ -66,22 +86,29 @@ class HomeHeroBanner extends ConsumerWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({required this.text});
+  const _Pill({required this.text, required this.fill});
 
   final String text;
+  final Color fill;
 
   @override
   Widget build(BuildContext context) {
+    final ink = ComicColors.of(context).ink;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: Spacing.sm,
         vertical: Spacing.xs,
       ),
       decoration: BoxDecoration(
+        color: fill,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(width: 2),
+        border: Border.all(color: ink, width: 2),
       ),
-      child: Text(text, style: Theme.of(context).textTheme.labelLarge),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelLarge
+            ?.copyWith(fontWeight: FontWeight.w800),
+      ),
     );
   }
 }

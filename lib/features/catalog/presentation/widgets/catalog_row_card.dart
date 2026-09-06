@@ -25,12 +25,12 @@ class CatalogRowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final comic = ComicColors.of(context);
-    final tint = StickerFills.tintAt(index, Theme.of(context).brightness);
+    final tint = StickerFills.accentAt(index);
 
     return StaggeredFade(
       index: index,
       child: ComicCard(
-        color: Color.alphaBlend(tint.withValues(alpha: 0.38), comic.sticker),
+        color: comic.sticker,
         padding: const EdgeInsets.symmetric(
           horizontal: Spacing.md,
           vertical: Spacing.sm,
@@ -38,6 +38,15 @@ class CatalogRowCard extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
+            Container(
+              width: 4,
+              height: 36,
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            const SizedBox(width: Spacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,9 +4,10 @@ Read `docs/00_PRODUCT.md` first. This file is locked engineering decisions — i
 Cursor (or you) later suggests deviating from one of these, treat it as a flag
 to stop and think, not a default to accept.
 
-**Product:** MBBS university-exam companion (KUHS in v1). The stack below was
-chosen for a timer-driven MCQ player; that player is now **practice-only**. Do
-not reintroduce a NEET-PG catalog as the home screen.
+**Product:** MBBS university-exam companion. Students pick their university;
+v1 **content** is KUHS (fallback bank). The stack below was chosen for a
+timer-driven MCQ player; that player is now **practice-only**. Do not
+reintroduce a NEET-PG catalog as the home screen.
 
 Read this before writing any code. These are locked decisions — if Cursor (or you) later suggests deviating from one of these, treat it as a flag to stop and think, not a default to accept.
 
@@ -104,15 +105,25 @@ Rule for the AI agent: **a feature's `presentation/` layer never calls Supabase 
 - **Every screen that reads user-plan-gated data must handle the "content not available on your plan" case explicitly** — not just a generic error state. This is a product requirement, not just a coding style point: users need to see "Upgrade to Pro to unlock this test," not a blank screen or a crash.
 - **Widgets over 150 lines get split.** If Cursor generates a 400-line `build()` method, ask it to extract sub-widgets before you accept the change — long build methods are where subtle layout bugs hide.
 
-## Design direction ("modern looking")
+## Design direction (GeckoMed-close, Medico brand)
 
-Concrete enough for Cursor to act on, not just "make it modern":
+Concrete enough for Cursor to act on. Docci and the Medico name stay; do not
+copy a competitor mascot or pixel-identical layouts.
 
-- **Material 3**, `ColorScheme.fromSeed()` with a single seed color you pick (deep blue or teal reads as "medical/trustworthy" without being generic — avoid the default Material purple, it reads as a Flutter tutorial app).
-- **Dark mode from day one** — implement both `ColorScheme.light()` and `.dark()` variants together; retrofitting dark mode later touches every screen twice.
-- **Type scale**: use Material 3's built-in `TextTheme` roles (`headlineSmall`, `titleMedium`, `bodyLarge`, etc.) rather than ad-hoc `TextStyle(fontSize: 16)` scattered through the code — keeps typography consistent without a design system doc.
-- **One accent color for interactive/urgent elements only** (timer running low, "submit test" button) — reserve it, don't spray it across every button or it stops meaning anything.
-- **Spacing**: define an 8px-based spacing scale as constants (`Spacing.xs = 4, .sm = 8, .md = 16, .lg = 24, .xl = 32`) and require Cursor to use these instead of arbitrary `SizedBox(height: 13)` values — this single rule does more for "looking professional" than almost anything else.
+- **Material 3.** Seed / primary is **coral-orange** (`#F25C2D`) for CTAs,
+  high-yield numbers, and filled buttons. **Indigo-purple** (`#6C5CE7`) is
+  section chrome / progress. **Gold** (`#F5C542`) is Pro chips only.
+- **Dark-first charcoal** canvas (`#121212`) with slightly lighter raised
+  cards. Light mode is clean white/gray cards with the same orange CTAs —
+  not warm comic paper `#FBF4E6`.
+- **Theme modes:** System (follow the phone) / Light / Dark. Persist the
+  choice. **Dark is the app default** until the student picks something else.
+- **Type scale**: use Material 3's built-in `TextTheme` roles (`headlineSmall`,
+  `titleMedium`, `bodyLarge`, etc.) rather than ad-hoc `TextStyle(fontSize: 16)`.
+- **Urgent actions** (timer running low, submit test) use the same orange
+  family as primary — do not invent a second red.
+- **Spacing**: 8px scale (`Spacing.xs = 4, .sm = 8, .md = 16, .lg = 24,
+  .xl = 32`). No arbitrary `SizedBox(height: 13)`.
 
 ## Environment setup checklist (do this once, in order)
 

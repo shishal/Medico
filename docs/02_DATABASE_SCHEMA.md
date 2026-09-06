@@ -657,7 +657,10 @@ NEET-PG tables above stay. This section is the **current product schema**. Apply
 `supabase/migrations/20260830140000_ug_university_pivot.sql` — do not re-run
 sections 1–8 on a live project.
 
-v1 university: **KUHS**. See `docs/00_PRODUCT.md`.
+v1 **content** university: **KUHS** (`is_fallback = true`). The app lists
+other affiliating universities for onboarding/Profile. PYQ lists filter by
+`exam_papers.university_id`; if the student’s university has zero appearances,
+read the fallback (KUHS) bank. See `docs/00_PRODUCT.md`.
 
 ### 9.1 Enums and catalog
 
@@ -687,8 +690,18 @@ Also: `question_appearances` (frequency = count), `question_textbook_refs`
 (citation only — never PDF bytes).
 
 View `pyq_teasers` (security_invoker = true so questions RLS still applies):
-stem, marks, lesson_id, required_plan, appearance_count — no sample answer,
-no MCQ keys.
+stem, marks, kind, lesson_id, required_plan, appearance_count — no sample
+answer, no MCQ keys. Includes both `pyq_theory` and `mcq` rows. University
+filter is applied in the client/RPC via appearances → exam_papers.
+
+`universities.is_fallback` marks the default content bank (KUHS).
+
+### 9.2b Editor sheet vs database
+
+The Google Sheet is **denormalized** for a non-technical editor: a wide
+`Questions` tab (university, phase, subject, topic, lesson, stem, paper,
+textbook page, sample answer on one row). Sync upserts the normalized
+tables above. Editors do not invent UUIDs. See `content/google_sheet/README.md`.
 
 ### 9.3 Profile academic fields + 4-day trial
 

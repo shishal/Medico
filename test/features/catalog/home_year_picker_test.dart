@@ -6,10 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medico/core/router/app_routes.dart';
 import 'package:medico/core/theme/app_theme.dart';
 import 'package:medico/features/catalog/domain/catalog_models.dart';
+import 'package:medico/features/catalog/domain/university_coverage.dart';
 import 'package:medico/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/profile/domain/user_profile.dart';
@@ -46,7 +48,10 @@ class _NoopSync extends PendingSubmitSync {
 }
 
 void main() {
-  testWidgets('tapping a year sticker swaps the subject grid', (tester) async {
+  testWidgets('Home follows the profile year without a week strip or year switcher', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(400, 1200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -109,7 +114,7 @@ void main() {
             ],
           ),
           phaseSubjectsProvider.overrideWith((ref) async {
-            final phaseId = ref.watch(activePhaseIdProvider);
+            final phaseId = ref.watch(userProfileProvider).value?.mbbsPhaseId;
             if (phaseId == 'p2') {
               return const [
                 CatalogSubject(id: 'path', name: 'Pathology', displayOrder: 1),
@@ -130,6 +135,15 @@ void main() {
           trackerListProvider.overrideWith((ref) async => const []),
           inProgressAttemptsProvider.overrideWith(_NoAttempts.new),
           pendingSubmitSyncProvider.overrideWith(_NoopSync.new),
+          universitiesProvider.overrideWith((ref) async => const []),
+          universityCoverageProvider.overrideWith(
+            (ref) async => const UniversityCoverage(
+              paperCount: 12,
+              pyqCount: 40,
+              usingFallback: false,
+              contentUniversityId: 'kuhs',
+            ),
+          ),
         ],
         child: RepaintBoundary(
           child: MaterialApp.router(
@@ -149,15 +163,18 @@ void main() {
 
     expect(find.text('Anatomy'), findsOneWidget);
     expect(find.text('Pathology'), findsNothing);
-    await _savePng(tester, 'home_year_first_anatomy.png');
-
-    await tester.tap(find.byKey(const ValueKey('year-chip-p2')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(find.text('Pathology'), findsOneWidget);
-    expect(find.text('Anatomy'), findsNothing);
-    await _savePng(tester, 'home_year_second_pathology.png');
+    expect(find.text('Your year'), findsNothing);
+    expect(find.text('Start practice'), findsOneWidget);
+    expect(find.byKey(const ValueKey('year-chip-p2')), findsNothing);
+    expect(
+      find.textContaining('Tap a subject for PYQs'),
+      findsOneWidget,
+    );
+    expect(
+      tester.getTopLeft(find.text('Subjects')).dy,
+      lessThan(tester.getTopLeft(find.text('Start practice')).dy),
+    );
+    await _savePng(tester, 'home_profile_year_subjects.png');
   });
 }
 

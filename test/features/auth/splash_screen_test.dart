@@ -9,7 +9,7 @@ import 'package:medico/features/auth/presentation/providers/auth_session_provide
 import 'package:medico/features/auth/presentation/screens/splash_screen.dart';
 
 void main() {
-  testWidgets('Splash shows brand mark on teal', (tester) async {
+  testWidgets('Splash shows brand mark on charcoal', (tester) async {
     final router = GoRouter(
       initialLocation: AppRoutes.splash,
       routes: [
@@ -41,7 +41,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, AppTheme.seedColor);
+    expect(scaffold.backgroundColor, AppTheme.splashCanvas);
 
     await tester.pump(const Duration(milliseconds: 1100));
   });

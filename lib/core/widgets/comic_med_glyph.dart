@@ -5,14 +5,20 @@ import '../theme/comic_colors.dart';
 
 /// Thick-outline doodle of medical kit, drawn so it scales like a sticker.
 class ComicMedGlyph extends StatelessWidget {
-  const ComicMedGlyph({super.key, required this.glyph, this.size = 56});
+  const ComicMedGlyph({
+    super.key,
+    required this.glyph,
+    this.size = 56,
+    this.color,
+  });
 
   final MedGlyph glyph;
   final double size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final ink = ComicColors.of(context).ink;
+    final ink = color ?? ComicColors.of(context).ink;
     return CustomPaint(
       size: Size.square(size),
       painter: _GlyphPainter(glyph: glyph, ink: ink),

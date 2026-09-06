@@ -280,6 +280,7 @@ abstract final class UniversityColumns {
   static const name = 'name';
   static const state = 'state';
   static const slug = 'slug';
+  static const isFallback = 'is_fallback';
 }
 
 abstract final class MbbsPhaseColumns {
@@ -317,6 +318,7 @@ abstract final class PyqTeaserColumns {
   static const requiredPlan = 'required_plan';
   static const isActive = 'is_active';
   static const appearanceCount = 'appearance_count';
+  static const kind = 'kind';
 }
 
 abstract final class ResourceColumns {
@@ -361,6 +363,7 @@ abstract final class ExamPaperColumns {
   static const id = 'id';
   static const examYear = 'exam_year';
   static const paperName = 'paper_name';
+  static const universityId = 'university_id';
 }
 
 abstract final class TrackerColumns {

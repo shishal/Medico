@@ -1,7 +1,8 @@
 # Medico — MBBS university-exam companion
 
 Flutter app for **MBBS university exams** (PYQs, trackers, textbook page refs,
-MCQ practice). v1 university is **KUHS** — see `docs/00_PRODUCT.md`.
+MCQ practice). Students pick their affiliating university; v1 **content** is
+**KUHS** (fallback bank) — see `docs/00_PRODUCT.md`.
 
 Full planning docs live in `docs/` — read the relevant one before starting any
 task:
@@ -11,6 +12,7 @@ task:
 - docs/03_BUILD_PLAN.md — phased tasks with acceptance criteria (work one phase at a time)
 - docs/04_TEST_ENGINE_SPEC.md — **historical** NEET-PG test engine (MCQ player still uses this)
 - docs/05_PRACTICE_MODE_SPEC.md — practice mode behavior (MCQ only)
+- docs/10_INDIA_MBBS_EXAMS.md — how Indian MBBS university papers actually work (paper mixes topics; chapters are tags)
 
 ## Non-negotiable rules
 - Stack is locked: Flutter + Riverpod (codegen) + go_router + Supabase. Don't suggest

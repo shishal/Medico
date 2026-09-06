@@ -198,10 +198,16 @@ function performSync_(data) {
     syncUgCatalog_(data.ug, subjectIdByKey, topicIdByKey, questionIdByExt);
   }
 
-  // 4) Tests
-  // sheet_key (not title) is the PostgREST conflict target. Phase 4B dropped
-  // UNIQUE(title) so practice sessions can share "Practice Session"; PostgREST
-  // cannot ON CONFLICT on that partial unique index (Postgres 42P10).
+  // 4) Tests — optional. Retired from the student catalog; skip when empty.
+  if (!data.tests || !data.tests.length) {
+    return {
+      subjects: subjectRows.length,
+      topics: topicRows.length,
+      questions: questionRows.length,
+      tests: 0,
+      testsLinked: 0,
+    };
+  }
   var testRows = data.tests.map(function (t) {
     var payload = {
       sheet_key: t.title,

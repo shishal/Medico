@@ -1,35 +1,119 @@
 import '../../../core/supabase/tables.dart';
 import '../../profile/domain/plan_tier.dart';
+import 'question_format.dart';
 
 class PyqTeaser {
   const PyqTeaser({
     required this.id,
     this.lessonId,
+    this.topicId,
     required this.questionText,
     this.marks,
     required this.requiredPlan,
     required this.appearanceCount,
+    this.kind = 'pyq_theory',
+    this.textbookLine,
+    this.appearanceYears = const [],
+    this.paperNames = const [],
+    this.topicName,
+    this.lessonName,
   });
 
   final String id;
   final String? lessonId;
+  final String? topicId;
   final String questionText;
   final num? marks;
   final PlanTier requiredPlan;
   final int appearanceCount;
+  final String kind;
+  final String? textbookLine;
+  final List<int> appearanceYears;
+
+  /// Paper labels from the selected university (e.g. Paper I).
+  final List<String> paperNames;
+  final String? topicName;
+  final String? lessonName;
+
+  QuestionFormat get format =>
+      QuestionFormat.fromKindAndMarks(kind: kind, marks: marks);
+
+  bool get isHighYield => appearanceCount >= 2;
 
   factory PyqTeaser.fromJson(Map<String, dynamic> json) {
     return PyqTeaser(
       id: json[PyqTeaserColumns.id] as String,
       lessonId: json[PyqTeaserColumns.lessonId] as String?,
+      topicId: json[PyqTeaserColumns.topicId] as String?,
       questionText: json[PyqTeaserColumns.questionText] as String,
       marks: json[PyqTeaserColumns.marks] as num?,
       requiredPlan: PlanTier.fromString(
         json[PyqTeaserColumns.requiredPlan] as String? ?? 'free',
       ),
       appearanceCount: _asInt(json[PyqTeaserColumns.appearanceCount]),
+      kind: json[PyqTeaserColumns.kind] as String? ?? 'pyq_theory',
     );
   }
+
+  PyqTeaser copyWith({
+    String? textbookLine,
+    List<int>? appearanceYears,
+    int? appearanceCount,
+    List<String>? paperNames,
+    String? topicName,
+    String? lessonName,
+    String? topicId,
+  }) {
+    return PyqTeaser(
+      id: id,
+      lessonId: lessonId,
+      topicId: topicId ?? this.topicId,
+      questionText: questionText,
+      marks: marks,
+      requiredPlan: requiredPlan,
+      appearanceCount: appearanceCount ?? this.appearanceCount,
+      kind: kind,
+      textbookLine: textbookLine ?? this.textbookLine,
+      appearanceYears: appearanceYears ?? this.appearanceYears,
+      paperNames: paperNames ?? this.paperNames,
+      topicName: topicName ?? this.topicName,
+      lessonName: lessonName ?? this.lessonName,
+    );
+  }
+}
+
+class PyqLessonFeed {
+  const PyqLessonFeed({
+    required this.teasers,
+    required this.usingFallback,
+  });
+
+  final List<PyqTeaser> teasers;
+  final bool usingFallback;
+}
+
+class PyqChapter {
+  const PyqChapter({required this.id, required this.name});
+
+  final String id;
+  final String name;
+}
+
+/// Subject PYQ list: mixed-topic papers, with chapter tags for filters.
+class PyqSubjectFeed {
+  const PyqSubjectFeed({
+    required this.teasers,
+    required this.usingFallback,
+    this.paperNames = const [],
+    this.years = const [],
+    this.chapters = const [],
+  });
+
+  final List<PyqTeaser> teasers;
+  final bool usingFallback;
+  final List<String> paperNames;
+  final List<int> years;
+  final List<PyqChapter> chapters;
 }
 
 class ResourceLink {
@@ -65,6 +149,7 @@ class TextbookCitation {
     this.edition,
     required this.page,
     this.sectionHeading,
+    this.sheetKey,
   });
 
   final String title;
@@ -72,6 +157,7 @@ class TextbookCitation {
   final String? edition;
   final int page;
   final String? sectionHeading;
+  final String? sheetKey;
 
   String get label {
     final ed = edition == null ? '' : ' ($edition)';
@@ -88,6 +174,7 @@ class TextbookCitation {
       edition: map[TextbookColumns.edition] as String?,
       page: _asInt(json[TextbookRefColumns.page]),
       sectionHeading: json[TextbookRefColumns.sectionHeading] as String?,
+      sheetKey: map[TextbookColumns.sheetKey] as String?,
     );
   }
 }

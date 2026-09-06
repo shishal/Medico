@@ -68,10 +68,8 @@ class SubjectSticker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fill = StickerFills.subjectFill(
-      subject.name,
-      Theme.of(context).brightness,
-    );
+    final comic = ComicColors.of(context);
+    final accent = StickerFills.subjectAccent(subject.name);
     // Display fraction from server learnt/total — not a client-computed score.
     final total = coverage?.totalLessons ?? 0;
     final learnt = coverage?.learntLessons ?? 0;
@@ -79,7 +77,7 @@ class SubjectSticker extends StatelessWidget {
 
     return ComicCard(
       key: ValueKey('subject-tile-${subject.id}'),
-      color: fill,
+      color: comic.sticker,
       semanticLabel: subject.name,
       onTap: () =>
           context.push(AppRoutes.subjectPath(subject.id, subject.name)),
@@ -88,12 +86,26 @@ class SubjectSticker extends StatelessWidget {
         children: [
           Row(
             children: [
-              ComicMedGlyph(glyph: glyphForSubject(subject.name), size: 40),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                alignment: Alignment.center,
+                child: ComicMedGlyph(
+                  glyph: glyphForSubject(subject.name),
+                  size: 28,
+                  color: accent,
+                ),
+              ),
               const Spacer(),
               CoverageRing(
                 progress: progress,
                 size: 36,
                 strokeWidth: 4,
+                color: accent,
                 child: Text(
                   total == 0 ? '—' : '$learnt',
                   style: Theme.of(context).textTheme.labelSmall
@@ -110,11 +122,14 @@ class SubjectSticker extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.w800),
           ),
-          if (total > 0)
-            Text(
-              '$learnt / $total lessons',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+          Text(
+            total == 0
+                ? 'No lessons yet'
+                : '$learnt of $total lessons learnt',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ],
       ),
     );

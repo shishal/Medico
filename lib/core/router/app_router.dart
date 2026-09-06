@@ -18,12 +18,12 @@ import '../../features/practice/presentation/screens/practice_builder_screen.dar
 import '../../features/progress/presentation/screens/progress_screens.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/pyq/presentation/screens/pyq_reader_screen.dart';
+import '../../features/pyq/presentation/screens/subject_pyq_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/results/presentation/screens/solution_review_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
-import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import '../../features/trackers/presentation/screens/trackers_screen.dart';
 import '../widgets/app_shell.dart';
@@ -150,11 +150,19 @@ GoRouter goRouter(Ref ref) {
         builder: (context, state) => const CreateTrackerScreen(),
       ),
       comicGoRoute(
-        path: AppRoutes.subject,
+        path: AppRoutes.subjectTopics,
         builder: (context, state) {
           final id = state.pathParameters['subjectId']!;
           final title = state.uri.queryParameters['title'] ?? 'Subject';
           return SubjectListScreen(subjectId: id, title: title);
+        },
+      ),
+      comicGoRoute(
+        path: AppRoutes.subject,
+        builder: (context, state) {
+          final id = state.pathParameters['subjectId']!;
+          final title = state.uri.queryParameters['title'] ?? 'Subject';
+          return SubjectPyqScreen(subjectId: id, title: title);
         },
       ),
       comicGoRoute(
@@ -179,10 +187,6 @@ GoRouter goRouter(Ref ref) {
           final id = state.pathParameters['questionId']!;
           return PyqReaderScreen(questionId: id);
         },
-      ),
-      comicGoRoute(
-        path: AppRoutes.testList,
-        builder: (context, state) => const TestListScreen(),
       ),
       // More specific `/play` route before bare `:testId` so paths match correctly.
       comicGoRoute(

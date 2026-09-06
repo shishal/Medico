@@ -10,19 +10,17 @@ import '../domain/attempt.dart';
 import '../domain/attempt_score.dart';
 import '../domain/attempt_status.dart';
 import '../domain/attempt_submit_request.dart';
-import '../domain/catalog_test.dart';
 import '../domain/player_question.dart';
 import '../domain/test_detail.dart';
 import '../domain/test_player_bundle.dart';
 
 part 'tests_repository.g.dart';
 
-/// Fetches catalog teasers and plan-gated test details.
+/// Fetches plan-gated test details for the Practice player.
 /// Presentation never calls Supabase directly.
 ///
-/// List data comes from [Tables.catalogTestTeasers] (all authenticated users
-/// see titles for higher plans). Full rows (marking, sections) come from
-/// [Tables.tests] and are RLS-gated — empty result means upgrade required.
+/// Full rows (marking, sections) come from [Tables.tests] and are RLS-gated —
+/// empty result means upgrade required. Practice sessions create these rows.
 class TestsRepository {
   TestsRepository(this._client);
 
@@ -44,42 +42,6 @@ class TestsRepository {
       ')';
 
   String? get currentUserId => _client.auth.currentUser?.id;
-
-  /// Active catalog teasers (locked + unlocked). Caller applies plan locks in UI.
-  Future<Result<List<CatalogTest>>> fetchCatalogTests() async {
-    if (_client.auth.currentUser == null) {
-      return const Failure('Not signed in.');
-    }
-
-    try {
-      final rows = await _client
-          .from(Tables.catalogTestTeasers)
-          .select(
-            '${TestColumns.id},'
-            '${TestColumns.title},'
-            '${TestColumns.testType},'
-            '${TestColumns.requiredPlan},'
-            '${TestColumns.isSectional},'
-            '${TestColumns.totalDurationMinutes},'
-            '${TestColumns.totalQuestions}',
-          )
-          .order(TestColumns.createdAt, ascending: false);
-
-      final tests = (rows as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .map(CatalogTest.fromJson)
-          .toList();
-
-      return Success(tests);
-    } catch (e) {
-      return Failure(
-        UserFacingError.from(
-          e,
-          fallback: 'Could not load tests. Please try again.',
-        ),
-      );
-    }
-  }
 
   /// Instructions payload for one test. RLS returns no row if plan is too low.
   Future<Result<TestDetail>> fetchTestDetail(String testId) async {

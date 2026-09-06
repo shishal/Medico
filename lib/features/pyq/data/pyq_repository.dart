@@ -20,6 +20,12 @@ class PyqDetail {
     this.sampleAnswer,
     required this.canReadSample,
     required this.questionLearnt,
+    this.optionA,
+    this.optionB,
+    this.optionC,
+    this.optionD,
+    this.correctOption,
+    this.explanationText,
   });
 
   final PyqTeaser teaser;
@@ -30,6 +36,14 @@ class PyqDetail {
   final String? sampleAnswer;
   final bool canReadSample;
   final bool questionLearnt;
+  final String? optionA;
+  final String? optionB;
+  final String? optionC;
+  final String? optionD;
+  final String? correctOption;
+  final String? explanationText;
+
+  bool get isMcq => teaser.kind == 'mcq';
 }
 
 class PyqRepository {
@@ -60,7 +74,10 @@ class PyqRepository {
     }
   }
 
-  Future<Result<List<PyqTeaser>>> fetchTeasersForLesson(String lessonId) async {
+  Future<Result<PyqLessonFeed>> fetchTeasersForLesson({
+    required String lessonId,
+    String? universityId,
+  }) async {
     if (_client.auth.currentUser == null) {
       return const Failure('Not signed in.');
     }
@@ -70,11 +87,294 @@ class PyqRepository {
           .select()
           .eq(PyqTeaserColumns.lessonId, lessonId)
           .order(PyqTeaserColumns.appearanceCount, ascending: false);
+      final all = (rows as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map(PyqTeaser.fromJson)
+          .toList();
+      if (all.isEmpty) {
+        return const Success(PyqLessonFeed(teasers: [], usingFallback: false));
+      }
+
+      final ids = all.map((t) => t.id).toList();
+      final appRows = await _client
+          .from(Tables.questionAppearances)
+          .select(
+            '${AppearanceColumns.questionId},'
+            '${AppearanceColumns.examPaperEmbed}:${Tables.examPapers}('
+            '${ExamPaperColumns.universityId},'
+            '${ExamPaperColumns.examYear})',
+          )
+          .inFilter(AppearanceColumns.questionId, ids);
+
+      final resolved = await _resolveContentUniversity(universityId);
+      final contentUni = resolved.contentUni;
+      final usingFallback = resolved.usingFallback;
+
+      final yearsByQuestionUni = <String, Map<String, List<int>>>{};
+      final unisByQuestion = <String, Set<String>>{};
+      for (final raw in (appRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+        final qid = raw[AppearanceColumns.questionId] as String;
+        final paper = raw[AppearanceColumns.examPaperEmbed];
+        final map = paper is Map<String, dynamic> ? paper : <String, dynamic>{};
+        final uid = map[ExamPaperColumns.universityId] as String?;
+        if (uid != null) {
+          unisByQuestion.putIfAbsent(qid, () => {}).add(uid);
+        }
+        final year = map[ExamPaperColumns.examYear];
+        if (uid != null && year is num) {
+          yearsByQuestionUni
+              .putIfAbsent(qid, () => {})
+              .putIfAbsent(uid, () => [])
+              .add(year.toInt());
+        }
+      }
+
+      final refRows = await _client
+          .from(Tables.questionTextbookRefs)
+          .select(
+            '${TextbookRefColumns.questionId},${TextbookRefColumns.page},'
+            '${TextbookRefColumns.sectionHeading},'
+            '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
+            '${TextbookColumns.title},${TextbookColumns.edition},'
+            '${TextbookColumns.sheetKey})',
+          )
+          .inFilter(TextbookRefColumns.questionId, ids);
+      final firstRef = <String, String>{};
+      for (final raw in (refRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+        final qid = raw[TextbookRefColumns.questionId] as String;
+        if (firstRef.containsKey(qid)) continue;
+        firstRef[qid] = TextbookCitation.fromJson(raw).label;
+      }
+
+      final teasers = <PyqTeaser>[];
+      for (final t in all) {
+        final owned = unisByQuestion[t.id];
+        final isMcqBank = t.kind == 'mcq' && (owned == null || owned.isEmpty);
+        final matchesUni = contentUni == null ||
+            isMcqBank ||
+            (owned != null && owned.contains(contentUni));
+        if (!matchesUni) continue;
+        final years = {
+          ...?yearsByQuestionUni[t.id]?[contentUni],
+        }.toList()
+          ..sort();
+        teasers.add(
+          t.copyWith(
+            textbookLine: firstRef[t.id],
+            appearanceYears: years,
+            appearanceCount: years.length,
+          ),
+        );
+      }
+
       return Success(
-        (rows as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map(PyqTeaser.fromJson)
-            .toList(),
+        PyqLessonFeed(teasers: teasers, usingFallback: usingFallback),
+      );
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not load PYQs.'),
+      );
+    }
+  }
+
+  /// PYQs for a subject (mixed-topic papers). Chapters are tags, not a funnel.
+  Future<Result<PyqSubjectFeed>> fetchTeasersForSubject({
+    required String subjectId,
+    String? universityId,
+  }) async {
+    if (_client.auth.currentUser == null) {
+      return const Failure('Not signed in.');
+    }
+    try {
+      final topicRows = await _client
+          .from(Tables.topics)
+          .select()
+          .eq(TopicColumns.subjectId, subjectId)
+          .order(TopicColumns.displayOrder);
+      final topics = (topicRows as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+      final chapters = [
+        for (final t in topics)
+          PyqChapter(
+            id: t[TopicColumns.id] as String,
+            name: t[TopicColumns.name] as String? ?? 'Chapter',
+          ),
+      ];
+      final topicNameById = {for (final c in chapters) c.id: c.name};
+      if (chapters.isEmpty) {
+        return const Success(
+          PyqSubjectFeed(teasers: [], usingFallback: false),
+        );
+      }
+
+      final topicIds = chapters.map((c) => c.id).toList();
+      final lessonRows = await _inFilterSelect(
+        table: Tables.lessons,
+        column: LessonColumns.topicId,
+        ids: topicIds,
+        select:
+            '${LessonColumns.id},${LessonColumns.name},${LessonColumns.topicId}',
+      );
+      final lessonNameById = <String, String>{};
+      final lessonTopicById = <String, String>{};
+      for (final raw in lessonRows) {
+        final id = raw[LessonColumns.id] as String;
+        lessonNameById[id] = raw[LessonColumns.name] as String? ?? '';
+        final tid = raw[LessonColumns.topicId] as String?;
+        if (tid != null) lessonTopicById[id] = tid;
+      }
+
+      // Read questions directly. pyq_teasers runs a per-row appearance count
+      // that is fine for one lesson and too slow for a whole subject.
+      const teaserSelect =
+          '${QuestionColumns.id},${QuestionColumns.lessonId},'
+          '${QuestionColumns.topicId},${QuestionColumns.questionText},'
+          '${QuestionColumns.marks},${QuestionColumns.requiredPlan},'
+          '${QuestionColumns.kind}';
+      final questionRows = await _inFilterSelect(
+        table: Tables.questions,
+        column: QuestionColumns.topicId,
+        ids: topicIds,
+        select: teaserSelect,
+        activeOnly: true,
+      );
+      final all = questionRows.map(PyqTeaser.fromJson).toList();
+      if (all.isEmpty) {
+        final resolved = await _resolveContentUniversity(universityId);
+        return Success(
+          PyqSubjectFeed(
+            teasers: const [],
+            usingFallback: resolved.usingFallback,
+            chapters: chapters,
+          ),
+        );
+      }
+
+      final ids = all.map((t) => t.id).toList();
+      const appSelect =
+          '${AppearanceColumns.questionId},'
+          '${AppearanceColumns.examPaperEmbed}:${Tables.examPapers}('
+          '${ExamPaperColumns.universityId},'
+          '${ExamPaperColumns.examYear},'
+          '${ExamPaperColumns.paperName})';
+      const refSelect =
+          '${TextbookRefColumns.questionId},${TextbookRefColumns.page},'
+          '${TextbookRefColumns.sectionHeading},'
+          '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
+          '${TextbookColumns.title},${TextbookColumns.edition},'
+          '${TextbookColumns.sheetKey})';
+      // `.then` attaches a listener immediately. Starting the Futures and
+      // awaiting later lets a 400 surface as an unhandled async error
+      // before this try/catch runs.
+      late final List<Map<String, dynamic>> appRows;
+      late final List<Map<String, dynamic>> refRows;
+      late final ({String? contentUni, bool usingFallback}) resolved;
+      await Future.wait([
+        _inFilterSelect(
+          table: Tables.questionAppearances,
+          column: AppearanceColumns.questionId,
+          ids: ids,
+          select: appSelect,
+          orderColumns: const [
+            AppearanceColumns.questionId,
+            AppearanceColumns.examPaperId,
+          ],
+        ).then((v) => appRows = v),
+        _inFilterSelect(
+          table: Tables.questionTextbookRefs,
+          column: TextbookRefColumns.questionId,
+          ids: ids,
+          select: refSelect,
+          orderColumns: const [
+            TextbookRefColumns.questionId,
+            TextbookRefColumns.textbookId,
+          ],
+        ).then((v) => refRows = v),
+        _resolveContentUniversity(universityId).then((v) => resolved = v),
+      ]);
+      final contentUni = resolved.contentUni;
+      final usingFallback = resolved.usingFallback;
+
+      final yearsByQuestionUni = <String, Map<String, List<int>>>{};
+      final papersByQuestionUni = <String, Map<String, Set<String>>>{};
+      final unisByQuestion = <String, Set<String>>{};
+      for (final raw in appRows) {
+        final qid = raw[AppearanceColumns.questionId] as String;
+        final paper = raw[AppearanceColumns.examPaperEmbed];
+        final map = paper is Map<String, dynamic> ? paper : <String, dynamic>{};
+        final uid = map[ExamPaperColumns.universityId] as String?;
+        if (uid != null) {
+          unisByQuestion.putIfAbsent(qid, () => {}).add(uid);
+        }
+        final year = map[ExamPaperColumns.examYear];
+        if (uid != null && year is num) {
+          yearsByQuestionUni
+              .putIfAbsent(qid, () => {})
+              .putIfAbsent(uid, () => [])
+              .add(year.toInt());
+        }
+        final paperName = map[ExamPaperColumns.paperName] as String?;
+        if (uid != null && paperName != null && paperName.isNotEmpty) {
+          papersByQuestionUni
+              .putIfAbsent(qid, () => {})
+              .putIfAbsent(uid, () => {})
+              .add(paperName);
+        }
+      }
+
+      final firstRef = <String, String>{};
+      for (final raw in refRows) {
+        final qid = raw[TextbookRefColumns.questionId] as String;
+        if (firstRef.containsKey(qid)) continue;
+        firstRef[qid] = TextbookCitation.fromJson(raw).label;
+      }
+
+      final teasers = <PyqTeaser>[];
+      final paperNames = <String>{};
+      final years = <int>{};
+      for (final t in all) {
+        final owned = unisByQuestion[t.id];
+        final isMcqBank = t.kind == 'mcq' && (owned == null || owned.isEmpty);
+        final matchesUni = contentUni == null ||
+            isMcqBank ||
+            (owned != null && owned.contains(contentUni));
+        if (!matchesUni) continue;
+        final qYears = {
+          ...?yearsByQuestionUni[t.id]?[contentUni],
+        }.toList()
+          ..sort();
+        final qPapers = {
+          ...?papersByQuestionUni[t.id]?[contentUni],
+        }.toList()
+          ..sort();
+        paperNames.addAll(qPapers);
+        years.addAll(qYears);
+        final topicId = t.topicId ??
+            (t.lessonId == null ? null : lessonTopicById[t.lessonId]);
+        teasers.add(
+          t.copyWith(
+            textbookLine: firstRef[t.id],
+            appearanceYears: qYears,
+            appearanceCount: qYears.length,
+            paperNames: qPapers,
+            topicId: topicId,
+            topicName: topicId == null ? null : topicNameById[topicId],
+            lessonName:
+                t.lessonId == null ? null : lessonNameById[t.lessonId],
+          ),
+        );
+      }
+
+      final yearList = years.toList()..sort((a, b) => b.compareTo(a));
+      final paperList = paperNames.toList()..sort();
+      return Success(
+        PyqSubjectFeed(
+          teasers: teasers,
+          usingFallback: usingFallback,
+          paperNames: paperList,
+          years: yearList,
+          chapters: chapters,
+        ),
       );
     } catch (e) {
       return Failure(
@@ -116,7 +416,8 @@ class PyqRepository {
           .select(
             '${TextbookRefColumns.page},${TextbookRefColumns.sectionHeading},'
             '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
-            '${TextbookColumns.title},${TextbookColumns.authors},${TextbookColumns.edition})',
+            '${TextbookColumns.title},${TextbookColumns.authors},'
+            '${TextbookColumns.edition},${TextbookColumns.sheetKey})',
           )
           .eq(TextbookRefColumns.questionId, questionId);
 
@@ -133,6 +434,34 @@ class PyqRepository {
             .select()
             .eq(ResourceColumns.lessonId, lessonId)
             .order(ResourceColumns.displayOrder) as List<dynamic>;
+      }
+
+      String? optionA;
+      String? optionB;
+      String? optionC;
+      String? optionD;
+      String? correctOption;
+      String? explanationText;
+      if (teaser.kind == 'mcq') {
+        final qRows = await _client
+            .from(Tables.questions)
+            .select(
+              '${QuestionColumns.optionA},${QuestionColumns.optionB},'
+              '${QuestionColumns.optionC},${QuestionColumns.optionD},'
+              '${QuestionColumns.correctOption},${QuestionColumns.explanationText}',
+            )
+            .eq(QuestionColumns.id, questionId)
+            .limit(1);
+        final qList = (qRows as List<dynamic>).cast<Map<String, dynamic>>();
+        if (qList.isNotEmpty) {
+          final q = qList.first;
+          optionA = q[QuestionColumns.optionA] as String?;
+          optionB = q[QuestionColumns.optionB] as String?;
+          optionC = q[QuestionColumns.optionC] as String?;
+          optionD = q[QuestionColumns.optionD] as String?;
+          correctOption = q[QuestionColumns.correctOption] as String?;
+          explanationText = q[QuestionColumns.explanationText] as String?;
+        }
       }
 
       String? sample;
@@ -190,6 +519,12 @@ class PyqRepository {
           sampleAnswer: sample,
           canReadSample: canReadSample,
           questionLearnt: learnt,
+          optionA: optionA,
+          optionB: optionB,
+          optionC: optionC,
+          optionD: optionD,
+          correctOption: correctOption,
+          explanationText: explanationText,
         ),
       );
     } catch (e) {
@@ -197,6 +532,90 @@ class PyqRepository {
         UserFacingError.from(e, fallback: 'Could not load this question.'),
       );
     }
+  }
+
+  /// PostgREST puts `.inFilter` values on the GET URL, so a subject with
+  /// 1k+ question ids would blow past typical 8KB limits and look hung.
+  /// We also page with `.range` because the API `max_rows` cap is 1000.
+  Future<List<Map<String, dynamic>>> _inFilterSelect({
+    required String table,
+    required String column,
+    required List<String> ids,
+    String select = '*',
+    List<String> orderColumns = const ['id'],
+    bool activeOnly = false,
+  }) async {
+    if (ids.isEmpty) return const [];
+    const chunkSize = 80;
+    const pageSize = 1000;
+    final orders = orderColumns.isEmpty ? const ['id'] : orderColumns;
+    final rows = <Map<String, dynamic>>[];
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final end = i + chunkSize > ids.length ? ids.length : i + chunkSize;
+      final chunk = ids.sublist(i, end);
+      var from = 0;
+      while (true) {
+        var query =
+            _client.from(table).select(select).inFilter(column, chunk);
+        if (activeOnly) {
+          query = query.eq(QuestionColumns.isActive, true);
+        }
+        var ordered = query.order(orders.first);
+        for (var o = 1; o < orders.length; o++) {
+          ordered = ordered.order(orders[o]);
+        }
+        final page = await ordered.range(from, from + pageSize - 1);
+        final list = List<Map<String, dynamic>>.from(page as List);
+        rows.addAll(list);
+        if (list.length < pageSize) break;
+        from += pageSize;
+      }
+    }
+    return rows;
+  }
+
+  /// Fallback is university-wide: if the selected university has any papers,
+  /// empty subjects stay empty. Only swap to KUHS when that university has
+  /// zero papers in the catalog.
+  ///
+  /// Do not SELECT `is_fallback` — that column is added by
+  /// `geckomed_ux.sql`. A live project that has not applied it returns
+  /// PostgREST 42703 and the subject screen never leaves the spinner.
+  /// KUHS by `code` is the v1 fallback bank either way.
+  Future<({String? contentUni, bool usingFallback})> _resolveContentUniversity(
+    String? universityId,
+  ) async {
+    final uniRows = await _client
+        .from(Tables.universities)
+        .select(
+          '${UniversityColumns.id},${UniversityColumns.code}',
+        );
+    final unis = (uniRows as List<dynamic>).cast<Map<String, dynamic>>();
+    String? fallbackId;
+    for (final u in unis) {
+      if (u[UniversityColumns.code] == 'KUHS') {
+        fallbackId = u[UniversityColumns.id] as String;
+        break;
+      }
+    }
+
+    var contentUni = universityId;
+    var usingFallback = false;
+    if (contentUni != null && contentUni.isNotEmpty) {
+      final paperRows = await _client
+          .from(Tables.examPapers)
+          .select(ExamPaperColumns.id)
+          .eq(ExamPaperColumns.universityId, contentUni)
+          .limit(1);
+      final hasPapers = (paperRows as List<dynamic>).isNotEmpty;
+      if (!hasPapers && fallbackId != null) {
+        usingFallback = contentUni != fallbackId;
+        contentUni = fallbackId;
+      }
+    } else if (fallbackId != null) {
+      contentUni = fallbackId;
+    }
+    return (contentUni: contentUni, usingFallback: usingFallback);
   }
 
   Future<Result<void>> markLearnt(String questionId) async {

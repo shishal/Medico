@@ -9,7 +9,6 @@ import '../../../../core/widgets/async_status_views.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../domain/test_detail.dart';
 import '../../domain/test_type.dart';
-import '../providers/catalog_tests_provider.dart';
 import '../providers/in_progress_attempts_provider.dart';
 import '../providers/test_detail_provider.dart';
 
@@ -35,7 +34,7 @@ class TestInstructionsScreen extends ConsumerWidget {
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(AppRoutes.testList);
+              context.go(AppRoutes.practice);
             }
           },
         ),
@@ -45,23 +44,15 @@ class TestInstructionsScreen extends ConsumerWidget {
         error: (error, _) {
           final message = UserFacingError.display(error);
           final planLocked = message == _planLockedMessage;
-          // Teaser list still has required_plan even when full row is RLS-empty.
-          final teasers = ref.watch(catalogTestsProvider).value;
-          final requiredPlan =
-              teasers
-                  ?.where((t) => t.id == testId)
-                  .map((t) => t.requiredPlan)
-                  .firstOrNull ??
-              PlanTier.pro;
           return AsyncErrorView(
             message: message,
             icon: planLocked ? Icons.lock_outline : null,
             actionLabel: planLocked ? 'View upgrade options' : 'Retry',
             onAction: planLocked
-                ? () => context.go(AppRoutes.upgradePath(requiredPlan))
+                ? () => context.go(AppRoutes.upgradePath(PlanTier.pro))
                 : () => ref.invalidate(testDetailProvider(testId)),
-            secondaryLabel: 'Back to tests',
-            onSecondary: () => context.go(AppRoutes.testList),
+            secondaryLabel: 'Back to practice',
+            onSecondary: () => context.go(AppRoutes.practice),
           );
         },
         data: (detail) {

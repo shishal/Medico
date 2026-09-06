@@ -13,10 +13,10 @@ abstract final class AppRoutes {
   static const trackers = '/trackers';
   static const trackerCreate = '/trackers/new';
   static const subject = '/subjects/:subjectId';
+  static const subjectTopics = '/subjects/:subjectId/topics';
   static const topic = '/topics/:topicId';
   static const lesson = '/lessons/:lessonId';
   static const pyq = '/pyq/:questionId';
-  static const testList = '/tests';
   static const testDetail = '/tests/:testId';
   static const testPlayer = '/tests/:testId/play';
   static const results = '/results/:attemptId';
@@ -27,6 +27,12 @@ abstract final class AppRoutes {
 
   static String subjectPath(String id, String title) =>
       Uri(path: '/subjects/$id', queryParameters: {'title': title}).toString();
+
+  static String subjectTopicsPath(String id, String title) =>
+      Uri(
+        path: '/subjects/$id/topics',
+        queryParameters: {'title': title},
+      ).toString();
 
   static String topicPath(String id, String title) =>
       Uri(path: '/topics/$id', queryParameters: {'title': title}).toString();

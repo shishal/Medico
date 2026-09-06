@@ -104,6 +104,7 @@ class PyqTeaserCard extends StatelessWidget {
             const SizedBox(height: Spacing.sm),
             Text(
               [
+                if (teaser.paperNames.isNotEmpty) teaser.paperNames.join(' · '),
                 if (years.isNotEmpty) years,
                 if (teaser.appearanceCount > 0)
                   '${teaser.appearanceCount}× in papers',
@@ -111,6 +112,18 @@ class PyqTeaserCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: comic.ink.withValues(alpha: 0.7),
               ),
+            ),
+          ],
+          if (teaser.topicName != null) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              [
+                teaser.topicName,
+                if (teaser.lessonName != null &&
+                    teaser.lessonName != teaser.topicName)
+                  teaser.lessonName,
+              ].join(' · '),
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
           if (teaser.textbookLine != null) ...[

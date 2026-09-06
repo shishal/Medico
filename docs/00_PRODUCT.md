@@ -60,8 +60,9 @@ Visual language follows GeckoMed’s study apps (dark charcoal canvas, coral
 orange CTAs, indigo-purple chrome, gold Pro chips) while keeping **Docci** and
 the Medico name. Theme is **System / Light / Dark**, persisted, **Light default**.
 
-Home is a PYQ dashboard (coverage banner, year + university, subject cards),
-not a NEET-PG test list.
+Home is a PYQ dashboard (coverage banner, year + university, subject cards).
+Opening a subject starts with **that subject’s PYQs** (paper / year / chapter
+filters). Topic → lesson is for grouping and trackers, not the first tap.
 
 ## Monetization
 

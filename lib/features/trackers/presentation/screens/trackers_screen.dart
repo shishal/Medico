@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
@@ -196,6 +197,11 @@ class _CreateTrackerScreenState extends ConsumerState<CreateTrackerScreen> {
         children: [
           TextField(
             controller: _title,
+            keyboardType: TextInputType.text,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.next,
+            stylusHandwritingEnabled: false,
+            onTap: requestSoftKeyboard,
             decoration: const InputDecoration(
               labelText: 'Name (e.g. Anatomy internal 1)',
             ),

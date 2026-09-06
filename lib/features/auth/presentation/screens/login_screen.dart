@@ -7,6 +7,7 @@ import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
 
@@ -109,6 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   textInputAction: TextInputAction.next,
+                  stylusHandwritingEnabled: false,
+                  onTap: requestSoftKeyboard,
                   enabled: !_isLoading,
                   validator: AuthValidators.email,
                 ),
@@ -117,8 +120,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _passwordController,
                   decoration: const InputDecoration(labelText: 'Password'),
                   obscureText: true,
+                  keyboardType: TextInputType.visiblePassword,
                   autofillHints: const [AutofillHints.password],
                   textInputAction: TextInputAction.done,
+                  stylusHandwritingEnabled: false,
+                  onTap: requestSoftKeyboard,
                   enabled: !_isLoading,
                   onFieldSubmitted: (_) => _submit(),
                   validator: AuthValidators.password,

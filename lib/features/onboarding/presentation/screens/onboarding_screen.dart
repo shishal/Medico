@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/comic_select_sheet.dart';
@@ -127,7 +128,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             const SizedBox(height: Spacing.lg),
             TextField(
               controller: _nameController,
+              keyboardType: TextInputType.name,
               textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.next,
+              stylusHandwritingEnabled: false,
+              onTap: requestSoftKeyboard,
               decoration: const InputDecoration(labelText: 'Name'),
             ),
             const SizedBox(height: Spacing.md),

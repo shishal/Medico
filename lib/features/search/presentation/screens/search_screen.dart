@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
+import '../../../../core/utils/soft_keyboard.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../../progress/data/progress_repository.dart';
 import '../../../progress/domain/progress_models.dart';
-import '../../../../core/widgets/comic_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -59,6 +60,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Column(
           children: [
             TextField(
+              autofocus: true,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.search,
+              stylusHandwritingEnabled: false,
+              onTap: requestSoftKeyboard,
               decoration: const InputDecoration(
                 hintText: 'Subjects, lessons, PYQs',
                 border: OutlineInputBorder(),

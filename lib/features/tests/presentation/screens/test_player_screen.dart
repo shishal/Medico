@@ -123,7 +123,7 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
                   ? () => context.go(AppRoutes.upgradePath(PlanTier.pro))
                   : () => ref.invalidate(playerSessionProvider(testId)),
               secondaryLabel: 'Back',
-              onSecondary: () => _exit(context, isPractice: false),
+              onSecondary: () => _exit(context),
             ),
           );
         },
@@ -170,23 +170,20 @@ class _TestPlayerScreenState extends ConsumerState<TestPlayerScreen>
             onFinish: () => ref
                 .read(playerSessionProvider(testId).notifier)
                 .finishAndSubmit(),
-            onExit: () =>
-                _exit(context, isPractice: session.isEphemeralPractice),
+            onExit: () => _exit(context),
           );
         },
       ),
     );
   }
 
-  void _exit(BuildContext context, {required bool isPractice}) {
+  void _exit(BuildContext context) {
     _flush();
     if (context.canPop()) {
       context.pop();
       return;
     }
-    context.go(
-      isPractice ? AppRoutes.home : AppRoutes.testDetailPath(widget.testId),
-    );
+    context.go(AppRoutes.home);
   }
 }
 

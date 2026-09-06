@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Fill content/google_sheet/tabs/*.csv with realistic KUHS seed data.
+"""Fill content/google_sheet/tabs/*.csv with a denormalized KUHS seed.
 
-Keeps existing MCQ stems, Tests, and the two Anatomy PYQs already in the
-sheet. Adds lessons/PYQs/resources so every Home → subject → topic → lesson
-path has something to open. Re-run any time; output is deterministic.
+Editor tabs: Universities, Colleges, Textbooks, Questions (wide),
+LessonResources, Phases. Hierarchy (subjects/topics/lessons/papers) is
+inferred by Apps Script on sync. Re-run any time; output is deterministic.
 
 Usage (from repo root):
   python3 scripts/generate_ug_seed_csvs.py
@@ -172,6 +172,49 @@ TOPICS = [
 ]
 
 TOPIC_SUBJECT = {name: subj for subj, name, _ in TOPICS}
+
+UNIVERSITIES = [
+    ("KUHS", "Kerala University of Health Sciences", "Kerala", "kuhs", "TRUE"),
+    ("RGUHS", "Rajiv Gandhi University of Health Sciences", "Karnataka", "rguhs", "FALSE"),
+    ("NTRUHS", "Dr. NTR University of Health Sciences", "Andhra Pradesh", "ntruhs", "FALSE"),
+    ("KNRUHS", "Kaloji Narayana Rao University of Health Sciences", "Telangana", "knruhs", "FALSE"),
+    ("TNMGRMU", "Tamil Nadu Dr. M.G.R. Medical University", "Tamil Nadu", "tnmgrmu", "FALSE"),
+    ("WBUHS", "West Bengal University of Health Sciences", "West Bengal", "wbuhs", "FALSE"),
+    ("RUHS", "Rajasthan University of Health Sciences", "Rajasthan", "ruhs", "FALSE"),
+    ("MUHS", "Maharashtra University of Health Sciences", "Maharashtra", "muhs", "FALSE"),
+]
+
+# Starter colleges so onboarding is never empty for a listed university.
+STARTER_COLLEGES = {
+    "RGUHS": [
+        "Bangalore Medical College and Research Institute",
+        "Mysore Medical College and Research Institute",
+    ],
+    "NTRUHS": [
+        "Andhra Medical College, Visakhapatnam",
+        "Guntur Medical College",
+    ],
+    "KNRUHS": [
+        "Osmania Medical College, Hyderabad",
+        "Gandhi Medical College, Secunderabad",
+    ],
+    "TNMGRMU": [
+        "Madras Medical College, Chennai",
+        "Stanley Medical College, Chennai",
+    ],
+    "WBUHS": [
+        "Medical College, Kolkata",
+        "Nil Ratan Sircar Medical College, Kolkata",
+    ],
+    "RUHS": [
+        "SMS Medical College, Jaipur",
+        "Dr. SN Medical College, Jodhpur",
+    ],
+    "MUHS": [
+        "Grant Medical College, Mumbai",
+        "B.J. Government Medical College, Pune",
+    ],
+}
 
 COLLEGES = [
     "Government Medical College, Thiruvananthapuram",
@@ -729,6 +772,15 @@ def lesson_id(topic: str, name: str) -> str:
     if len(lesson_slug) > 32:
         lesson_slug = lesson_slug[:32].rstrip("-")
     return f"L-{PREFIX[subj]}-{lesson_slug}"
+
+
+def invent_lesson_external_id(subject: str, topic: str, lesson: str) -> str:
+    """Must match inventLessonExternalId_ in Apps Script WideSheet/SheetReader."""
+
+    def token(value: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "-", value.strip().lower()).strip("-").upper()
+
+    return f"L-{token(subject)}-{token(topic)}-{token(lesson)}"[:80]
 
 
 def compose_sample(title: str, bullets: list[str]) -> str:
@@ -1515,10 +1567,12 @@ def read_existing_questions() -> list[dict]:
     with path.open(newline="", encoding="utf-8-sig") as fh:
         rows = list(csv.DictReader(fh))
     cleaned = []
+    seen = set()
     for row in rows:
         ext = (row.get("external_id") or "").strip()
-        if not ext or is_generated_id(ext):
+        if not ext or ext in seen or is_generated_id(ext):
             continue
+        seen.add(ext)
         kind = (row.get("kind") or "").strip().lower()
         # Never round-trip theory rows (multiline sample answers shift columns).
         if kind == "pyq_theory" or ext.startswith("Q-") and "-PYQ-" in ext:
@@ -1580,13 +1634,14 @@ def build() -> None:
                     "display_order": lesson_index + 1,
                     "required_plan": plan,
                     "is_active": "TRUE",
+                    "sheet_external_id": invent_lesson_external_id(subject, topic, lesson_name),
                 }
             )
             lessons_by_topic[topic].append(lid)
 
             lesson_resources.append(
                 {
-                    "lesson_external_id": lid,
+                    "lesson_external_id": invent_lesson_external_id(subject, topic, lesson_name),
                     "title": f"{lesson_name} — KUHS topic page",
                     "url": medico_url(subject),
                     "source_label": "Medico topic page",
@@ -1596,7 +1651,7 @@ def build() -> None:
             )
             lesson_resources.append(
                 {
-                    "lesson_external_id": lid,
+                    "lesson_external_id": invent_lesson_external_id(subject, topic, lesson_name),
                     "title": f"Read more: {lesson_name}",
                     "url": wiki_url(wiki.split("#")[0]),
                     "source_label": "Wikipedia (open reference)",
@@ -1736,15 +1791,22 @@ def build() -> None:
     rr_index: dict[str, int] = defaultdict(int)
     merged_questions: list[dict] = []
     mcq_by_lesson: dict[str, int] = defaultdict(int)
+    lesson_name_to_id = {(L["topic_name"], L["name"]): L["external_id"] for L in lessons}
     for row in existing_q:
         kind = (row.get("kind") or "mcq").strip().lower() or "mcq"
         if kind == "pyq_theory":
             merged_questions.append(row)
             continue
-        topic = row["topic_name"]
+        topic = row.get("topic_name") or ""
         lids = lessons_by_topic.get(topic, [])
         current = (row.get("lesson_external_id") or "").strip()
-        if (not current or current not in seen_lesson_ids) and lids:
+        lesson_name = (row.get("lesson_name") or "").strip()
+        mapped = lesson_name_to_id.get((topic, lesson_name)) if lesson_name else None
+        if mapped:
+            row = dict(row)
+            row["lesson_external_id"] = mapped
+            current = mapped
+        elif (not current or current not in seen_lesson_ids) and lids:
             pick = lids[rr_index[topic] % len(lids)]
             rr_index[topic] += 1
             row = dict(row)
@@ -1844,38 +1906,36 @@ def build() -> None:
     # Static tabs
     write_csv(
         "Universities.csv",
-        ["code", "name", "state", "slug"],
-        [{"code": "KUHS", "name": "Kerala University of Health Sciences", "state": "Kerala", "slug": "kuhs"}],
+        ["code", "name", "state", "slug", "is_fallback"],
+        [
+            {
+                "code": code,
+                "name": name,
+                "state": state,
+                "slug": slug,
+                "is_fallback": fallback,
+            }
+            for code, name, state, slug, fallback in UNIVERSITIES
+        ],
     )
     write_csv(
         "Phases.csv",
         ["code", "name", "display_order"],
         [{"code": c, "name": n, "display_order": o} for c, n, o in PHASES],
     )
+    college_rows = [
+        {"university_code": "KUHS", "name": n} for n in COLLEGES
+    ]
+    for code, *_ in UNIVERSITIES:
+        for name in STARTER_COLLEGES.get(code, []):
+            college_rows.append({"university_code": code, "name": name})
+        college_rows.append(
+            {"university_code": code, "name": "Other / not listed"}
+        )
     write_csv(
         "Colleges.csv",
         ["university_code", "name"],
-        [{"university_code": "KUHS", "name": n} for n in COLLEGES],
-    )
-    write_csv(
-        "Subjects.csv",
-        ["name", "display_order", "phase_code"],
-        [{"name": n, "display_order": o, "phase_code": p} for n, o, p in SUBJECTS],
-    )
-    write_csv(
-        "Topics.csv",
-        ["subject_name", "name", "display_order"],
-        [{"subject_name": s, "name": n, "display_order": o} for s, n, o in TOPICS],
-    )
-    write_csv(
-        "Lessons.csv",
-        ["external_id", "topic_name", "name", "display_order", "required_plan", "is_active"],
-        lessons,
-    )
-    write_csv(
-        "LessonResources.csv",
-        ["lesson_external_id", "title", "url", "source_label", "display_order", "is_free"],
-        lesson_resources,
+        college_rows,
     )
     write_csv(
         "Textbooks.csv",
@@ -1886,14 +1946,30 @@ def build() -> None:
         ],
     )
     write_csv(
-        "ExamPapers.csv",
-        ["external_id", "university_code", "subject_name", "exam_year", "paper_name", "exam_type"],
-        papers,
+        "LessonResources.csv",
+        ["lesson_external_id", "title", "url", "source_label", "display_order", "is_free"],
+        lesson_resources,
     )
 
-    q_fields = [
+    subject_phase = {n: p for n, _o, p in SUBJECTS}
+    lesson_by_id = {L["external_id"]: L for L in lessons}
+    paper_by_id = {p["external_id"]: p for p in papers}
+    apps_by_q: dict[str, list[str]] = defaultdict(list)
+    for a in appearances:
+        apps_by_q[a["question_external_id"]].append(a["paper_external_id"])
+    refs_by_q: dict[str, list[dict]] = defaultdict(list)
+    for r in textbook_refs:
+        refs_by_q[r["question_external_id"]].append(r)
+
+    wide_fields = [
         "external_id",
+        "university_code",
+        "phase_code",
+        "subject_name",
         "topic_name",
+        "lesson_name",
+        "kind",
+        "marks",
         "question_text",
         "option_a",
         "option_b",
@@ -1901,33 +1977,62 @@ def build() -> None:
         "option_d",
         "correct_option",
         "explanation_text",
-        "explanation_video_url",
-        "image_url",
+        "sample_answer_text",
         "difficulty",
-        "source",
         "required_plan",
         "is_active",
-        "kind",
-        "lesson_external_id",
-        "marks",
-        "sample_answer_text",
+        "exam_year",
+        "paper_name",
+        "exam_type",
+        "textbook_key",
+        "page",
+        "section_heading",
     ]
-    write_csv("Questions.csv", q_fields, merged_questions)
-    write_csv(
-        "Appearances.csv",
-        ["question_external_id", "paper_external_id"],
-        appearances,
-    )
-    write_csv(
-        "TextbookRefs.csv",
-        ["question_external_id", "textbook_key", "page", "section_heading"],
-        textbook_refs,
-    )
-    write_csv(
-        "QuestionResources.csv",
-        ["question_external_id", "title", "url", "source_label", "display_order", "is_free"],
-        question_resources,
-    )
+    wide_rows: list[dict] = []
+    seen_q = set()
+    for q in merged_questions:
+        ext = q.get("external_id") or ""
+        lid = (q.get("lesson_external_id") or "").strip()
+        lesson = lesson_by_id.get(lid)
+        topic = q.get("topic_name") or (lesson["topic_name"] if lesson else "")
+        subject = TOPIC_SUBJECT.get(topic, "")
+        phase = subject_phase.get(subject, "")
+        paper_ids = apps_by_q.get(ext) or [None]
+        refs = refs_by_q.get(ext) or [None]
+        for pid in paper_ids:
+            paper = paper_by_id.get(pid) if pid else None
+            for ref in refs:
+                wide_rows.append(
+                    {
+                        "external_id": ext,
+                        "university_code": (paper or {}).get("university_code") or "KUHS",
+                        "phase_code": phase,
+                        "subject_name": subject,
+                        "topic_name": topic,
+                        "lesson_name": lesson["name"] if lesson else "",
+                        "kind": q.get("kind") or "mcq",
+                        "marks": q.get("marks") or "",
+                        "question_text": q.get("question_text") or "",
+                        "option_a": q.get("option_a") or "",
+                        "option_b": q.get("option_b") or "",
+                        "option_c": q.get("option_c") or "",
+                        "option_d": q.get("option_d") or "",
+                        "correct_option": q.get("correct_option") or "",
+                        "explanation_text": q.get("explanation_text") or "",
+                        "sample_answer_text": q.get("sample_answer_text") or "",
+                        "difficulty": q.get("difficulty") or "medium",
+                        "required_plan": q.get("required_plan") or "free",
+                        "is_active": q.get("is_active") or "TRUE",
+                        "exam_year": (paper or {}).get("exam_year") or "",
+                        "paper_name": (paper or {}).get("paper_name") or "",
+                        "exam_type": (paper or {}).get("exam_type") or "",
+                        "textbook_key": (ref or {}).get("textbook_key") or "",
+                        "page": (ref or {}).get("page") or "",
+                        "section_heading": (ref or {}).get("section_heading") or "",
+                    }
+                )
+        seen_q.add(ext)
+    write_csv("Questions.csv", wide_fields, wide_rows)
 
     # Coverage report
     by_kind = defaultdict(int)
@@ -1948,25 +2053,36 @@ def build() -> None:
     empty_pyq = [L["external_id"] for L in lessons if pyq_by_lesson[L["external_id"]] == 0]
     topics_without_lessons = [n for _, n, _ in TOPICS if n not in lessons_by_topic]
 
-    print("Wrote seed CSVs to", TABS)
-    print(f"  colleges          {len(COLLEGES)}")
-    print(f"  subjects          {len(SUBJECTS)}")
-    print(f"  topics            {len(TOPICS)}")
-    print(f"  lessons           {len(lessons)}")
-    print(f"  lesson resources  {len(lesson_resources)}")
+    print("Wrote wide seed CSVs to", TABS)
+    print(f"  universities      {len(UNIVERSITIES)}")
+    print(f"  colleges          {len(college_rows)}")
     print(f"  textbooks         {len(TEXTBOOKS)}")
-    print(f"  exam papers       {len(papers)}")
-    print(f"  questions         {len(merged_questions)}  (mcq={by_kind['mcq']}, pyq_theory={by_kind['pyq_theory']})")
-    print(f"  appearances       {len(appearances)}")
-    print(f"  textbook refs     {len(textbook_refs)}")
-    print(f"  question resources {len(question_resources)}")
+    print(f"  lesson resources  {len(lesson_resources)}")
+    print(f"  question rows     {len(wide_rows)}  (unique ids={len(seen_q)}, mcq={by_kind['mcq']}, pyq_theory={by_kind['pyq_theory']})")
     if topics_without_lessons:
         print("  ERROR topics with no lessons:", topics_without_lessons)
     if empty_pyq:
         print(f"  lessons missing PYQ ({len(empty_pyq)}):", empty_pyq[:8], "...")
     if empty_mcq:
         print(f"  lessons missing MCQ ({len(empty_mcq)}):", empty_mcq[:8], "...")
-    print("  Tests.csv / TestQuestions.csv left unchanged (legacy MCQ catalog).")
+
+    retired = [
+        "Subjects.csv",
+        "Topics.csv",
+        "Lessons.csv",
+        "ExamPapers.csv",
+        "Appearances.csv",
+        "TextbookRefs.csv",
+        "QuestionResources.csv",
+        "QuestionOptions.csv",
+        "Tests.csv",
+        "TestQuestions.csv",
+    ]
+    for name in retired:
+        path = TABS / name
+        if path.exists():
+            path.unlink()
+            print(f"  removed retired tab {name}")
 
 
 if __name__ == "__main__":

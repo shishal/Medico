@@ -2,6 +2,11 @@
 
 part of 'progress_repository.dart';
 
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(progressRepository)
@@ -40,6 +45,7 @@ final class ProgressRepositoryProvider
     return progressRepository(ref);
   }
 
+  /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ProgressRepository value) {
     return $ProviderOverride(
       origin: this,
@@ -49,4 +55,4 @@ final class ProgressRepositoryProvider
 }
 
 String _$progressRepositoryHash() =>
-    r'3333333333333333333333333333333333333333';
+    r'b19c0ceafddfc30555a1d925b11e6a7e97532396';

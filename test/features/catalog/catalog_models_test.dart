@@ -19,4 +19,17 @@ void main() {
     expect(item.topicName, 'Upper Limb Anatomy');
     expect(item.mbbsPhaseId, 'phase-1');
   });
+
+  test('University reads is_fallback', () {
+    final uni = University.fromJson({
+      UniversityColumns.id: 'u1',
+      UniversityColumns.code: 'KUHS',
+      UniversityColumns.name: 'Kerala University of Health Sciences',
+      UniversityColumns.state: 'Kerala',
+      UniversityColumns.slug: 'kuhs',
+      UniversityColumns.isFallback: true,
+    });
+    expect(uni.isFallback, isTrue);
+    expect(uni.code, 'KUHS');
+  });
 }

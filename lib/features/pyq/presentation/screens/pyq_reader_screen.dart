@@ -15,6 +15,7 @@ import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../bookmarks/presentation/widgets/bookmark_icon_button.dart';
 import '../../data/pyq_repository.dart';
 import '../../domain/pyq_models.dart';
+import '../providers/preferred_textbook_provider.dart';
 import '../providers/pyq_providers.dart';
 
 class PyqReaderScreen extends ConsumerWidget {
@@ -77,28 +78,43 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
   Widget build(BuildContext context) {
     final d = widget.detail;
     final plan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
+    final preferred = ref.watch(preferredTextbookProvider);
     final years = d.appearances
         .map((a) => '${a.year} ${a.paperName}')
         .join(' · ');
+    final citations = [...d.textbookRefs];
+    if (preferred != null) {
+      citations.sort((a, b) {
+        final ap = a.sheetKey == preferred ? 0 : 1;
+        final bp = b.sheetKey == preferred ? 0 : 1;
+        return ap.compareTo(bp);
+      });
+    }
+    final keys = {
+      for (final c in d.textbookRefs)
+        if (c.sheetKey != null) c.sheetKey!,
+    };
 
     return ListView(
       padding: const EdgeInsets.all(Spacing.lg),
       children: [
         ComicCard(
           color: Color.alphaBlend(
-            StickerFills.butter.withValues(alpha: 0.4),
+            StickerFills.peach.withValues(alpha: 0.35),
             ComicColors.of(context).sticker,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (d.teaser.marks != null)
-                Text(
-                  '${d.teaser.marks} marks'
-                  '${d.teaser.appearanceCount > 0 ? ' · appeared ${d.teaser.appearanceCount}×' : ''}',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              if (d.teaser.marks != null) const SizedBox(height: Spacing.sm),
+              Text(
+                d.teaser.format.label +
+                    (d.teaser.marks != null ? ' · ${d.teaser.marks} marks' : '') +
+                    (d.teaser.appearanceCount > 0
+                        ? ' · ${d.teaser.appearanceCount}×'
+                        : ''),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              const SizedBox(height: Spacing.sm),
               Text(
                 d.teaser.questionText,
                 style: Theme.of(context).textTheme.titleMedium,
@@ -110,10 +126,34 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
             ],
           ),
         ),
+        if (d.isMcq) ...[
+          const SizedBox(height: Spacing.lg),
+          _McqOptions(detail: d, revealed: _showSample),
+        ],
         const SizedBox(height: Spacing.lg),
-        Text('Sample answer', style: Theme.of(context).textTheme.titleSmall),
+        Text(
+          d.isMcq ? 'Answer' : 'Sample answer',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
         const SizedBox(height: Spacing.sm),
-        if (!d.canReadSample)
+        if (d.isMcq)
+          _showSample
+              ? ComicCard(
+                  child: Text(
+                    [
+                      if (d.correctOption != null)
+                        'Correct option: ${d.correctOption}',
+                      if (d.explanationText != null &&
+                          d.explanationText!.trim().isNotEmpty)
+                        d.explanationText!,
+                    ].join('\n\n'),
+                  ),
+                )
+              : OutlinedButton(
+                  onPressed: () => setState(() => _showSample = true),
+                  child: const Text('Show answer'),
+                )
+        else if (!d.canReadSample)
           ComicCard(
             onTap: () => context.push(AppRoutes.upgradePath(PlanTier.pro)),
             child: const ListTile(
@@ -132,10 +172,33 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
           )
         else
           ComicCard(child: Text(d.sampleAnswer!)),
-        if (d.textbookRefs.isNotEmpty) ...[
+        if (citations.isNotEmpty) ...[
           const SizedBox(height: Spacing.lg),
           Text('Textbook pages', style: Theme.of(context).textTheme.titleSmall),
-          for (final c in d.textbookRefs)
+          if (keys.length > 1) ...[
+            const SizedBox(height: Spacing.sm),
+            Wrap(
+              spacing: Spacing.sm,
+              children: [
+                for (final key in keys)
+                  ChoiceChip(
+                    label: Text(
+                      citations
+                          .firstWhere(
+                            (c) => c.sheetKey == key,
+                            orElse: () => citations.first,
+                          )
+                          .title,
+                    ),
+                    selected: preferred == key,
+                    onSelected: (_) => ref
+                        .read(preferredTextbookProvider.notifier)
+                        .setKey(preferred == key ? null : key),
+                  ),
+              ],
+            ),
+          ],
+          for (final c in citations)
             ComicCard(
               padding: const EdgeInsets.symmetric(
                 horizontal: Spacing.sm,
@@ -165,7 +228,7 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
                     case Success():
                       setState(() => _learnt = true);
                     case Failure(:final message):
-                      ScaffoldMessenger.of(context)
+                      ScaffoldMessenger.of(this.context)
                           .showSnackBar(SnackBar(content: Text(message)));
                   }
                 },
@@ -206,5 +269,40 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
           ),
         ),
     ];
+  }
+}
+
+class _McqOptions extends StatelessWidget {
+  const _McqOptions({required this.detail, required this.revealed});
+
+  final PyqDetail detail;
+  final bool revealed;
+
+  @override
+  Widget build(BuildContext context) {
+    final options = <String, String?>{
+      'A': detail.optionA,
+      'B': detail.optionB,
+      'C': detail.optionC,
+      'D': detail.optionD,
+    };
+    return Column(
+      children: [
+        for (final entry in options.entries)
+          if (entry.value != null && entry.value!.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: Spacing.sm),
+              child: ComicCard(
+                color: revealed && entry.key == detail.correctOption
+                    ? Color.alphaBlend(
+                        Colors.green.withValues(alpha: 0.18),
+                        ComicColors.of(context).sticker,
+                      )
+                    : null,
+                child: Text('${entry.key}. ${entry.value}'),
+              ),
+            ),
+      ],
+    );
   }
 }

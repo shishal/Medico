@@ -6,10 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medico/core/router/app_routes.dart';
 import 'package:medico/core/theme/app_theme.dart';
 import 'package:medico/features/catalog/domain/catalog_models.dart';
+import 'package:medico/features/catalog/domain/university_coverage.dart';
 import 'package:medico/features/catalog/presentation/providers/catalog_providers.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/profile/domain/user_profile.dart';
@@ -47,6 +49,7 @@ class _NoopSync extends PendingSubmitSync {
 
 void main() {
   testWidgets('tapping a year sticker swaps the subject grid', (tester) async {
+    SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(400, 1200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -130,6 +133,15 @@ void main() {
           trackerListProvider.overrideWith((ref) async => const []),
           inProgressAttemptsProvider.overrideWith(_NoAttempts.new),
           pendingSubmitSyncProvider.overrideWith(_NoopSync.new),
+          universitiesProvider.overrideWith((ref) async => const []),
+          universityCoverageProvider.overrideWith(
+            (ref) async => const UniversityCoverage(
+              paperCount: 12,
+              pyqCount: 40,
+              usingFallback: false,
+              contentUniversityId: 'kuhs',
+            ),
+          ),
         ],
         child: RepaintBoundary(
           child: MaterialApp.router(

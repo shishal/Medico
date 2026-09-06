@@ -2,8 +2,12 @@
 
 part of 'catalog_providers.dart';
 
-// ignore_for_file: type=lint, type=warning
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// Year the student is browsing on Home. Null = follow the profile year.
 /// Tapping a year sticker writes here so subjects can change immediately.
 
@@ -43,7 +47,8 @@ final class CatalogBrowsePhaseProvider
   }
 }
 
-String _$catalogBrowsePhaseHash() => r'catalogbrowsephasehashplaceholder000001';
+String _$catalogBrowsePhaseHash() =>
+    r'16a2687428ab7ac8cc2010d6d093763e16cef2a5';
 
 /// Year the student is browsing on Home. Null = follow the profile year.
 /// Tapping a year sticker writes here so subjects can change immediately.
@@ -72,6 +77,7 @@ abstract class _$CatalogBrowsePhase extends $Notifier<String?> {
 final activePhaseIdProvider = ActivePhaseIdProvider._();
 
 /// Effective catalog year: explicit browse selection, else onboarding year.
+
 final class ActivePhaseIdProvider
     extends $FunctionalProvider<String?, String?, String?>
     with $Provider<String?> {
@@ -109,7 +115,7 @@ final class ActivePhaseIdProvider
   }
 }
 
-String _$activePhaseIdHash() => r'activephaseidhashplaceholder00000000001';
+String _$activePhaseIdHash() => r'20ee8fbdd064601ed9e791691f56839844eac473';
 
 @ProviderFor(universities)
 final universitiesProvider = UniversitiesProvider._();
@@ -148,7 +154,7 @@ final class UniversitiesProvider
   }
 }
 
-String _$universitiesHash() => r'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+String _$universitiesHash() => r'bf9520eaaeb7096b1ec63399e6979c913d327879';
 
 @ProviderFor(mbbsPhases)
 final mbbsPhasesProvider = MbbsPhasesProvider._();
@@ -187,7 +193,7 @@ final class MbbsPhasesProvider
   }
 }
 
-String _$mbbsPhasesHash() => r'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+String _$mbbsPhasesHash() => r'9995a086bb968c8b7222d240193b6f4ffd1915e8';
 
 @ProviderFor(colleges)
 final collegesProvider = CollegesFamily._();
@@ -214,6 +220,13 @@ final class CollegesProvider
   @override
   String debugGetCreateSourceHash() => _$collegesHash();
 
+  @override
+  String toString() {
+    return r'collegesProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $FutureProviderElement<List<College>> $createElement(
@@ -232,10 +245,12 @@ final class CollegesProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$collegesHash() => r'cccccccccccccccccccccccccccccccccccccccc';
+String _$collegesHash() => r'e1718c99f6b6811f79292192bd06d80d5c678946';
 
 final class CollegesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<College>>, String> {
@@ -250,6 +265,9 @@ final class CollegesFamily extends $Family
 
   CollegesProvider call(String universityId) =>
       CollegesProvider._(argument: universityId, from: this);
+
+  @override
+  String toString() => r'collegesProvider';
 }
 
 @ProviderFor(phaseSubjects)
@@ -291,7 +309,7 @@ final class PhaseSubjectsProvider
   }
 }
 
-String _$phaseSubjectsHash() => r'dddddddddddddddddddddddddddddddddddddddd';
+String _$phaseSubjectsHash() => r'5cd5d4cf63ae06feb5d646d2181e0ec76567ddae';
 
 @ProviderFor(subjectTopics)
 final subjectTopicsProvider = SubjectTopicsFamily._();
@@ -320,6 +338,13 @@ final class SubjectTopicsProvider
   @override
   String debugGetCreateSourceHash() => _$subjectTopicsHash();
 
+  @override
+  String toString() {
+    return r'subjectTopicsProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $FutureProviderElement<List<CatalogTopic>> $createElement(
@@ -338,10 +363,12 @@ final class SubjectTopicsProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$subjectTopicsHash() => r'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+String _$subjectTopicsHash() => r'919f5f9478c998d41682f2b1f11c329b98b25b26';
 
 final class SubjectTopicsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<CatalogTopic>>, String> {
@@ -356,6 +383,9 @@ final class SubjectTopicsFamily extends $Family
 
   SubjectTopicsProvider call(String subjectId) =>
       SubjectTopicsProvider._(argument: subjectId, from: this);
+
+  @override
+  String toString() => r'subjectTopicsProvider';
 }
 
 @ProviderFor(topicLessons)
@@ -385,6 +415,13 @@ final class TopicLessonsProvider
   @override
   String debugGetCreateSourceHash() => _$topicLessonsHash();
 
+  @override
+  String toString() {
+    return r'topicLessonsProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $FutureProviderElement<List<CatalogLesson>> $createElement(
@@ -403,10 +440,12 @@ final class TopicLessonsProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$topicLessonsHash() => r'ffffffffffffffffffffffffffffffffffffffff';
+String _$topicLessonsHash() => r'1065659d7306d55c6e9705c97bc30e7616e2bc4c';
 
 final class TopicLessonsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<CatalogLesson>>, String> {
@@ -421,7 +460,52 @@ final class TopicLessonsFamily extends $Family
 
   TopicLessonsProvider call(String topicId) =>
       TopicLessonsProvider._(argument: topicId, from: this);
+
+  @override
+  String toString() => r'topicLessonsProvider';
 }
+
+@ProviderFor(universityCoverage)
+final universityCoverageProvider = UniversityCoverageProvider._();
+
+final class UniversityCoverageProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<UniversityCoverage>,
+          UniversityCoverage,
+          FutureOr<UniversityCoverage>
+        >
+    with
+        $FutureModifier<UniversityCoverage>,
+        $FutureProvider<UniversityCoverage> {
+  UniversityCoverageProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'universityCoverageProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$universityCoverageHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<UniversityCoverage> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<UniversityCoverage> create(Ref ref) {
+    return universityCoverage(ref);
+  }
+}
+
+String _$universityCoverageHash() =>
+    r'278e83c4ce4cfbabf692523606fc4f6885abb50f';
 
 @ProviderFor(lessonDetail)
 final lessonDetailProvider = LessonDetailFamily._();
@@ -448,6 +532,13 @@ final class LessonDetailProvider
   @override
   String debugGetCreateSourceHash() => _$lessonDetailHash();
 
+  @override
+  String toString() {
+    return r'lessonDetailProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $FutureProviderElement<CatalogLesson?> $createElement(
@@ -466,10 +557,12 @@ final class LessonDetailProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$lessonDetailHash() => r'1212121212121212121212121212121212121212';
+String _$lessonDetailHash() => r'a0f411cf1dc0c27e3aefac249cee84f09c980289';
 
 final class LessonDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<CatalogLesson?>, String> {
@@ -484,4 +577,7 @@ final class LessonDetailFamily extends $Family
 
   LessonDetailProvider call(String lessonId) =>
       LessonDetailProvider._(argument: lessonId, from: this);
+
+  @override
+  String toString() => r'lessonDetailProvider';
 }

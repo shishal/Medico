@@ -2,6 +2,13 @@
 
 part of 'pyq_repository.dart';
 
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
 @ProviderFor(pyqRepository)
 final pyqRepositoryProvider = PyqRepositoryProvider._();
 
@@ -32,6 +39,7 @@ final class PyqRepositoryProvider
     return pyqRepository(ref);
   }
 
+  /// {@macro riverpod.override_with_value}
   Override overrideWithValue(PyqRepository value) {
     return $ProviderOverride(
       origin: this,
@@ -40,4 +48,4 @@ final class PyqRepositoryProvider
   }
 }
 
-String _$pyqRepositoryHash() => r'2222222222222222222222222222222222222222';
+String _$pyqRepositoryHash() => r'34009b46489316ba5b6552a4c6213bce1fb77ce4';

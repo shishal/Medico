@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/utils/result.dart';
 import '../../data/catalog_repository.dart';
 import '../../domain/catalog_models.dart';
+import '../../domain/university_coverage.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 
 part 'catalog_providers.g.dart';
@@ -87,6 +88,18 @@ Future<List<CatalogLesson>> topicLessons(Ref ref, String topicId) async {
   final result = await ref
       .watch(catalogRepositoryProvider)
       .fetchLessons(topicId);
+  return switch (result) {
+    Success(:final value) => value,
+    Failure(:final message) => throw Exception(message),
+  };
+}
+
+@riverpod
+Future<UniversityCoverage> universityCoverage(Ref ref) async {
+  final universityId = ref.watch(userProfileProvider).value?.universityId;
+  final result = await ref
+      .watch(catalogRepositoryProvider)
+      .fetchCoverage(universityId);
   return switch (result) {
     Success(:final value) => value,
     Failure(:final message) => throw Exception(message),

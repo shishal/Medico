@@ -10,6 +10,7 @@ import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/comic_select_sheet.dart';
+import '../../../../core/widgets/theme_mode_selector.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
 import '../../../catalog/presentation/widgets/year_picker.dart';
@@ -25,31 +26,20 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameController = TextEditingController();
+  var _step = 0;
   String? _universityId;
-  String? _universityName;
   String? _collegeId;
   String? _phaseId;
   int _batchYear = DateTime.now().year;
   bool _saving = false;
   String? _error;
 
+  static const _stepCount = 4;
+
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
-  }
-
-  void _applyUniversity(List<University> items) {
-    if (items.isEmpty || _universityId != null) return;
-    final kuhs = items.where((u) => u.code == 'KUHS');
-    final chosen = kuhs.isNotEmpty ? kuhs.first : items.first;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _universityId != null) return;
-      setState(() {
-        _universityId = chosen.id;
-        _universityName = chosen.name;
-      });
-    });
   }
 
   Future<void> _submit() async {
@@ -67,9 +57,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _error = null;
     });
 
-    final result = await ref
-        .read(profileRepositoryProvider)
-        .saveOnboarding(
+    final result = await ref.read(profileRepositoryProvider).saveOnboarding(
           fullName: name,
           universityId: _universityId!,
           collegeId: _collegeId!,
@@ -90,6 +78,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  void _next() {
+    if (_step == 1 && _nameController.text.trim().isEmpty) {
+      setState(() => _error = 'Add your name.');
+      return;
+    }
+    if (_step == 2 && _phaseId == null) {
+      setState(() => _error = 'Pick your MBBS year.');
+      return;
+    }
+    setState(() {
+      _error = null;
+      _step += 1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final universities = ref.watch(universitiesProvider);
@@ -106,7 +109,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             const Center(
               child: ComicMascot(
                 asset: BrandAssets.mascotStudy,
-                size: 140,
+                size: 120,
                 heroTag: 'onboarding-docci',
               ),
             ),
@@ -119,100 +122,96 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
             const SizedBox(height: Spacing.sm),
             Text(
-              'University is KUHS. Pick your year — that unlocks that year’s subjects on Home.',
+              'Step ${_step + 1} of $_stepCount',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: Spacing.lg),
-            TextField(
-              controller: _nameController,
-              keyboardType: TextInputType.name,
-              textCapitalization: TextCapitalization.words,
-              textInputAction: TextInputAction.next,
-              stylusHandwritingEnabled: false,
-              onTap: requestSoftKeyboard,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            const SizedBox(height: Spacing.md),
-            universities.when(
-              data: (items) {
-                _applyUniversity(items);
-                return ComicCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'University',
-                        style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                      const SizedBox(height: Spacing.xs),
-                      Text(
-                        _universityName ?? 'Loading…',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                );
-              },
-              loading: () => const LinearProgressIndicator(),
-              error: (e, _) => Text('$e'),
-            ),
-            const SizedBox(height: Spacing.md),
-            colleges.when(
-              data: (items) {
-                final selected = items.where((c) => c.id == _collegeId);
-                return ComicSelectField<College>(
-                  label: 'College',
-                  items: items,
-                  value: selected.isEmpty ? null : selected.first,
-                  labelOf: (c) => c.name,
-                  onSelected: (c) => setState(() {
-                    _collegeId = c.id;
-                  }),
-                );
-              },
-              loading: () => const LinearProgressIndicator(),
-              error: (e, _) => Text('$e'),
-            ),
-            const SizedBox(height: Spacing.lg),
-            Text(
-              'Current MBBS year',
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: Spacing.sm),
-            phases.when(
-              data: (items) {
-                return YearPickerRow(
-                  phases: items,
-                  selectedId: _phaseId,
-                  onSelect: (id) {
-                    setState(() => _phaseId = id);
-                    ref.read(catalogBrowsePhaseProvider.notifier).select(id);
-                  },
-                  padding: EdgeInsets.zero,
-                );
-              },
-              loading: () => const LinearProgressIndicator(),
-              error: (e, _) => Text('$e'),
-            ),
-            const SizedBox(height: Spacing.md),
-            ComicSelectField<int>(
-              label: 'Batch year',
-              items: [
-                for (
-                  var y = DateTime.now().year;
-                  y >= DateTime.now().year - 6;
-                  y--
-                )
-                  y,
-              ],
-              value: _batchYear,
-              labelOf: (y) => '$y',
-              onSelected: (y) => setState(() => _batchYear = y),
-            ),
+            if (_step == 0) const ComicCard(child: ThemeModeSelector()),
+            if (_step == 1)
+              TextField(
+                controller: _nameController,
+                keyboardType: TextInputType.name,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.next,
+                stylusHandwritingEnabled: false,
+                onTap: requestSoftKeyboard,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+            if (_step == 2) ...[
+              Text(
+                'Current MBBS year',
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: Spacing.sm),
+              phases.when(
+                data: (items) {
+                  return YearPickerRow(
+                    phases: items,
+                    selectedId: _phaseId,
+                    onSelect: (id) {
+                      setState(() => _phaseId = id);
+                      ref.read(catalogBrowsePhaseProvider.notifier).select(id);
+                    },
+                    padding: EdgeInsets.zero,
+                  );
+                },
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text('$e'),
+              ),
+            ],
+            if (_step == 3) ...[
+              universities.when(
+                data: (items) {
+                  final selected = items.where((u) => u.id == _universityId);
+                  return ComicSelectField<University>(
+                    label: 'University',
+                    items: items,
+                    value: selected.isEmpty ? null : selected.first,
+                    labelOf: (u) => '${u.code} · ${u.name}',
+                    onSelected: (u) => setState(() {
+                      _universityId = u.id;
+                      _collegeId = null;
+                    }),
+                  );
+                },
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text('$e'),
+              ),
+              const SizedBox(height: Spacing.md),
+              colleges.when(
+                data: (items) {
+                  final selected = items.where((c) => c.id == _collegeId);
+                  return ComicSelectField<College>(
+                    label: 'College',
+                    items: items,
+                    value: selected.isEmpty ? null : selected.first,
+                    labelOf: (c) => c.name,
+                    onSelected: (c) => setState(() => _collegeId = c.id),
+                  );
+                },
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text('$e'),
+              ),
+              const SizedBox(height: Spacing.md),
+              ComicSelectField<int>(
+                label: 'Batch year',
+                items: [
+                  for (
+                    var y = DateTime.now().year;
+                    y >= DateTime.now().year - 6;
+                    y--
+                  )
+                    y,
+                ],
+                value: _batchYear,
+                labelOf: (y) => '$y',
+                onSelected: (y) => setState(() => _batchYear = y),
+              ),
+            ],
             if (_error != null) ...[
               const SizedBox(height: Spacing.md),
               Text(
@@ -221,15 +220,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ],
             const SizedBox(height: Spacing.lg),
-            FilledButton(
-              onPressed: _saving ? null : _submit,
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Continue'),
+            Row(
+              children: [
+                if (_step > 0)
+                  OutlinedButton(
+                    onPressed: () => setState(() {
+                      _error = null;
+                      _step -= 1;
+                    }),
+                    child: const Text('Back'),
+                  ),
+                if (_step > 0) const SizedBox(width: Spacing.md),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _saving
+                        ? null
+                        : (_step == _stepCount - 1 ? _submit : _next),
+                    child: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(_step == _stepCount - 1 ? 'Continue' : 'Next'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

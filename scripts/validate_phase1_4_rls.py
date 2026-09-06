@@ -126,7 +126,7 @@ def main() -> int:
 
             if free_active == 0:
                 print(
-                    "FAIL: no active free questions — run scripts/seed_phase1_3.py first"
+                    "FAIL: no active free questions — seed the catalog first"
                 )
                 return 1
             if pro_active + elite_active == 0:

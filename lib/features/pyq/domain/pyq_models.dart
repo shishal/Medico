@@ -1,5 +1,6 @@
 import '../../../core/supabase/tables.dart';
 import '../../profile/domain/plan_tier.dart';
+import 'question_format.dart';
 
 class PyqTeaser {
   const PyqTeaser({
@@ -9,6 +10,9 @@ class PyqTeaser {
     this.marks,
     required this.requiredPlan,
     required this.appearanceCount,
+    this.kind = 'pyq_theory',
+    this.textbookLine,
+    this.appearanceYears = const [],
   });
 
   final String id;
@@ -17,6 +21,14 @@ class PyqTeaser {
   final num? marks;
   final PlanTier requiredPlan;
   final int appearanceCount;
+  final String kind;
+  final String? textbookLine;
+  final List<int> appearanceYears;
+
+  QuestionFormat get format =>
+      QuestionFormat.fromKindAndMarks(kind: kind, marks: marks);
+
+  bool get isHighYield => appearanceCount >= 2;
 
   factory PyqTeaser.fromJson(Map<String, dynamic> json) {
     return PyqTeaser(
@@ -28,8 +40,37 @@ class PyqTeaser {
         json[PyqTeaserColumns.requiredPlan] as String? ?? 'free',
       ),
       appearanceCount: _asInt(json[PyqTeaserColumns.appearanceCount]),
+      kind: json[PyqTeaserColumns.kind] as String? ?? 'pyq_theory',
     );
   }
+
+  PyqTeaser copyWith({
+    String? textbookLine,
+    List<int>? appearanceYears,
+    int? appearanceCount,
+  }) {
+    return PyqTeaser(
+      id: id,
+      lessonId: lessonId,
+      questionText: questionText,
+      marks: marks,
+      requiredPlan: requiredPlan,
+      appearanceCount: appearanceCount ?? this.appearanceCount,
+      kind: kind,
+      textbookLine: textbookLine ?? this.textbookLine,
+      appearanceYears: appearanceYears ?? this.appearanceYears,
+    );
+  }
+}
+
+class PyqLessonFeed {
+  const PyqLessonFeed({
+    required this.teasers,
+    required this.usingFallback,
+  });
+
+  final List<PyqTeaser> teasers;
+  final bool usingFallback;
 }
 
 class ResourceLink {
@@ -65,6 +106,7 @@ class TextbookCitation {
     this.edition,
     required this.page,
     this.sectionHeading,
+    this.sheetKey,
   });
 
   final String title;
@@ -72,6 +114,7 @@ class TextbookCitation {
   final String? edition;
   final int page;
   final String? sectionHeading;
+  final String? sheetKey;
 
   String get label {
     final ed = edition == null ? '' : ' ($edition)';
@@ -88,6 +131,7 @@ class TextbookCitation {
       edition: map[TextbookColumns.edition] as String?,
       page: _asInt(json[TextbookRefColumns.page]),
       sectionHeading: json[TextbookRefColumns.sectionHeading] as String?,
+      sheetKey: map[TextbookColumns.sheetKey] as String?,
     );
   }
 }

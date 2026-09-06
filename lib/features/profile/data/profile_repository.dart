@@ -112,32 +112,29 @@ class ProfileRepository {
     }
   }
 
-  /// Change year / college / batch after onboarding. Does not touch plan.
+  /// Change name / university / year / college / batch after onboarding.
   Future<Result<UserProfile>> updateAcademic({
     String? fullName,
+    required String universityId,
     String? collegeId,
-    int? batchYear,
-    String? mbbsPhaseId,
+    required int batchYear,
+    required String mbbsPhaseId,
   }) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) {
       return const Failure('Not signed in.');
     }
 
-    final patch = <String, dynamic>{
-      ProfileColumns.fullName: ?fullName,
-      ProfileColumns.collegeId: ?collegeId,
-      ProfileColumns.batchYear: ?batchYear,
-      ProfileColumns.mbbsPhaseId: ?mbbsPhaseId,
-    };
-    if (patch.isEmpty) {
-      return fetchOwnProfile();
-    }
-
     try {
       final row = await _client
           .from(Tables.profiles)
-          .update(patch)
+          .update({
+            ProfileColumns.fullName: ?fullName,
+            ProfileColumns.universityId: universityId,
+            ProfileColumns.collegeId: collegeId,
+            ProfileColumns.batchYear: batchYear,
+            ProfileColumns.mbbsPhaseId: mbbsPhaseId,
+          })
           .eq(ProfileColumns.id, userId)
           .select()
           .single();

@@ -98,6 +98,24 @@ function parseBool_(raw, tab, row, field, errors) {
   return null;
 }
 
+/** Blank cell → defaultValue. Checkboxes and TRUE/FALSE still validate. */
+function parseOptionalBool_(raw, tab, row, field, errors, defaultValue) {
+  if (typeof raw === 'boolean') return raw;
+  if (raw === '' || raw == null) return defaultValue;
+  return parseBool_(raw, tab, row, field, errors);
+}
+
+/** Stable lesson upsert key from names — keep in sync with generate_ug_seed_csvs.py. */
+function inventLessonExternalId_(subjectName, topicName, lessonName) {
+  function token(s) {
+    return normKey_(s)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toUpperCase();
+  }
+  return ('L-' + token(subjectName) + '-' + token(topicName) + '-' + token(lessonName)).substring(0, 80);
+}
+
 function parseIntRequired_(raw, tab, row, field, errors) {
   if (raw === '' || raw == null) {
     errors.push(tab + ' row ' + row + ': ' + field + ' is required');

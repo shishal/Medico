@@ -2,6 +2,11 @@
 
 part of 'pyq_providers.dart';
 
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(lessonPyqs)
@@ -10,11 +15,11 @@ final lessonPyqsProvider = LessonPyqsFamily._();
 final class LessonPyqsProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<PyqTeaser>>,
-          List<PyqTeaser>,
-          FutureOr<List<PyqTeaser>>
+          AsyncValue<PyqLessonFeed>,
+          PyqLessonFeed,
+          FutureOr<PyqLessonFeed>
         >
-    with $FutureModifier<List<PyqTeaser>>, $FutureProvider<List<PyqTeaser>> {
+    with $FutureModifier<PyqLessonFeed>, $FutureProvider<PyqLessonFeed> {
   LessonPyqsProvider._({
     required LessonPyqsFamily super.from,
     required String super.argument,
@@ -29,14 +34,21 @@ final class LessonPyqsProvider
   @override
   String debugGetCreateSourceHash() => _$lessonPyqsHash();
 
+  @override
+  String toString() {
+    return r'lessonPyqsProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
-  $FutureProviderElement<List<PyqTeaser>> $createElement(
+  $FutureProviderElement<PyqLessonFeed> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<PyqTeaser>> create(Ref ref) {
+  FutureOr<PyqLessonFeed> create(Ref ref) {
     final argument = this.argument as String;
     return lessonPyqs(ref, argument);
   }
@@ -47,13 +59,15 @@ final class LessonPyqsProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$lessonPyqsHash() => r'1313131313131313131313131313131313131313';
+String _$lessonPyqsHash() => r'245f4008d4da7a5fa0644430b54a44eea6ad5aef';
 
 final class LessonPyqsFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<PyqTeaser>>, String> {
+    with $FunctionalFamilyOverride<FutureOr<PyqLessonFeed>, String> {
   LessonPyqsFamily._()
     : super(
         retry: null,
@@ -65,6 +79,9 @@ final class LessonPyqsFamily extends $Family
 
   LessonPyqsProvider call(String lessonId) =>
       LessonPyqsProvider._(argument: lessonId, from: this);
+
+  @override
+  String toString() => r'lessonPyqsProvider';
 }
 
 @ProviderFor(pyqDetail)
@@ -72,7 +89,11 @@ final pyqDetailProvider = PyqDetailFamily._();
 
 final class PyqDetailProvider
     extends
-        $FunctionalProvider<AsyncValue<PyqDetail>, PyqDetail, FutureOr<PyqDetail>>
+        $FunctionalProvider<
+          AsyncValue<PyqDetail>,
+          PyqDetail,
+          FutureOr<PyqDetail>
+        >
     with $FutureModifier<PyqDetail>, $FutureProvider<PyqDetail> {
   PyqDetailProvider._({
     required PyqDetailFamily super.from,
@@ -87,6 +108,13 @@ final class PyqDetailProvider
 
   @override
   String debugGetCreateSourceHash() => _$pyqDetailHash();
+
+  @override
+  String toString() {
+    return r'pyqDetailProvider'
+        ''
+        '($argument)';
+  }
 
   @$internal
   @override
@@ -105,10 +133,12 @@ final class PyqDetailProvider
   }
 
   @override
-  int get hashCode => argument.hashCode;
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$pyqDetailHash() => r'1414141414141414141414141414141414141414';
+String _$pyqDetailHash() => r'8745bc3a0effe519046e16754fab8098ba9b116f';
 
 final class PyqDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<PyqDetail>, String> {
@@ -123,4 +153,7 @@ final class PyqDetailFamily extends $Family
 
   PyqDetailProvider call(String questionId) =>
       PyqDetailProvider._(argument: questionId, from: this);
+
+  @override
+  String toString() => r'pyqDetailProvider';
 }

@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'comic_colors.dart';
 import 'spacing.dart';
 
-/// Material 3 + soft dashboard chrome, using the comic paper/pastel palette.
-/// Seed stays deep teal. Urgent orange is timer/submit only.
+/// Material 3 + Gecko-like charcoal/orange chrome. Docci stays in brand assets.
 abstract final class AppTheme {
-  static const Color seedColor = Color(0xFF0D7377);
+  /// Coral-orange — CTAs, high-yield, filled buttons.
+  static const Color seedColor = Color(0xFFF25C2D);
 
-  /// Reserved for urgent actions only: timer running low, submit test, etc.
-  static const Color accentUrgent = Color(0xFFE65100);
+  /// Same family as [seedColor]; timer-low / submit.
+  static const Color accentUrgent = seedColor;
+
+  /// Native splash + Flutter splash canvas (dark-first, no teal flash).
+  static const Color splashCanvas = Color(0xFF121212);
 
   static const double cardRadius = 22;
 
@@ -24,7 +27,14 @@ abstract final class AppTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,
-    ).copyWith(surface: comic.paper);
+    ).copyWith(
+      surface: comic.paper,
+      primary: seedColor,
+      onPrimary: Colors.white,
+      secondary: comic.accentPurple,
+      onSecondary: Colors.white,
+      tertiary: comic.proGold,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -55,6 +65,8 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
+          backgroundColor: seedColor,
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(
             horizontal: Spacing.lg,
             vertical: Spacing.md,
@@ -73,6 +85,8 @@ abstract final class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: seedColor,
+        foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
       inputDecorationTheme: InputDecorationTheme(

@@ -34,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
             const ComicSectionTitle(
               title: 'Subjects',
               subtitle:
-                  'Subject → topic → lesson → PYQs. The ring is lessons marked learnt — not a PYQ count.',
+                  'Tap a subject for PYQs. Filter by paper, year, or chapter. The ring is lessons marked learnt — not a PYQ count.',
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 280),

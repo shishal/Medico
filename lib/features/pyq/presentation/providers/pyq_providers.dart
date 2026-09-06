@@ -23,6 +23,19 @@ Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
 }
 
 @riverpod
+Future<PyqSubjectFeed> subjectPyqs(Ref ref, String subjectId) async {
+  final universityId = ref.watch(userProfileProvider).value?.universityId;
+  final result = await ref.watch(pyqRepositoryProvider).fetchTeasersForSubject(
+        subjectId: subjectId,
+        universityId: universityId,
+      );
+  return switch (result) {
+    Success(:final value) => value,
+    Failure(:final message) => throw Exception(message),
+  };
+}
+
+@riverpod
 Future<PyqDetail> pyqDetail(Ref ref, String questionId) async {
   final plan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
   final result = await ref.watch(pyqRepositoryProvider).fetchDetail(

@@ -167,7 +167,7 @@ void main() {
     expect(find.text('Start practice'), findsOneWidget);
     expect(find.byKey(const ValueKey('year-chip-p2')), findsNothing);
     expect(
-      find.textContaining('Subject → topic → lesson → PYQs'),
+      find.textContaining('Tap a subject for PYQs'),
       findsOneWidget,
     );
     expect(

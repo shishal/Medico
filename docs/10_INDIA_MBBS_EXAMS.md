@@ -4,8 +4,7 @@ Reference for product and catalog decisions. The app’s job is to help a
 student pass **affiliating-university professional exams** (and the college
 internals that feed them), not NEET-PG.
 
-**Status:** research note. Do **not** treat the “intended browse” section as
-shipped IA until it is confirmed and scheduled in `docs/03_BUILD_PLAN.md`.
+**Status:** research note plus shipped subject-first PYQ browse (see §6–7).
 
 Sources (Aug 2023–2025, not a substitute for the current university
 notification):
@@ -179,30 +178,28 @@ trackers; also list papers by year / Paper I / Paper II.
 
 ### Currently true in the app (browse)
 
-Home → subject → **topic list** → **lesson list** → PYQs.
+Home → subject → **that subject’s PYQs**, with paper / year / format / chapter
+chips. **Chapters** opens topic → lesson for trackers and mark-learnt.
 
-That is a **curriculum browser**. It is the wrong **primary** path for
-“help me with my university exam”, because it forces a single-topic funnel
-before any real paper is visible.
-
-### Intended student path (pending confirmation — not implemented)
+### Student path (shipped)
 
 1. Home → tap **subject** (Anatomy)
 2. Land on **that subject’s PYQs** (university-filtered, KUHS fallback
    banner when needed)
 3. **Group / filter**, do not hide the list:
-   - Paper I / Paper II / year (reconstruct a real paper in exam order)
-   - Essay / Short / VSA / MCQ (marks, already in the lesson reader)
-   - Chapter / lesson (revision and trackers)
-4. Trackers: pick chapters/lessons (and later question sets), not “unlock
-   PYQs by drilling the tree”
+   - Paper I / Paper II / year (reconstruct a real paper)
+   - Essay / Short / VSA / MCQ
+   - Chapter (revision; Trackers still pick lessons)
+4. **Chapters** in the app bar still opens topic → lesson for mark-learnt
 
-Do **not** delete topic/lesson. They remain the syllabus index and the
-tracker unit. Change **what opening a subject shows first**.
+Topic/lesson stay the syllabus index. Opening a subject no longer funnels
+through them first. Exam order inside a paper is not stored yet (no
+`order_index` on appearances); a Paper+year filter sorts essay → short →
+VSA → MCQ.
 
 ---
 
-## 7. Product decision (waiting)
+## 7. Product decision (confirmed)
 
 The owner’s understanding is **correct** for India MBBS university exams:
 
@@ -210,9 +207,9 @@ The owner’s understanding is **correct** for India MBBS university exams:
 > and feed trackers. Real papers mix topics, so the paper is the upload
 > unit and the chapter is a tag.
 
-One addition from the research: **Paper I / Paper II / year must be
-first-class filters**, not only chapter chips — that is how the university
-prints the exam.
+**Paper I / Paper II / year** are first-class filters.
 
-No browse rewrite until this is confirmed in chat and given a build-plan
-task.
+**Shipped browse:** Home → subject → that subject’s PYQs, with paper / year /
+format / chapter chips. **Chapters** still opens topic → lesson for trackers
+and mark-learnt. Database is unchanged (`exam_papers` + appearances +
+lesson/topic tags).

@@ -6,6 +6,7 @@ class PyqTeaser {
   const PyqTeaser({
     required this.id,
     this.lessonId,
+    this.topicId,
     required this.questionText,
     this.marks,
     required this.requiredPlan,
@@ -13,10 +14,14 @@ class PyqTeaser {
     this.kind = 'pyq_theory',
     this.textbookLine,
     this.appearanceYears = const [],
+    this.paperNames = const [],
+    this.topicName,
+    this.lessonName,
   });
 
   final String id;
   final String? lessonId;
+  final String? topicId;
   final String questionText;
   final num? marks;
   final PlanTier requiredPlan;
@@ -24,6 +29,11 @@ class PyqTeaser {
   final String kind;
   final String? textbookLine;
   final List<int> appearanceYears;
+
+  /// Paper labels from the selected university (e.g. Paper I).
+  final List<String> paperNames;
+  final String? topicName;
+  final String? lessonName;
 
   QuestionFormat get format =>
       QuestionFormat.fromKindAndMarks(kind: kind, marks: marks);
@@ -34,6 +44,7 @@ class PyqTeaser {
     return PyqTeaser(
       id: json[PyqTeaserColumns.id] as String,
       lessonId: json[PyqTeaserColumns.lessonId] as String?,
+      topicId: json[PyqTeaserColumns.topicId] as String?,
       questionText: json[PyqTeaserColumns.questionText] as String,
       marks: json[PyqTeaserColumns.marks] as num?,
       requiredPlan: PlanTier.fromString(
@@ -48,10 +59,15 @@ class PyqTeaser {
     String? textbookLine,
     List<int>? appearanceYears,
     int? appearanceCount,
+    List<String>? paperNames,
+    String? topicName,
+    String? lessonName,
+    String? topicId,
   }) {
     return PyqTeaser(
       id: id,
       lessonId: lessonId,
+      topicId: topicId ?? this.topicId,
       questionText: questionText,
       marks: marks,
       requiredPlan: requiredPlan,
@@ -59,6 +75,9 @@ class PyqTeaser {
       kind: kind,
       textbookLine: textbookLine ?? this.textbookLine,
       appearanceYears: appearanceYears ?? this.appearanceYears,
+      paperNames: paperNames ?? this.paperNames,
+      topicName: topicName ?? this.topicName,
+      lessonName: lessonName ?? this.lessonName,
     );
   }
 }
@@ -71,6 +90,30 @@ class PyqLessonFeed {
 
   final List<PyqTeaser> teasers;
   final bool usingFallback;
+}
+
+class PyqChapter {
+  const PyqChapter({required this.id, required this.name});
+
+  final String id;
+  final String name;
+}
+
+/// Subject PYQ list: mixed-topic papers, with chapter tags for filters.
+class PyqSubjectFeed {
+  const PyqSubjectFeed({
+    required this.teasers,
+    required this.usingFallback,
+    this.paperNames = const [],
+    this.years = const [],
+    this.chapters = const [],
+  });
+
+  final List<PyqTeaser> teasers;
+  final bool usingFallback;
+  final List<String> paperNames;
+  final List<int> years;
+  final List<PyqChapter> chapters;
 }
 
 class ResourceLink {

@@ -84,6 +84,81 @@ final class LessonPyqsFamily extends $Family
   String toString() => r'lessonPyqsProvider';
 }
 
+@ProviderFor(subjectPyqs)
+final subjectPyqsProvider = SubjectPyqsFamily._();
+
+final class SubjectPyqsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<PyqSubjectFeed>,
+          PyqSubjectFeed,
+          FutureOr<PyqSubjectFeed>
+        >
+    with $FutureModifier<PyqSubjectFeed>, $FutureProvider<PyqSubjectFeed> {
+  SubjectPyqsProvider._({
+    required SubjectPyqsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'subjectPyqsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$subjectPyqsHash();
+
+  @override
+  String toString() {
+    return r'subjectPyqsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<PyqSubjectFeed> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PyqSubjectFeed> create(Ref ref) {
+    final argument = this.argument as String;
+    return subjectPyqs(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SubjectPyqsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$subjectPyqsHash() => r'61794436c527017043abf7dcd87253e0796dce9f';
+
+final class SubjectPyqsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<PyqSubjectFeed>, String> {
+  SubjectPyqsFamily._()
+    : super(
+        retry: null,
+        name: r'subjectPyqsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  SubjectPyqsProvider call(String subjectId) =>
+      SubjectPyqsProvider._(argument: subjectId, from: this);
+
+  @override
+  String toString() => r'subjectPyqsProvider';
+}
+
 @ProviderFor(pyqDetail)
 final pyqDetailProvider = PyqDetailFamily._();
 

@@ -39,7 +39,7 @@ class SubjectListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final topics = ref.watch(subjectTopicsProvider(subjectId));
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text('$title chapters')),
       body: topics.when(
         loading: () => const AsyncLoadingView(),
         error: (e, _) => AsyncErrorView(
@@ -49,7 +49,7 @@ class SubjectListScreen extends ConsumerWidget {
         data: (items) {
           if (items.isEmpty) {
             return const AsyncEmptyView(
-              message: 'No topics in this subject yet.',
+              message: 'No chapters in this subject yet.',
             );
           }
           return ListView.separated(

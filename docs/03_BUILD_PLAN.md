@@ -55,8 +55,8 @@ Mini / Subject / Mock / Grand list IA is retired.
 - Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (fallback KUHS PYQs + banner).
 
 **UG-D.2 — Catalog browse**
-- Description: Home lists subjects for the student’s phase. **Current IA:** Subject → topics → lessons. Lesson lists PYQs + “Practice MCQs” + lesson resources. **Intended exam-first browse** (subject → PYQs, chapters as filters/trackers) is documented in `docs/10_INDIA_MBBS_EXAMS.md` and is **not** this task — wait for an explicit build-plan item.
-- Validation: empty catalog shows an empty state, not a crash. A `required_plan = pro` lesson the free user cannot open shows an upgrade prompt.
+- Description: Home lists subjects for the student’s phase. **Opening a subject shows that subject’s PYQs** (paper / year / format / chapter filters). Topic → lesson remains under **Chapters** for trackers and mark-learnt. See `docs/10_INDIA_MBBS_EXAMS.md`.
+- Validation: a Paper II stem and a Paper I stem appear together on the subject screen; filtering Paper II hides Paper I. Chapters still opens the topic list.
 
 **UG-D.3 — PYQ reader**
 - Description: Stem, marks, appearance years, textbook page citations, collapsed sample answer (text / Pro lock / “No sample answer yet”), “More on this topic” links, bookmark, mark as learnt.

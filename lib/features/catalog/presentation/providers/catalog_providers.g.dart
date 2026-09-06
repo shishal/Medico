@@ -8,114 +8,6 @@ part of 'catalog_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Year the student is browsing on Home. Null = follow the profile year.
-/// Tapping a year sticker writes here so subjects can change immediately.
-
-@ProviderFor(CatalogBrowsePhase)
-final catalogBrowsePhaseProvider = CatalogBrowsePhaseProvider._();
-
-/// Year the student is browsing on Home. Null = follow the profile year.
-/// Tapping a year sticker writes here so subjects can change immediately.
-final class CatalogBrowsePhaseProvider
-    extends $NotifierProvider<CatalogBrowsePhase, String?> {
-  /// Year the student is browsing on Home. Null = follow the profile year.
-  /// Tapping a year sticker writes here so subjects can change immediately.
-  CatalogBrowsePhaseProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'catalogBrowsePhaseProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$catalogBrowsePhaseHash();
-
-  @$internal
-  @override
-  CatalogBrowsePhase create() => CatalogBrowsePhase();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String?>(value),
-    );
-  }
-}
-
-String _$catalogBrowsePhaseHash() =>
-    r'16a2687428ab7ac8cc2010d6d093763e16cef2a5';
-
-/// Year the student is browsing on Home. Null = follow the profile year.
-/// Tapping a year sticker writes here so subjects can change immediately.
-
-abstract class _$CatalogBrowsePhase extends $Notifier<String?> {
-  String? build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<String?, String?>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<String?, String?>,
-              String?,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
-
-/// Effective catalog year: explicit browse selection, else onboarding year.
-
-@ProviderFor(activePhaseId)
-final activePhaseIdProvider = ActivePhaseIdProvider._();
-
-/// Effective catalog year: explicit browse selection, else onboarding year.
-
-final class ActivePhaseIdProvider
-    extends $FunctionalProvider<String?, String?, String?>
-    with $Provider<String?> {
-  /// Effective catalog year: explicit browse selection, else onboarding year.
-  ActivePhaseIdProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'activePhaseIdProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$activePhaseIdHash();
-
-  @$internal
-  @override
-  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String? create(Ref ref) {
-    return activePhaseId(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String? value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String?>(value),
-    );
-  }
-}
-
-String _$activePhaseIdHash() => r'20ee8fbdd064601ed9e791691f56839844eac473';
 
 @ProviderFor(universities)
 final universitiesProvider = UniversitiesProvider._();
@@ -309,7 +201,7 @@ final class PhaseSubjectsProvider
   }
 }
 
-String _$phaseSubjectsHash() => r'5cd5d4cf63ae06feb5d646d2181e0ec76567ddae';
+String _$phaseSubjectsHash() => r'b7777e338b450ca053a01f2aae487e00ca0e96e3';
 
 @ProviderFor(subjectTopics)
 final subjectTopicsProvider = SubjectTopicsFamily._();

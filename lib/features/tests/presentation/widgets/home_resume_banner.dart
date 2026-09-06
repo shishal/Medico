@@ -43,18 +43,34 @@ class HomeResumeBanner extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
             child: ComicCard(
               color: Color.alphaBlend(
-                StickerFills.mint.withValues(
-                  alpha: brightness == Brightness.dark ? 0.45 : 0.55,
+                Theme.of(context).colorScheme.primary.withValues(
+                  alpha: brightness == Brightness.dark ? 0.2 : 0.12,
                 ),
-                comic.sticker,
+                comic.stickerLift,
               ),
               onTap: () => context.go(AppRoutes.practice),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.play_circle_outline_rounded,
-                    size: 36,
-                    color: Theme.of(context).colorScheme.primary,
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.primary
+                              .withValues(alpha: 0.5),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                   const SizedBox(width: Spacing.md),
                   Expanded(
@@ -85,10 +101,10 @@ class HomeResumeBanner extends ConsumerWidget {
                     padding: const EdgeInsets.only(bottom: Spacing.sm),
                     child: ComicCard(
                       color: Color.alphaBlend(
-                        StickerFills.sky.withValues(
-                          alpha: brightness == Brightness.dark ? 0.4 : 0.55,
+                        Theme.of(context).colorScheme.secondary.withValues(
+                          alpha: brightness == Brightness.dark ? 0.2 : 0.12,
                         ),
-                        comic.sticker,
+                        comic.stickerLift,
                       ),
                       onTap: () =>
                           context.go(AppRoutes.testPlayerPath(item.testId)),

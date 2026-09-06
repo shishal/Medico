@@ -54,8 +54,6 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
     setState(() => _saving = false);
     switch (result) {
       case Success():
-        ref.read(catalogBrowsePhaseProvider.notifier).followProfile();
-        ref.read(catalogBrowsePhaseProvider.notifier).select(phaseId);
         await ref.read(userProfileProvider.notifier).refresh();
         if (!mounted) return;
         ScaffoldMessenger.of(context)

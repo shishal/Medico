@@ -70,7 +70,7 @@ class HomeHeroBanner extends ConsumerWidget {
                 ),
                 Text(
                   subtitleParts.isEmpty
-                      ? 'Pick a year, then a subject.'
+                      ? 'Pick a subject to start.'
                       : subtitleParts.join(' · '),
                   style: textTheme.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant,
@@ -127,6 +127,7 @@ class HomeCoverageBanner extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       data: (c) {
         final scheme = Theme.of(context).colorScheme;
+        final comic = ComicColors.of(context);
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             Spacing.lg,
@@ -136,25 +137,47 @@ class HomeCoverageBanner extends ConsumerWidget {
           ),
           child: ComicCard(
             color: Color.alphaBlend(
-              scheme.primary.withValues(alpha: 0.12),
-              ComicColors.of(context).sticker,
+              scheme.primary.withValues(alpha: 0.22),
+              comic.stickerLift,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            highlighted: true,
+            child: Row(
               children: [
-                Text(
-                  '${c.pyqCount} PYQs · ${c.paperCount} papers indexed',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+                Container(
+                  width: 4,
+                  height: 44,
+                  decoration: BoxDecoration(
                     color: scheme.primary,
+                    borderRadius: BorderRadius.circular(99),
+                    boxShadow: [
+                      BoxShadow(
+                        color: scheme.primary.withValues(alpha: 0.45),
+                        blurRadius: 10,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: Spacing.xs),
-                Text(
-                  c.usingFallback
-                      ? 'Showing default PYQs until ${c.selectedUniversityName ?? 'your university'} papers are added.'
-                      : 'Counts are from tagged university papers — not a marketing score.',
-                  style: Theme.of(context).textTheme.bodySmall,
+                const SizedBox(width: Spacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${c.pyqCount} PYQs · ${c.paperCount} papers indexed',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: scheme.primary,
+                        ),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        c.usingFallback
+                            ? 'Showing default PYQs until ${c.selectedUniversityName ?? 'your university'} papers are added.'
+                            : 'Counts are from tagged university papers — not a marketing score.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

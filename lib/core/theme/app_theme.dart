@@ -27,13 +27,20 @@ abstract final class AppTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.vibrant,
     ).copyWith(
       surface: comic.paper,
+      surfaceContainerLowest: comic.paper,
+      surfaceContainerLow: comic.sticker,
+      surfaceContainer: comic.sticker,
+      surfaceContainerHigh: comic.stickerLift,
+      surfaceContainerHighest: comic.stickerLift,
       primary: seedColor,
       onPrimary: Colors.white,
       secondary: comic.accentPurple,
       onSecondary: Colors.white,
       tertiary: comic.proGold,
+      surfaceTint: seedColor,
     );
 
     return ThemeData(
@@ -56,12 +63,18 @@ abstract final class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        elevation: 0,
+        elevation: brightness == Brightness.dark ? 6 : 2,
         color: comic.sticker,
         shadowColor: comic.shadow,
+        surfaceTintColor: seedColor.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(cardRadius),
         ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: comic.sticker,
+        indicatorColor: seedColor.withValues(alpha: 0.22),
+        elevation: 0,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(

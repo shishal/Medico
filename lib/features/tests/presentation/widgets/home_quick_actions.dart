@@ -12,20 +12,19 @@ class HomeQuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
     final comic = ComicColors.of(context);
     final actions = [
       (
         'Progress',
         Icons.local_fire_department_outlined,
         AppRoutes.progress,
-        StickerFills.blush,
+        StickerFills.accentAt(0),
       ),
       (
         'Bookmarks',
         Icons.bookmark_outline,
         AppRoutes.bookmarks,
-        StickerFills.lavender,
+        StickerFills.accentAt(1),
       ),
     ];
 
@@ -37,13 +36,7 @@ class HomeQuickActions extends StatelessWidget {
             if (i > 0) const SizedBox(width: Spacing.sm),
             Expanded(
               child: ComicCard(
-                color: Color.alphaBlend(
-                  (brightness == Brightness.dark
-                          ? StickerFills.subjectDark[i]
-                          : actions[i].$4)
-                      .withValues(alpha: 0.55),
-                  comic.sticker,
-                ),
+                color: comic.sticker,
                 padding: const EdgeInsets.symmetric(
                   horizontal: Spacing.md,
                   vertical: Spacing.md,
@@ -51,7 +44,15 @@ class HomeQuickActions extends StatelessWidget {
                 onTap: () => context.push(actions[i].$3),
                 child: Row(
                   children: [
-                    Icon(actions[i].$2),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: actions[i].$4.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(actions[i].$2, color: actions[i].$4),
+                    ),
                     const SizedBox(width: Spacing.sm),
                     Expanded(
                       child: Text(

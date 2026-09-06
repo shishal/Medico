@@ -208,47 +208,37 @@ class PyqRepository {
       }
 
       final topicIds = chapters.map((c) => c.id).toList();
-      final lessonRows = await _client
-          .from(Tables.lessons)
-          .select(
-            '${LessonColumns.id},${LessonColumns.name},'
-            '${LessonColumns.topicId}',
-          )
-          .inFilter(LessonColumns.topicId, topicIds);
+      final lessonRows = await _inFilterSelect(
+        table: Tables.lessons,
+        column: LessonColumns.topicId,
+        ids: topicIds,
+        select:
+            '${LessonColumns.id},${LessonColumns.name},${LessonColumns.topicId}',
+      );
       final lessonNameById = <String, String>{};
       final lessonTopicById = <String, String>{};
-      for (final raw in (lessonRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+      for (final raw in lessonRows) {
         final id = raw[LessonColumns.id] as String;
         lessonNameById[id] = raw[LessonColumns.name] as String? ?? '';
         final tid = raw[LessonColumns.topicId] as String?;
         if (tid != null) lessonTopicById[id] = tid;
       }
 
-      final topicTeaserRows = await _client
-          .from(Tables.pyqTeasers)
-          .select()
-          .inFilter(PyqTeaserColumns.topicId, topicIds);
-      final seenIds = <String>{};
-      final allMaps = <Map<String, dynamic>>[];
-      for (final raw
-          in (topicTeaserRows as List<dynamic>).cast<Map<String, dynamic>>()) {
-        final id = raw[PyqTeaserColumns.id] as String;
-        if (seenIds.add(id)) allMaps.add(raw);
-      }
-      final lessonIds = lessonNameById.keys.toList();
-      if (lessonIds.isNotEmpty) {
-        final lessonTeaserRows = await _client
-            .from(Tables.pyqTeasers)
-            .select()
-            .inFilter(PyqTeaserColumns.lessonId, lessonIds);
-        for (final raw
-            in (lessonTeaserRows as List<dynamic>).cast<Map<String, dynamic>>()) {
-          final id = raw[PyqTeaserColumns.id] as String;
-          if (seenIds.add(id)) allMaps.add(raw);
-        }
-      }
-      final all = allMaps.map(PyqTeaser.fromJson).toList()
-        ..sort((a, b) => b.appearanceCount.compareTo(a.appearanceCount));
+      // Read questions directly. pyq_teasers runs a per-row appearance count
+      // that is fine for one lesson and too slow for a whole subject.
+      const teaserSelect =
+          '${QuestionColumns.id},${QuestionColumns.lessonId},'
+          '${QuestionColumns.topicId},${QuestionColumns.questionText},'
+          '${QuestionColumns.marks},${QuestionColumns.requiredPlan},'
+          '${QuestionColumns.kind}';
+      final questionRows = await _inFilterSelect(
+        table: Tables.questions,
+        column: QuestionColumns.topicId,
+        ids: topicIds,
+        select: teaserSelect,
+        activeOnly: true,
+      );
+      final all = questionRows.map(PyqTeaser.fromJson).toList();
       if (all.isEmpty) {
         final resolved = await _resolveContentUniversity(universityId);
         return Success(
@@ -261,25 +251,51 @@ class PyqRepository {
       }
 
       final ids = all.map((t) => t.id).toList();
-      final appRows = await _client
-          .from(Tables.questionAppearances)
-          .select(
-            '${AppearanceColumns.questionId},'
-            '${AppearanceColumns.examPaperEmbed}:${Tables.examPapers}('
-            '${ExamPaperColumns.universityId},'
-            '${ExamPaperColumns.examYear},'
-            '${ExamPaperColumns.paperName})',
-          )
-          .inFilter(AppearanceColumns.questionId, ids);
-
-      final resolved = await _resolveContentUniversity(universityId);
+      const appSelect =
+          '${AppearanceColumns.questionId},'
+          '${AppearanceColumns.examPaperEmbed}:${Tables.examPapers}('
+          '${ExamPaperColumns.universityId},'
+          '${ExamPaperColumns.examYear},'
+          '${ExamPaperColumns.paperName})';
+      const refSelect =
+          '${TextbookRefColumns.questionId},${TextbookRefColumns.page},'
+          '${TextbookRefColumns.sectionHeading},'
+          '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
+          '${TextbookColumns.title},${TextbookColumns.edition},'
+          '${TextbookColumns.sheetKey})';
+      // Kick off these reads together, then await — Dart starts a Future
+      // as soon as you call the async method, even before `await`.
+      final appFuture = _inFilterSelect(
+        table: Tables.questionAppearances,
+        column: AppearanceColumns.questionId,
+        ids: ids,
+        select: appSelect,
+        orderColumns: const [
+          AppearanceColumns.questionId,
+          AppearanceColumns.examPaperId,
+        ],
+      );
+      final refFuture = _inFilterSelect(
+        table: Tables.questionTextbookRefs,
+        column: TextbookRefColumns.questionId,
+        ids: ids,
+        select: refSelect,
+        orderColumns: const [
+          TextbookRefColumns.questionId,
+          TextbookRefColumns.textbookId,
+        ],
+      );
+      final uniFuture = _resolveContentUniversity(universityId);
+      final appRows = await appFuture;
+      final refRows = await refFuture;
+      final resolved = await uniFuture;
       final contentUni = resolved.contentUni;
       final usingFallback = resolved.usingFallback;
 
       final yearsByQuestionUni = <String, Map<String, List<int>>>{};
       final papersByQuestionUni = <String, Map<String, Set<String>>>{};
       final unisByQuestion = <String, Set<String>>{};
-      for (final raw in (appRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+      for (final raw in appRows) {
         final qid = raw[AppearanceColumns.questionId] as String;
         final paper = raw[AppearanceColumns.examPaperEmbed];
         final map = paper is Map<String, dynamic> ? paper : <String, dynamic>{};
@@ -303,18 +319,8 @@ class PyqRepository {
         }
       }
 
-      final refRows = await _client
-          .from(Tables.questionTextbookRefs)
-          .select(
-            '${TextbookRefColumns.questionId},${TextbookRefColumns.page},'
-            '${TextbookRefColumns.sectionHeading},'
-            '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
-            '${TextbookColumns.title},${TextbookColumns.edition},'
-            '${TextbookColumns.sheetKey})',
-          )
-          .inFilter(TextbookRefColumns.questionId, ids);
       final firstRef = <String, String>{};
-      for (final raw in (refRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+      for (final raw in refRows) {
         final qid = raw[TextbookRefColumns.questionId] as String;
         if (firstRef.containsKey(qid)) continue;
         firstRef[qid] = TextbookCitation.fromJson(raw).label;
@@ -523,6 +529,46 @@ class PyqRepository {
         UserFacingError.from(e, fallback: 'Could not load this question.'),
       );
     }
+  }
+
+  /// PostgREST puts `.inFilter` values on the GET URL, so a subject with
+  /// 1k+ question ids would blow past typical 8KB limits and look hung.
+  /// We also page with `.range` because the API `max_rows` cap is 1000.
+  Future<List<Map<String, dynamic>>> _inFilterSelect({
+    required String table,
+    required String column,
+    required List<String> ids,
+    String select = '*',
+    List<String> orderColumns = const ['id'],
+    bool activeOnly = false,
+  }) async {
+    if (ids.isEmpty) return const [];
+    const chunkSize = 80;
+    const pageSize = 1000;
+    final orders = orderColumns.isEmpty ? const ['id'] : orderColumns;
+    final rows = <Map<String, dynamic>>[];
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final end = i + chunkSize > ids.length ? ids.length : i + chunkSize;
+      final chunk = ids.sublist(i, end);
+      var from = 0;
+      while (true) {
+        var query =
+            _client.from(table).select(select).inFilter(column, chunk);
+        if (activeOnly) {
+          query = query.eq(QuestionColumns.isActive, true);
+        }
+        var ordered = query.order(orders.first);
+        for (var o = 1; o < orders.length; o++) {
+          ordered = ordered.order(orders[o]);
+        }
+        final page = await ordered.range(from, from + pageSize - 1);
+        final list = List<Map<String, dynamic>>.from(page as List);
+        rows.addAll(list);
+        if (list.length < pageSize) break;
+        from += pageSize;
+      }
+    }
+    return rows;
   }
 
   /// Fallback is university-wide: if the selected university has any papers,

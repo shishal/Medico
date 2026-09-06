@@ -11,10 +11,10 @@ part 'pyq_providers.g.dart';
 
 @riverpod
 Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
-  final universityId = ref.watch(userProfileProvider).value?.universityId;
+  final profile = await ref.watch(userProfileProvider.future);
   final result = await ref.watch(pyqRepositoryProvider).fetchTeasersForLesson(
         lessonId: lessonId,
-        universityId: universityId,
+        universityId: profile?.universityId,
       );
   return switch (result) {
     Success(:final value) => value,
@@ -22,12 +22,14 @@ Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
   };
 }
 
-@riverpod
+/// Kept alive so leaving the subject and coming back does not re-show
+/// the loading spinner while the feed is fetched again.
+@Riverpod(keepAlive: true)
 Future<PyqSubjectFeed> subjectPyqs(Ref ref, String subjectId) async {
-  final universityId = ref.watch(userProfileProvider).value?.universityId;
+  final profile = await ref.watch(userProfileProvider.future);
   final result = await ref.watch(pyqRepositoryProvider).fetchTeasersForSubject(
         subjectId: subjectId,
-        universityId: universityId,
+        universityId: profile?.universityId,
       );
   return switch (result) {
     Success(:final value) => value,

@@ -64,7 +64,7 @@ final class LessonPyqsProvider
   }
 }
 
-String _$lessonPyqsHash() => r'245f4008d4da7a5fa0644430b54a44eea6ad5aef';
+String _$lessonPyqsHash() => r'ac051abcc090571a9a0fc6b05b77c3ef4d30ca33';
 
 final class LessonPyqsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<PyqLessonFeed>, String> {
@@ -84,8 +84,14 @@ final class LessonPyqsFamily extends $Family
   String toString() => r'lessonPyqsProvider';
 }
 
+/// Kept alive so leaving the subject and coming back does not re-show
+/// the loading spinner while the feed is fetched again.
+
 @ProviderFor(subjectPyqs)
 final subjectPyqsProvider = SubjectPyqsFamily._();
+
+/// Kept alive so leaving the subject and coming back does not re-show
+/// the loading spinner while the feed is fetched again.
 
 final class SubjectPyqsProvider
     extends
@@ -95,13 +101,15 @@ final class SubjectPyqsProvider
           FutureOr<PyqSubjectFeed>
         >
     with $FutureModifier<PyqSubjectFeed>, $FutureProvider<PyqSubjectFeed> {
+  /// Kept alive so leaving the subject and coming back does not re-show
+  /// the loading spinner while the feed is fetched again.
   SubjectPyqsProvider._({
     required SubjectPyqsFamily super.from,
     required String super.argument,
   }) : super(
          retry: null,
          name: r'subjectPyqsProvider',
-         isAutoDispose: true,
+         isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
@@ -139,7 +147,10 @@ final class SubjectPyqsProvider
   }
 }
 
-String _$subjectPyqsHash() => r'61794436c527017043abf7dcd87253e0796dce9f';
+String _$subjectPyqsHash() => r'51191e4a7c9e0ead37e6bd15fdc795a7a01fbb8a';
+
+/// Kept alive so leaving the subject and coming back does not re-show
+/// the loading spinner while the feed is fetched again.
 
 final class SubjectPyqsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<PyqSubjectFeed>, String> {
@@ -149,8 +160,11 @@ final class SubjectPyqsFamily extends $Family
         name: r'subjectPyqsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
-        isAutoDispose: true,
+        isAutoDispose: false,
       );
+
+  /// Kept alive so leaving the subject and coming back does not re-show
+  /// the loading spinner while the feed is fetched again.
 
   SubjectPyqsProvider call(String subjectId) =>
       SubjectPyqsProvider._(argument: subjectId, from: this);

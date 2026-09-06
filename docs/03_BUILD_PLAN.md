@@ -13,7 +13,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 ## UG-A — Product docs & university lock
 
 **UG-A.1 — Product identity**
-- Description: `docs/00_PRODUCT.md` is the source of truth: KUHS, Year→Subject→Topic→Lesson, dual question kinds, sample answers, reference links, 4-day trial.
+- Description: `docs/00_PRODUCT.md` is the source of truth: KUHS, dual question kinds, sample answers, reference links, 4-day trial. Syllabus tags are Year→Subject→Topic→Lesson; the exam unit is a university paper (see `docs/10_INDIA_MBBS_EXAMS.md`).
 - Expected Outcome: AGENTS.md and foundation docs point at the UG product. NEET-PG specs are marked historical.
 - Validation: a new session reading AGENTS.md would not build a Grand Test as the home screen.
 
@@ -55,7 +55,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 - Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (fallback KUHS PYQs + banner).
 
 **UG-D.2 — Catalog browse**
-- Description: Home lists subjects for the student’s phase. Subject → topics → lessons. Lesson lists PYQs + “Practice MCQs” + lesson resources.
+- Description: Home lists subjects for the student’s phase. **Current IA:** Subject → topics → lessons. Lesson lists PYQs + “Practice MCQs” + lesson resources. **Intended exam-first browse** (subject → PYQs, chapters as filters/trackers) is documented in `docs/10_INDIA_MBBS_EXAMS.md` and is **not** this task — wait for an explicit build-plan item.
 - Validation: empty catalog shows an empty state, not a crash. A `required_plan = pro` lesson the free user cannot open shows an upgrade prompt.
 
 **UG-D.3 — PYQ reader**

@@ -21,12 +21,20 @@ shows the KUHS bank with a banner: “Showing default PYQs until [University]
 papers are added.” Adding another university later is new sheet rows, not a
 schema rewrite.
 
-Curriculum (year → subject → topic → lesson) is **shared** across universities.
-PYQs are **university-owned** via `exam_papers.university_id` → appearances.
+Curriculum (year → subject → topic → lesson) is **shared** across universities
+and is how we **tag** questions for revision and trackers. PYQs are
+**university-owned** via `exam_papers.university_id` → appearances. A real
+university paper mixes many topics in one sitting — see
+`docs/10_INDIA_MBBS_EXAMS.md`.
 
 ## Content hierarchy
 
-Year (MBBS phase) → Subject → Topic → Lesson → questions (theory PYQ and/or MCQ)
+- **Exam unit (what the student sits):** university + subject + year + paper
+  (Paper I / Paper II / …) → questions in that paper, several chapters.
+- **Syllabus tags (shared):** Year (MBBS phase) → Subject → Topic → Lesson.
+  A lesson is a syllabus unit, not a PYQ count. Used to group questions and
+  to build trackers.
+- **Question kinds** on a lesson or paper: theory PYQ and/or MCQ.
 
 ## Question kinds
 

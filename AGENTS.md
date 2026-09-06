@@ -12,6 +12,7 @@ task:
 - docs/03_BUILD_PLAN.md — phased tasks with acceptance criteria (work one phase at a time)
 - docs/04_TEST_ENGINE_SPEC.md — **historical** NEET-PG test engine (MCQ player still uses this)
 - docs/05_PRACTICE_MODE_SPEC.md — practice mode behavior (MCQ only)
+- docs/10_INDIA_MBBS_EXAMS.md — how Indian MBBS university papers actually work (paper mixes topics; chapters are tags)
 
 ## Non-negotiable rules
 - Stack is locked: Flutter + Riverpod (codegen) + go_router + Supabase. Don't suggest

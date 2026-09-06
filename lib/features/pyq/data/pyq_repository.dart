@@ -263,32 +263,35 @@ class PyqRepository {
           '${TextbookRefColumns.textbookEmbed}:${Tables.textbooks}('
           '${TextbookColumns.title},${TextbookColumns.edition},'
           '${TextbookColumns.sheetKey})';
-      // Kick off these reads together, then await — Dart starts a Future
-      // as soon as you call the async method, even before `await`.
-      final appFuture = _inFilterSelect(
-        table: Tables.questionAppearances,
-        column: AppearanceColumns.questionId,
-        ids: ids,
-        select: appSelect,
-        orderColumns: const [
-          AppearanceColumns.questionId,
-          AppearanceColumns.examPaperId,
-        ],
-      );
-      final refFuture = _inFilterSelect(
-        table: Tables.questionTextbookRefs,
-        column: TextbookRefColumns.questionId,
-        ids: ids,
-        select: refSelect,
-        orderColumns: const [
-          TextbookRefColumns.questionId,
-          TextbookRefColumns.textbookId,
-        ],
-      );
-      final uniFuture = _resolveContentUniversity(universityId);
-      final appRows = await appFuture;
-      final refRows = await refFuture;
-      final resolved = await uniFuture;
+      // `.then` attaches a listener immediately. Starting the Futures and
+      // awaiting later lets a 400 surface as an unhandled async error
+      // before this try/catch runs.
+      late final List<Map<String, dynamic>> appRows;
+      late final List<Map<String, dynamic>> refRows;
+      late final ({String? contentUni, bool usingFallback}) resolved;
+      await Future.wait([
+        _inFilterSelect(
+          table: Tables.questionAppearances,
+          column: AppearanceColumns.questionId,
+          ids: ids,
+          select: appSelect,
+          orderColumns: const [
+            AppearanceColumns.questionId,
+            AppearanceColumns.examPaperId,
+          ],
+        ).then((v) => appRows = v),
+        _inFilterSelect(
+          table: Tables.questionTextbookRefs,
+          column: TextbookRefColumns.questionId,
+          ids: ids,
+          select: refSelect,
+          orderColumns: const [
+            TextbookRefColumns.questionId,
+            TextbookRefColumns.textbookId,
+          ],
+        ).then((v) => refRows = v),
+        _resolveContentUniversity(universityId).then((v) => resolved = v),
+      ]);
       final contentUni = resolved.contentUni;
       final usingFallback = resolved.usingFallback;
 
@@ -574,22 +577,25 @@ class PyqRepository {
   /// Fallback is university-wide: if the selected university has any papers,
   /// empty subjects stay empty. Only swap to KUHS when that university has
   /// zero papers in the catalog.
+  ///
+  /// Do not SELECT `is_fallback` — that column is added by
+  /// `geckomed_ux.sql`. A live project that has not applied it returns
+  /// PostgREST 42703 and the subject screen never leaves the spinner.
+  /// KUHS by `code` is the v1 fallback bank either way.
   Future<({String? contentUni, bool usingFallback})> _resolveContentUniversity(
     String? universityId,
   ) async {
     final uniRows = await _client
         .from(Tables.universities)
         .select(
-          '${UniversityColumns.id},${UniversityColumns.code},'
-          '${UniversityColumns.isFallback}',
+          '${UniversityColumns.id},${UniversityColumns.code}',
         );
     final unis = (uniRows as List<dynamic>).cast<Map<String, dynamic>>();
     String? fallbackId;
     for (final u in unis) {
-      if (u[UniversityColumns.isFallback] == true ||
-          u[UniversityColumns.code] == 'KUHS') {
+      if (u[UniversityColumns.code] == 'KUHS') {
         fallbackId = u[UniversityColumns.id] as String;
-        if (u[UniversityColumns.isFallback] == true) break;
+        break;
       }
     }
 

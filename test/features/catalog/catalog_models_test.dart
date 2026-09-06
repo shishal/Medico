@@ -32,4 +32,16 @@ void main() {
     expect(uni.isFallback, isTrue);
     expect(uni.code, 'KUHS');
   });
+
+  test('University stays usable when is_fallback is not in the row', () {
+    final uni = University.fromJson({
+      UniversityColumns.id: 'u1',
+      UniversityColumns.code: 'KUHS',
+      UniversityColumns.name: 'Kerala University of Health Sciences',
+      UniversityColumns.state: 'Kerala',
+      UniversityColumns.slug: 'kuhs',
+    });
+    expect(uni.isFallback, isFalse);
+    expect(uni.code, 'KUHS');
+  });
 }

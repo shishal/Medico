@@ -16,7 +16,6 @@ abstract final class AppRoutes {
   static const topic = '/topics/:topicId';
   static const lesson = '/lessons/:lessonId';
   static const pyq = '/pyq/:questionId';
-  static const testList = '/tests';
   static const testDetail = '/tests/:testId';
   static const testPlayer = '/tests/:testId/play';
   static const results = '/results/:attemptId';

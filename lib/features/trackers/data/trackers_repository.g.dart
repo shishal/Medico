@@ -2,6 +2,13 @@
 
 part of 'trackers_repository.dart';
 
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
 @ProviderFor(trackersRepository)
 final trackersRepositoryProvider = TrackersRepositoryProvider._();
 
@@ -38,6 +45,7 @@ final class TrackersRepositoryProvider
     return trackersRepository(ref);
   }
 
+  /// {@macro riverpod.override_with_value}
   Override overrideWithValue(TrackersRepository value) {
     return $ProviderOverride(
       origin: this,
@@ -47,4 +55,4 @@ final class TrackersRepositoryProvider
 }
 
 String _$trackersRepositoryHash() =>
-    r'4444444444444444444444444444444444444444';
+    r'7fdb93c30967898666abda7c3d0fe1bbdad1b9c2';

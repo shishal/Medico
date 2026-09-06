@@ -18,7 +18,9 @@ import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../progress/presentation/providers/ug_home_providers.dart';
 import '../../../pyq/data/pyq_repository.dart';
 import '../../../pyq/domain/pyq_models.dart';
+import '../../../pyq/domain/question_format.dart';
 import '../../../pyq/presentation/providers/pyq_providers.dart';
+import '../../../pyq/presentation/widgets/pyq_teaser_card.dart';
 import '../../data/catalog_repository.dart';
 import '../providers/catalog_providers.dart';
 import '../widgets/catalog_row_card.dart';
@@ -140,6 +142,7 @@ class LessonScreen extends ConsumerStatefulWidget {
 class _LessonScreenState extends ConsumerState<LessonScreen> {
   List<ResourceLink> _resources = const [];
   bool _recordedOpen = false;
+  QuestionFormat? _formatFilter;
 
   @override
   void initState() {
@@ -198,7 +201,11 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
           message: UserFacingError.display(e),
           onAction: () => ref.invalidate(lessonPyqsProvider(widget.lessonId)),
         ),
-        data: (items) {
+        data: (feed) {
+          final items = [
+            for (final t in feed.teasers)
+              if (_formatFilter == null || t.format == _formatFilter) t,
+          ];
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
             children: [
@@ -287,20 +294,28 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: Spacing.sm),
+              if (feed.usingFallback)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: Spacing.sm),
+                  child: Text(
+                    'Showing default PYQs until your university papers are added.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              PyqFormatChips(
+                selected: _formatFilter,
+                onSelected: (value) => setState(() => _formatFilter = value),
+              ),
+              const SizedBox(height: Spacing.sm),
               if (items.isEmpty)
                 const Text('No PYQs tagged to this lesson yet.')
               else
                 for (var i = 0; i < items.length; i++)
                   Padding(
                     padding: const EdgeInsets.only(bottom: Spacing.sm),
-                    child: CatalogRowCard(
-                      title: items[i].questionText,
+                    child: PyqTeaserCard(
+                      teaser: items[i],
                       index: i,
-                      subtitle: [
-                        if (items[i].marks != null) '${items[i].marks} marks',
-                        if (items[i].appearanceCount > 0)
-                          '${items[i].appearanceCount}× in papers',
-                      ].join(' · '),
                       onTap: () => context.push(AppRoutes.pyqPath(items[i].id)),
                     ),
                   ),

@@ -18,6 +18,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
    - `Code.gs`
    - `SheetReader.gs`
    - `Validate.gs`
+   - `WideSheet.gs`
    - `UgCatalog.gs`
    - `SupabaseClient.gs`
    - `Sync.gs`
@@ -34,20 +35,28 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 
 ## What Sync does
 
-1. Reads UG tabs (Universities, Colleges, Phases, Lessons, resources, papers, appearances, textbook refs) plus `Subjects`, `Topics`, `Questions`. `Tests` / `TestQuestions` are optional.
-2. Validates **all** rows (collects every error — does not stop at the first). Theory rows skip options; MCQ rows still require them. Sample answers over ~400 words are a warning, not a reject.
+1. Reads editor tabs: `Universities`, `Colleges`, `Phases`, `Textbooks`,
+   `Questions` (wide), optional `LessonResources`. If Questions still has the
+   old headers (`topic_name` without `university_code` + `subject_name`), the
+   legacy Subjects/Topics path runs instead.
+2. Validates **all** rows (collects every error — does not stop at the first).
+   Theory rows skip options; MCQ rows still require them. Sample answers over
+   ~400 words are a warning, not a reject.
 3. If any error: popup lists them with **tab + row number**; **writes nothing**.
-4. If clean: upserts in order Universities → … → Lessons → Questions (sample answers to `question_sample_answers`) → Appearances → optional Tests.
+4. If clean: infers subjects/topics/lessons/papers/appearances from the wide
+   row and upserts normalized tables. `Tests` / `TestQuestions` are skipped
+   when those tabs are empty or missing (catalog tests are retired; Practice
+   still creates `tests` rows from the app).
 
 ### Validation (includes Phase 2.2 required checks)
 
 - `kind` ∈ mcq / pyq_theory. Blank kind: if all four options and `correct_option` are empty → `pyq_theory`, otherwise `mcq`. Column header is matched case-insensitively (`Kind` is fine).
 - MCQ: `correct_option` ∈ A/B/C/D and all four options non-empty
-- Theory: options not required; ≥1 Appearances row
+- Theory: options not required; paper columns (`exam_year` + `paper_name`) create the appearance
 - resource `url` must start with `https://`
 - `required_plan` ∈ free/pro/elite
-- `topic_name` must match a Topics tab row (**trim + case-insensitive**; fails loudly with row number)
-- plus header presence, enums, cross-links (`subject_name`, `test_title`, `question_external_id`), and `total_questions` vs link count
+- `subject_name` / `topic_name` / `lesson_name` on the wide Questions tab create catalog rows
+- plus header presence, enums, and `university_code` matching the Universities tab
 
 ### Upsert keys (re-run safe)
 

@@ -151,7 +151,7 @@ def main() -> int:
                 """
             ).fetchone()[0]
             if free_active < 1:
-                print("FAIL: no free questions — run scripts/seed_phase1_3.py first")
+                print("FAIL: no free questions — seed the catalog first")
                 return 1
             print(f"  DB free+active questions: {free_active}")
 

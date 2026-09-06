@@ -34,6 +34,7 @@ class HomeScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: Spacing.xl),
           children: [
             const HomeHeroBanner(),
+            const HomeCoverageBanner(),
             const HomeWeekStrip(),
             const HomeResumeBanner(),
             const ComicSectionTitle(

@@ -17,6 +17,22 @@ void main() {
     expect(teaser.appearanceCount, 3);
     expect(teaser.requiredPlan, PlanTier.free);
     expect(teaser.marks, 10);
+    expect(teaser.kind, 'pyq_theory');
+    expect(teaser.isHighYield, isTrue);
+    expect(teaser.format.label, 'Essay');
+  });
+
+  test('PyqTeaser reads kind for MCQ and is not high-yield at 1×', () {
+    final teaser = PyqTeaser.fromJson({
+      PyqTeaserColumns.id: 'q2',
+      PyqTeaserColumns.questionText: 'Axillary nerve supplies?',
+      PyqTeaserColumns.requiredPlan: 'free',
+      PyqTeaserColumns.appearanceCount: 1,
+      PyqTeaserColumns.kind: 'mcq',
+    });
+    expect(teaser.kind, 'mcq');
+    expect(teaser.isHighYield, isFalse);
+    expect(teaser.format.label, 'MCQ');
   });
 
   test('SearchHits maps subjects lessons and PYQ stems', () {

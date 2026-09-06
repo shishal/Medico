@@ -8,18 +8,18 @@ part of 'theme_mode_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Controls light / dark / system theme. Replaced by a settings screen later;
-/// for now a debug toggle on Home and Profile cycles through the three modes.
+/// Persisted System / Light / Dark. Dark is the default until the student
+/// picks something else.
 
 @ProviderFor(ThemeModeNotifier)
 final themeModeProvider = ThemeModeNotifierProvider._();
 
-/// Controls light / dark / system theme. Replaced by a settings screen later;
-/// for now a debug toggle on Home and Profile cycles through the three modes.
+/// Persisted System / Light / Dark. Dark is the default until the student
+/// picks something else.
 final class ThemeModeNotifierProvider
     extends $NotifierProvider<ThemeModeNotifier, ThemeMode> {
-  /// Controls light / dark / system theme. Replaced by a settings screen later;
-  /// for now a debug toggle on Home and Profile cycles through the three modes.
+  /// Persisted System / Light / Dark. Dark is the default until the student
+  /// picks something else.
   ThemeModeNotifierProvider._()
     : super(
         from: null,
@@ -47,10 +47,10 @@ final class ThemeModeNotifierProvider
   }
 }
 
-String _$themeModeNotifierHash() => r'2321d8d761b91328e8a0e94ec0a90ee8def46100';
+String _$themeModeNotifierHash() => r'9e0a3974b46aa7ccd35629aa9c13708e4973160d';
 
-/// Controls light / dark / system theme. Replaced by a settings screen later;
-/// for now a debug toggle on Home and Profile cycles through the three modes.
+/// Persisted System / Light / Dark. Dark is the default until the student
+/// picks something else.
 
 abstract class _$ThemeModeNotifier extends $Notifier<ThemeMode> {
   ThemeMode build();

@@ -23,7 +23,6 @@ import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/results/presentation/screens/solution_review_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
-import '../../features/tests/presentation/screens/test_list_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
 import '../../features/trackers/presentation/screens/trackers_screen.dart';
 import '../widgets/app_shell.dart';
@@ -179,10 +178,6 @@ GoRouter goRouter(Ref ref) {
           final id = state.pathParameters['questionId']!;
           return PyqReaderScreen(questionId: id);
         },
-      ),
-      comicGoRoute(
-        path: AppRoutes.testList,
-        builder: (context, state) => const TestListScreen(),
       ),
       // More specific `/play` route before bare `:testId` so paths match correctly.
       comicGoRoute(

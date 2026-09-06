@@ -8,6 +8,14 @@ function validateAllTabs_() {
   var errors = [];
   var warnings = [];
 
+  var questionsRaw = readTabObjects_(TAB.QUESTIONS);
+  var wide =
+    questionsRaw.headers.indexOf('university_code') >= 0 &&
+    questionsRaw.headers.indexOf('subject_name') >= 0;
+  if (wide) {
+    return validateWideSheet_(errors, warnings, questionsRaw);
+  }
+
   var subjectsRaw = readTabObjects_(TAB.SUBJECTS);
   var topicsRaw = readTabObjects_(TAB.TOPICS);
   var questionsRaw = readTabObjects_(TAB.QUESTIONS);

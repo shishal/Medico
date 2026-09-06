@@ -4,7 +4,9 @@ Work top to bottom. Don't start a phase until the previous phase's validation st
 
 Each task has: **Description**, **Expected Outcome** (what "done" means, testable), **Validation** (how you personally confirm it — not the AI's claim, your own check), and **Notes**.
 
-**Current work is UG-A onward.** Phases 0–9 below are the completed NEET-PG QBank; treat them as historical. Do not start new NEET-PG catalog tasks.
+**Current work is UG-F / Phase 10 (GeckoMed UX alignment).** UG-A–E and
+Phases 0–9 are complete or historical. Do not start new NEET-PG catalog tasks.
+Mini / Subject / Mock / Grand list IA is retired.
 
 ---
 
@@ -37,7 +39,7 @@ Each task has: **Description**, **Expected Outcome** (what "done" means, testabl
 ## UG-C — Content pipeline
 
 **UG-C.1 — Sheet tabs**
-- Description: Universities, Colleges, Phases, Subjects (with `phase_code`), Topics, Lessons, LessonResources, Textbooks, ExamPapers, Questions (kind-aware + optional `sample_answer_text`), Appearances, TextbookRefs, QuestionResources. Tests/TestQuestions remain optional.
+- Description: Universities, Colleges, Textbooks, a wide Questions tab (placement + stem + paper + textbook + sample answer), optional LessonResources. Subjects/Topics/Lessons/ExamPapers/Appearances/TextbookRefs are inferred by sync. Tests/TestQuestions are retired.
 - Validation: fill the sample CSV rows, run Apps Script validation against a missing `correct_option` on a theory row — it must pass. An MCQ row missing options must fail.
 
 **UG-C.2 — Sync script**
@@ -49,8 +51,8 @@ Each task has: **Description**, **Expected Outcome** (what "done" means, testabl
 ## UG-D — App information architecture
 
 **UG-D.1 — Onboarding**
-- Description: After signup, collect name, college, batch year, MBBS phase. University is KUHS (display, not a free-text field). Writes `profiles` academic columns + `onboarding_completed_at`.
-- Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects.
+- Description: After signup, stepped form: theme, name, MBBS year, **university picker**, college search for that university, batch year. Writes `profiles` academic columns + `onboarding_completed_at`. Profile can change the same fields later.
+- Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (fallback KUHS PYQs + banner).
 
 **UG-D.2 — Catalog browse**
 - Description: Home lists subjects for the student’s phase. Subject → topics → lessons. Lesson lists PYQs + “Practice MCQs” + lesson resources.
@@ -87,6 +89,47 @@ Each task has: **Description**, **Expected Outcome** (what "done" means, testabl
 **UG-E.1 — KUHS SEO pages** on the existing static site (`/kuhs/`, `/kuhs/anatomy/`, important-questions).
 **UG-E.2 — WhatsApp support** link in the app profile and site header (number is an operator setting, not hardcoded to a competitor).
 **UG-E.3 — Ambassadors page** explaining college-tracker contribution. Do not build a CRM in v1.
+
+---
+
+## UG-F / Phase 10 — GeckoMed UX alignment
+
+Work top to bottom. One task at a time.
+
+**10.1 — Visual system**
+- Description: Coral-orange primary, charcoal dark canvas, indigo-purple chrome, gold Pro. Persist System/Light/Dark; Dark is default. Keep Docci.
+- Expected Outcome: Dark default on first launch; Profile 3-way theme selector survives force-quit; light mode is clean white/gray, not comic paper.
+- Validation: toggle System and confirm it follows the emulator OS theme.
+
+**10.2 — Retire catalog tests**
+- Description: Remove Mini/Subject/Mock/Grand list UI, Tests.csv / TestQuestions.csv, and NEET seed scripts. Keep `tests`/`attempts` for Practice.
+- Expected Outcome: `/tests` list route is gone; Practice player still starts from a lesson or the Practice tab.
+- Validation: grep the app IA for Mini/Mock/Grand list — none. Start a 10-question practice session.
+
+**10.3 — Denormalized sheet + university-scoped PYQs**
+- Description: Wide Questions tab; sync writes normalized tables. `universities.is_fallback`. Teasers include `kind`. Filter PYQs by selected university; fall back to KUHS.
+- Expected Outcome: A content person can add a PYQ as one spreadsheet row (names, not UUIDs). A non-KUHS profile sees KUHS PYQs plus a fallback banner until that university has papers.
+- Validation: upsert two rows with the same `external_id` and different papers — one question, two appearances.
+
+**10.4 — Onboarding + Profile university picker**
+- Description: Stepped onboarding; Profile shows and edits name, university, college, year, batch.
+- Validation: change university on Profile; college that does not belong to the new university is cleared; Home follows the new id.
+
+**10.5 — Home dashboard**
+- Description: Docci + name + year + university; honest coverage banner; fallback banner when showing KUHS PYQs for another university.
+- Validation: KUHS profile shows KUHS counts; a university with zero papers shows the fallback banner, not a blank Home.
+
+**10.6 — PYQ list chips + cards**
+- Description: All / Essay / Short / VSA / MCQ chips; high-yield when appearance_count ≥ 2; textbook line; bookmark.
+- Validation: filter to MCQ on a lesson that has both kinds — only MCQ stems. Theory cards never show option keys.
+
+**10.7 — PYQ reader (theory + MCQ)**
+- Description: Theory sample answer + MCQ show-answer; preferred textbook picker (local). Never invent sample text.
+- Validation: MCQ teaser has no correct option; opening it and tapping Show answer reveals the key + explanation.
+
+**10.8 — Community links**
+- Description: Profile WhatsApp + Telegram via `SupportLinks` placeholders until real URLs exist.
+- Validation: both tiles open an external URL (placeholders are fine).
 
 ---
 
@@ -177,7 +220,10 @@ The original QBank phases follow. Do not extend them. Kept so migrations and old
 
 ---
 
-## Phase 4 — Test Discovery
+## Phase 4 — Test Discovery (historical)
+
+Retired from the student-facing IA in UG-F / 10.2. Practice still uses the
+player routes. Do not rebuild Mini / Subject / Mock / Grand as Home.
 
 **4.1 — Test list screen**
 - Description: Tabbed or filtered list of tests by type (Mini / Subject / Mock / Grand), pulling from Supabase (RLS already filters to what the user's plan allows — but see 4.2).

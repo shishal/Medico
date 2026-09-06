@@ -86,7 +86,13 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
       return;
     }
     uniByCode[normKey_(code)] = code;
-    universities.push({ code: code, name: name, state: state, slug: slug });
+    universities.push({
+      code: code,
+      name: name,
+      state: state,
+      slug: slug,
+      is_fallback: trimStr_(row.is_fallback).toUpperCase() === 'TRUE' || code === 'KUHS',
+    });
   });
 
   var colleges = [];

@@ -31,14 +31,8 @@ EXPECTED = {
     "subjects_min": 3,
     "topics_min": 3,
     "questions_with_external_id_min": 3,
-    "tests_min": 3,
-    "test_questions_min": 4,
-    "sample_external_ids": ("Q-MED-CARD-001", "Q-MED-PULM-001", "Q-SUR-GEN-001"),
-    "sample_test_titles": (
-        "Medicine Mini Drill",
-        "Surgery Subject Sample",
-        "NEET-PG Grand Sample",
-    ),
+    "universities_min": 2,
+    "sample_external_ids": ("Q-ANAT-001", "Q-ANAT-PYQ-001"),
 }
 
 
@@ -111,6 +105,12 @@ def check_migration(conn) -> list[str]:
             "(PostgREST cannot upsert on the Phase 4B partial title index)"
         )
 
+    if not column_exists(conn, "universities", "is_fallback"):
+        errors.append(
+            "universities.is_fallback column missing — run "
+            "supabase/migrations/20260906120000_geckomed_ux.sql"
+        )
+
     return errors
 
 
@@ -125,8 +125,7 @@ def check_synced_content(conn) -> list[str]:
     questions_ext = count(
         "select count(*) from public.questions where external_id is not null"
     )
-    tests = count("select count(*) from public.tests")
-    tq = count("select count(*) from public.test_questions")
+    universities = count("select count(*) from public.universities")
 
     if subjects < EXPECTED["subjects_min"]:
         errors.append(
@@ -139,45 +138,26 @@ def check_synced_content(conn) -> list[str]:
             "questions with external_id: expected at least "
             f"{EXPECTED['questions_with_external_id_min']}, got {questions_ext}"
         )
-    if tests < EXPECTED["tests_min"]:
-        errors.append(f"tests: expected at least {EXPECTED['tests_min']}, got {tests}")
-    if tq < EXPECTED["test_questions_min"]:
+    if universities < EXPECTED["universities_min"]:
         errors.append(
-            f"test_questions: expected at least {EXPECTED['test_questions_min']}, got {tq}"
+            f"universities: expected at least {EXPECTED['universities_min']}, got {universities}"
         )
+
+    fallback = conn.execute(
+        "select code from public.universities where is_fallback is true"
+    ).fetchone()
+    if not fallback:
+        errors.append("universities.is_fallback: expected one fallback row (KUHS)")
+    elif fallback[0] != "KUHS":
+        errors.append(f"universities.is_fallback: expected KUHS, got {fallback[0]!r}")
 
     for ext_id in EXPECTED["sample_external_ids"]:
         row = conn.execute(
-            "select external_id, correct_option from public.questions where external_id = %s",
+            "select external_id, kind from public.questions where external_id = %s",
             (ext_id,),
         ).fetchone()
         if not row:
             errors.append(f"sample question missing: external_id = {ext_id!r}")
-        elif row[1] not in ("A", "B", "C", "D"):
-            errors.append(f"{ext_id}: invalid correct_option {row[1]!r}")
-
-    for title in EXPECTED["sample_test_titles"]:
-        row = conn.execute(
-            "select title, total_questions from public.tests where title = %s",
-            (title,),
-        ).fetchone()
-        if not row:
-            errors.append(f"sample test missing: title = {title!r}")
-
-    # Medicine Mini Drill should link 2 questions
-    row = conn.execute(
-        """
-        select t.total_questions, count(tq.question_id) as linked
-        from public.tests t
-        left join public.test_questions tq on tq.test_id = t.id
-        where t.title = 'Medicine Mini Drill'
-        group by t.id, t.total_questions
-        """
-    ).fetchone()
-    if row and row[0] != row[1]:
-        errors.append(
-            f"Medicine Mini Drill: total_questions={row[0]} but {row[1]} link(s) in test_questions"
-        )
 
     return errors
 

@@ -6,6 +6,7 @@ import '../../../core/supabase/tables.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/user_facing_error.dart';
 import '../domain/catalog_models.dart';
+import '../domain/university_coverage.dart';
 
 part 'catalog_repository.g.dart';
 
@@ -179,6 +180,91 @@ class CatalogRepository {
     } catch (e) {
       return Failure(
         UserFacingError.from(e, fallback: 'Could not load that lesson.'),
+      );
+    }
+  }
+
+  /// Papers + PYQ counts for [selectedUniversityId], falling back to KUHS.
+  Future<Result<UniversityCoverage>> fetchCoverage(String? selectedUniversityId) async {
+    if (_client.auth.currentUser == null) {
+      return const Failure('Not signed in.');
+    }
+    try {
+      final uniRows = await _client.from(Tables.universities).select();
+      final unis = _map(uniRows, University.fromJson);
+      University? selected;
+      University? fallback;
+      for (final u in unis) {
+        if (u.id == selectedUniversityId) selected = u;
+        if (u.isFallback) fallback = u;
+      }
+      fallback ??= unis.where((u) => u.code == 'KUHS').firstOrNull ?? unis.firstOrNull;
+      if (fallback == null) {
+        return const Success(
+          UniversityCoverage(
+            paperCount: 0,
+            pyqCount: 0,
+            usingFallback: false,
+            contentUniversityId: '',
+          ),
+        );
+      }
+
+      Future<int> paperCount(String universityId) async {
+        final rows = await _client
+            .from(Tables.examPapers)
+            .select(ExamPaperColumns.id)
+            .eq(ExamPaperColumns.universityId, universityId);
+        return (rows as List<dynamic>).length;
+      }
+
+      final selectedCount = selected == null ? 0 : await paperCount(selected.id);
+      final University content;
+      final bool showingFallback;
+      if (selected != null && selectedCount > 0) {
+        content = selected;
+        showingFallback = false;
+      } else {
+        content = fallback;
+        showingFallback = selected != null && selected.id != fallback.id;
+      }
+      final papers = showingFallback || selected == null
+          ? await paperCount(content.id)
+          : selectedCount;
+
+      final paperIds = await _client
+          .from(Tables.examPapers)
+          .select(ExamPaperColumns.id)
+          .eq(ExamPaperColumns.universityId, content.id);
+      final ids = (paperIds as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map((r) => r[ExamPaperColumns.id] as String)
+          .toList();
+      var pyqCount = 0;
+      if (ids.isNotEmpty) {
+        final apps = await _client
+            .from(Tables.questionAppearances)
+            .select(AppearanceColumns.questionId)
+            .inFilter(AppearanceColumns.examPaperId, ids);
+        pyqCount = {
+          for (final row in (apps as List<dynamic>).cast<Map<String, dynamic>>())
+            row[AppearanceColumns.questionId] as String,
+        }.length;
+      }
+
+      return Success(
+        UniversityCoverage(
+          paperCount: papers,
+          pyqCount: pyqCount,
+          usingFallback: showingFallback,
+          contentUniversityId: content.id,
+          contentUniversityName: content.name,
+          selectedUniversityName: selected?.name,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not load coverage.'),
       );
     }
   }

@@ -2,11 +2,12 @@
 
 part of 'catalog_repository.dart';
 
-// ignore_for_file: type=lint, type=warning
-
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(catalogRepository)
 final catalogRepositoryProvider = CatalogRepositoryProvider._();
@@ -44,6 +45,7 @@ final class CatalogRepositoryProvider
     return catalogRepository(ref);
   }
 
+  /// {@macro riverpod.override_with_value}
   Override overrideWithValue(CatalogRepository value) {
     return $ProviderOverride(
       origin: this,
@@ -52,5 +54,4 @@ final class CatalogRepositoryProvider
   }
 }
 
-String _$catalogRepositoryHash() =>
-    r'1111111111111111111111111111111111111111';
+String _$catalogRepositoryHash() => r'99a0d16ee59ed4f7c691c2ba464af5f21e1b98dd';

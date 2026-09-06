@@ -14,7 +14,8 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
-import '../../../../core/widgets/theme_mode_toggle_button.dart';
+import '../../../../core/widgets/theme_mode_selector.dart';
+import '../../../catalog/presentation/providers/catalog_providers.dart';
 import '../../../auth/data/auth_repository.dart';
 import '../providers/current_plan_provider.dart';
 import '../providers/user_profile_provider.dart';
@@ -84,6 +85,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: Theme.of(context).textTheme.titleLarge
                 ?.copyWith(fontWeight: FontWeight.w700),
           ),
+          profileAsync.when(
+            data: (profile) {
+              if (profile == null) return const SizedBox.shrink();
+              final unis = ref.watch(universitiesProvider).value ?? const [];
+              final phases = ref.watch(mbbsPhasesProvider).value ?? const [];
+              String? uniCode;
+              String? yearName;
+              for (final u in unis) {
+                if (u.id == profile.universityId) uniCode = u.code;
+              }
+              for (final p in phases) {
+                if (p.id == profile.mbbsPhaseId) yearName = p.name;
+              }
+              final bits = [
+                ?uniCode,
+                ?yearName,
+                if (profile.batchYear != null) '${profile.batchYear} batch',
+              ];
+              if (bits.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: Spacing.xs),
+                child: Text(
+                  bits.join(' · '),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
+          ),
           const SizedBox(height: Spacing.sm),
           planAsync.when(
             data: (plan) => Text(
@@ -145,7 +177,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 Icon(Icons.chat_outlined),
                 SizedBox(width: Spacing.md),
-                Expanded(child: Text('WhatsApp support')),
+                Expanded(child: Text('WhatsApp community')),
+                Icon(Icons.chevron_right_rounded),
+              ],
+            ),
+          ),
+          const SizedBox(height: Spacing.sm),
+          ComicCard(
+            color: Color.alphaBlend(
+              ComicColors.of(context).accentPurple.withValues(alpha: 0.18),
+              comic.sticker,
+            ),
+            onTap: () => launchUrl(
+              Uri.parse(SupportLinks.telegramUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.campaign_outlined),
+                SizedBox(width: Spacing.md),
+                Expanded(child: Text('Telegram channel')),
                 Icon(Icons.chevron_right_rounded),
               ],
             ),
@@ -167,7 +218,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           const SizedBox(height: Spacing.sm),
-          const ComicCard(child: ThemeModeToggleButton()),
+          const ComicCard(child: ThemeModeSelector()),
           const SizedBox(height: Spacing.md),
           TextButton(
             onPressed: _isSigningOut ? null : _signOut,

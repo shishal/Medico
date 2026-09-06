@@ -39,7 +39,7 @@ final class BookmarkedIdsProvider
   BookmarkedIds create() => BookmarkedIds();
 }
 
-String _$bookmarkedIdsHash() => r'd00e80c41caf0f5e96806f13ce68d1e4a776e29e';
+String _$bookmarkedIdsHash() => r'2a4b0de05ebbd868d50c17f4e8f92ce117afdea7';
 
 /// Question IDs the signed-in user has bookmarked. Persists in Supabase;
 /// this set is only a cache so the review-screen icon can toggle instantly.

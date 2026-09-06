@@ -2,6 +2,11 @@
 
 part of 'ug_home_providers.dart';
 
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(studyProgress)
@@ -41,7 +46,7 @@ final class StudyProgressProvider
   }
 }
 
-String _$studyProgressHash() => r'1515151515151515151515151515151515151515';
+String _$studyProgressHash() => r'd1a3e995995bdeff8e5147d6ad546cd1b711a871';
 
 @ProviderFor(trackerList)
 final trackerListProvider = TrackerListProvider._();
@@ -82,4 +87,4 @@ final class TrackerListProvider
   }
 }
 
-String _$trackerListHash() => r'1616161616161616161616161616161616161616';
+String _$trackerListHash() => r'427b1fa16269cf9ca20e562f21ff6eec04ee75c5';

@@ -1,2 +1,9 @@
-code,name,state,slug
-KUHS,Kerala University of Health Sciences,Kerala,kuhs
+code,name,state,slug,is_fallback
+KUHS,Kerala University of Health Sciences,Kerala,kuhs,TRUE
+RGUHS,Rajiv Gandhi University of Health Sciences,Karnataka,rguhs,FALSE
+NTRUHS,Dr. NTR University of Health Sciences,Andhra Pradesh,ntruhs,FALSE
+KNRUHS,Kaloji Narayana Rao University of Health Sciences,Telangana,knruhs,FALSE
+TNMGRMU,Tamil Nadu Dr. M.G.R. Medical University,Tamil Nadu,tnmgrmu,FALSE
+WBUHS,West Bengal University of Health Sciences,West Bengal,wbuhs,FALSE
+RUHS,Rajasthan University of Health Sciences,Rajasthan,ruhs,FALSE
+MUHS,Maharashtra University of Health Sciences,Maharashtra,muhs,FALSE

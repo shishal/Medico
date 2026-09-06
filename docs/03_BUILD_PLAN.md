@@ -97,8 +97,8 @@ Mini / Subject / Mock / Grand list IA is retired.
 Work top to bottom. One task at a time.
 
 **10.1 — Visual system**
-- Description: Coral-orange primary, charcoal dark canvas, indigo-purple chrome, gold Pro. Persist System/Light/Dark; Dark is default. Keep Docci.
-- Expected Outcome: Dark default on first launch; Profile 3-way theme selector survives force-quit; light mode is clean white/gray, not comic paper.
+- Description: Coral-orange primary, charcoal dark canvas, indigo-purple chrome, gold Pro. Persist System/Light/Dark; Light is default. Keep Docci.
+- Expected Outcome: Light default on first launch; Profile 3-way theme selector survives force-quit; light mode is clean white/gray, not comic paper.
 - Validation: toggle System and confirm it follows the emulator OS theme.
 
 **10.2 — Retire catalog tests**

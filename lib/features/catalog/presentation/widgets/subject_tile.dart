@@ -122,11 +122,14 @@ class SubjectSticker extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.w800),
           ),
-          if (total > 0)
-            Text(
-              '$learnt / $total lessons',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+          Text(
+            total == 0
+                ? 'No lessons yet'
+                : '$learnt of $total lessons learnt',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ],
       ),
     );

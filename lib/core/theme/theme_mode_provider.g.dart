@@ -8,17 +8,17 @@ part of 'theme_mode_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Persisted System / Light / Dark. Dark is the default until the student
+/// Persisted System / Light / Dark. Light is the default until the student
 /// picks something else.
 
 @ProviderFor(ThemeModeNotifier)
 final themeModeProvider = ThemeModeNotifierProvider._();
 
-/// Persisted System / Light / Dark. Dark is the default until the student
+/// Persisted System / Light / Dark. Light is the default until the student
 /// picks something else.
 final class ThemeModeNotifierProvider
     extends $NotifierProvider<ThemeModeNotifier, ThemeMode> {
-  /// Persisted System / Light / Dark. Dark is the default until the student
+  /// Persisted System / Light / Dark. Light is the default until the student
   /// picks something else.
   ThemeModeNotifierProvider._()
     : super(
@@ -47,9 +47,9 @@ final class ThemeModeNotifierProvider
   }
 }
 
-String _$themeModeNotifierHash() => r'9e0a3974b46aa7ccd35629aa9c13708e4973160d';
+String _$themeModeNotifierHash() => r'7eea0335a357639be1dee89ebf781a75baee37ee';
 
-/// Persisted System / Light / Dark. Dark is the default until the student
+/// Persisted System / Light / Dark. Light is the default until the student
 /// picks something else.
 
 abstract class _$ThemeModeNotifier extends $Notifier<ThemeMode> {

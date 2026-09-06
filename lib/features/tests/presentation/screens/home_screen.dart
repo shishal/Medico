@@ -31,10 +31,10 @@ class HomeScreen extends ConsumerWidget {
           children: [
             const HomeHeroBanner(),
             const HomeCoverageBanner(),
-            const HomeResumeBanner(),
             const ComicSectionTitle(
               title: 'Subjects',
-              subtitle: 'From your year — rings fill as you mark lessons learnt',
+              subtitle:
+                  'Subject → topic → lesson → PYQs. The ring is lessons marked learnt — not a PYQ count.',
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 280),
@@ -61,6 +61,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            const HomeResumeBanner(),
             const ComicSectionTitle(title: 'Saved'),
             const HomeQuickActions(),
           ],

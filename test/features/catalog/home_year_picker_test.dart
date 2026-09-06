@@ -147,7 +147,7 @@ void main() {
         ],
         child: RepaintBoundary(
           child: MaterialApp.router(
-            theme: AppTheme.dark,
+            theme: AppTheme.light,
             routerConfig: router,
           ),
         ),
@@ -166,6 +166,14 @@ void main() {
     expect(find.text('Your year'), findsNothing);
     expect(find.text('Start practice'), findsOneWidget);
     expect(find.byKey(const ValueKey('year-chip-p2')), findsNothing);
+    expect(
+      find.textContaining('Subject → topic → lesson → PYQs'),
+      findsOneWidget,
+    );
+    expect(
+      tester.getTopLeft(find.text('Subjects')).dy,
+      lessThan(tester.getTopLeft(find.text('Start practice')).dy),
+    );
     await _savePng(tester, 'home_profile_year_subjects.png');
   });
 }

@@ -6,14 +6,14 @@ part 'theme_mode_provider.g.dart';
 
 const _themeModePrefKey = 'theme_mode';
 
-/// Persisted System / Light / Dark. Dark is the default until the student
+/// Persisted System / Light / Dark. Light is the default until the student
 /// picks something else.
 @Riverpod(keepAlive: true)
 class ThemeModeNotifier extends _$ThemeModeNotifier {
   @override
   ThemeMode build() {
     _restore();
-    return ThemeMode.dark;
+    return ThemeMode.light;
   }
 
   Future<void> _restore() async {
@@ -44,7 +44,8 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
     return switch (raw) {
       'light' => ThemeMode.light,
       'system' => ThemeMode.system,
-      _ => ThemeMode.dark,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.light,
     };
   }
 }

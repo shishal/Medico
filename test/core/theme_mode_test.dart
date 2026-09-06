@@ -27,7 +27,7 @@ void main() {
     expect(ThemeModeNotifier.fromName('light'), ThemeMode.light);
     expect(ThemeModeNotifier.fromName('system'), ThemeMode.system);
     expect(ThemeModeNotifier.fromName('dark'), ThemeMode.dark);
-    expect(ThemeModeNotifier.fromName('nope'), ThemeMode.dark);
+    expect(ThemeModeNotifier.fromName('nope'), ThemeMode.light);
   });
 
   test('theme preference persists as the enum name', () async {

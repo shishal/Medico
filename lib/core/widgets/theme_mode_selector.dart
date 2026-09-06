@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/spacing.dart';
 import '../theme/theme_mode_provider.dart';
 
-/// System / Light / Dark. Dark is the stored default.
+/// System / Light / Dark. Light is the stored default.
 class ThemeModeSelector extends ConsumerWidget {
   const ThemeModeSelector({super.key});
 

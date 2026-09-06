@@ -13,8 +13,9 @@ void main() {
     expect(ComicColors.dark.paper, const Color(0xFF121212));
     expect(AppTheme.splashCanvas, const Color(0xFF121212));
     expect(AppTheme.seedColor, const Color(0xFFF25C2D));
-    expect(ComicColors.dark.accentPurple, const Color(0xFF7B6CFF));
-    expect(ComicColors.dark.proGold, const Color(0xFFF5C542));
+    expect(ComicColors.dark.sticker, const Color(0xFF252528));
+    expect(ComicColors.dark.stickerLift, const Color(0xFF2E2E33));
+    expect(ComicColors.dark.accentPurple, const Color(0xFF8B7CFF));
   });
 
   test('light canvas is clean gray, not comic paper', () {

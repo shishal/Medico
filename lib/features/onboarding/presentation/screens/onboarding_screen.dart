@@ -152,10 +152,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   return YearPickerRow(
                     phases: items,
                     selectedId: _phaseId,
-                    onSelect: (id) {
-                      setState(() => _phaseId = id);
-                      ref.read(catalogBrowsePhaseProvider.notifier).select(id);
-                    },
+                    onSelect: (id) => setState(() => _phaseId = id),
                     padding: EdgeInsets.zero,
                   );
                 },

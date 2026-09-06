@@ -34,9 +34,14 @@ class AppShell extends StatelessWidget {
         ),
         child: Material(
           color: comic.sticker,
-          elevation: 4,
+          elevation: 8,
           shadowColor: comic.shadow,
-          borderRadius: BorderRadius.circular(28),
+          surfaceTintColor: scheme.primary.withValues(alpha: 0.08),
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: Spacing.sm,
@@ -105,8 +110,16 @@ class _NavItem extends StatelessWidget {
                 vertical: Spacing.xs,
               ),
               decoration: BoxDecoration(
-                color: selected ? color.withValues(alpha: 0.14) : null,
+                color: selected ? color.withValues(alpha: 0.22) : null,
                 borderRadius: BorderRadius.circular(999),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.35),
+                          blurRadius: 10,
+                        ),
+                      ]
+                    : null,
               ),
               child: Icon(selected ? filled : outlined, color: fg, size: 22),
             ),

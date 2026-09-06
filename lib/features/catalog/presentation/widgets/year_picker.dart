@@ -7,8 +7,7 @@ import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/staggered_fade.dart';
 import '../../domain/catalog_models.dart';
 
-/// Compact year chips with year art inside. Same [year-chip-*] keys as the
-/// taller stickers so Home tests still tap `year-chip-p2`.
+/// Compact year chips with year art inside. Used on onboarding and Profile.
 class YearPickerRow extends StatelessWidget {
   const YearPickerRow({
     super.key,
@@ -25,8 +24,6 @@ class YearPickerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-
     return SizedBox(
       height: 108,
       child: ListView.separated(
@@ -41,7 +38,7 @@ class YearPickerRow extends StatelessWidget {
             child: _YearChip(
               phase: phase,
               selected: phase.id == selectedId,
-              fill: StickerFills.yearFill(phase.displayOrder, brightness),
+              fill: ComicColors.of(context).sticker,
               onTap: () => onSelect(phase.id),
             ),
           );
@@ -73,6 +70,7 @@ class _YearChip extends StatelessWidget {
       child: ComicCard(
         key: ValueKey('year-chip-${phase.id}'),
         color: fill,
+        highlighted: selected,
         padding: const EdgeInsets.all(Spacing.xs),
         semanticLabel: phase.name,
         onTap: onTap,

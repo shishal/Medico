@@ -205,7 +205,7 @@ def _feature_graphic(mark: Image.Image) -> Image.Image:
     img.alpha_composite(badge, (48, (height - 280) // 2))
 
     title = _glyph("Medico", fill=WHITE, font_size=92)
-    sub = _glyph("KUHS MBBS exam companion", fill=WHITE, font_size=28)
+    sub = _glyph("MBBS exam companion", fill=WHITE, font_size=28)
     text_left = 360
     block_h = title.size[1] + 22 + sub.size[1]
     title_y = (height - block_h) // 2

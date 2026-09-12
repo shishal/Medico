@@ -1,4 +1,4 @@
-/// Comic glyph for a KUHS subject. Names are matched loosely so sheet
+/// Comic glyph for a catalog subject. Names are matched loosely so sheet
 /// titles like "Gen. Medicine" still get a stethoscope.
 enum MedGlyph {
   skull,

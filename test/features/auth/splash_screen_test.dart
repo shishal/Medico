@@ -38,7 +38,7 @@ void main() {
     );
 
     expect(find.text('Medico'), findsOneWidget);
-    expect(find.text('KUHS exam companion'), findsOneWidget);
+    expect(find.text('MBBS exam companion'), findsOneWidget);
     expect(find.byType(BrandPulseLoader), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));

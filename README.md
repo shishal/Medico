@@ -1,6 +1,6 @@
 # Medico
 
-Flutter app for **KUHS MBBS university exams**: previous-year theory questions
+Flutter app for **MBBS university exams**: previous-year theory questions
 (with optional sample answers and textbook page citations), lesson-scoped MCQ
 practice, and exam trackers.
 

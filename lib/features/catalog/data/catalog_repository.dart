@@ -20,14 +20,14 @@ class CatalogRepository {
       return const Failure('Not signed in.');
     }
     try {
-      // Do not SELECT `is_fallback` — that column is added by
-      // `geckomed_ux.sql`. A live project without it 400s the whole picker.
+      // `is_fallback` marks the default content bank (any university, not a
+      // hardcoded code). Added by `geckomed_ux.sql`.
       final rows = await _client
           .from(Tables.universities)
           .select(
             '${UniversityColumns.id},${UniversityColumns.code},'
             '${UniversityColumns.name},${UniversityColumns.state},'
-            '${UniversityColumns.slug}',
+            '${UniversityColumns.slug},${UniversityColumns.isFallback}',
           )
           .order(UniversityColumns.name);
       return Success(_map(rows, University.fromJson));
@@ -201,7 +201,8 @@ class CatalogRepository {
     }
   }
 
-  /// Papers + PYQ counts for [selectedUniversityId], falling back to KUHS.
+  /// Papers + PYQ counts for [selectedUniversityId], falling back to the
+  /// `is_fallback` content bank when that university has no papers.
   Future<Result<UniversityCoverage>> fetchCoverage(String? selectedUniversityId) async {
     if (_client.auth.currentUser == null) {
       return const Failure('Not signed in.');
@@ -212,16 +213,16 @@ class CatalogRepository {
           .select(
             '${UniversityColumns.id},${UniversityColumns.code},'
             '${UniversityColumns.name},${UniversityColumns.state},'
-            '${UniversityColumns.slug}',
+            '${UniversityColumns.slug},${UniversityColumns.isFallback}',
           );
       final unis = _map(uniRows, University.fromJson);
       University? selected;
       University? fallback;
       for (final u in unis) {
         if (u.id == selectedUniversityId) selected = u;
-        if (u.code == 'KUHS') fallback = u;
+        if (u.isFallback) fallback = u;
       }
-      fallback ??= unis.where((u) => u.code == 'KUHS').firstOrNull ?? unis.firstOrNull;
+      fallback ??= unis.firstOrNull;
       if (fallback == null) {
         return const Success(
           UniversityCoverage(

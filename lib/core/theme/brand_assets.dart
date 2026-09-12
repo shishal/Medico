@@ -16,7 +16,7 @@ abstract final class BrandAssets {
   static const yearThird = 'assets/illustrations/year_third.jpg';
   static const yearFinal = 'assets/illustrations/year_final.jpg';
 
-  /// Pick year art from KUHS phase code/name/order. 1st → skull, 2nd → lab,
+  /// Pick year art from MBBS phase code/name/order. 1st → skull, 2nd → lab,
   /// 3rd → clinics, final → stethoscope.
   static String yearArt({
     required String code,

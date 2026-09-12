@@ -101,7 +101,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
                 const SizedBox(height: Spacing.xs),
                 Text(
-                  'Create an account to study KUHS PYQs with ${BrandAssets.mascotName}.',
+                  'Create an account to study PYQs with ${BrandAssets.mascotName}.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium
                       ?.copyWith(color: colorScheme.onSurfaceVariant),

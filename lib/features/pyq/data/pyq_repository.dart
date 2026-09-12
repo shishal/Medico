@@ -573,25 +573,20 @@ class PyqRepository {
   }
 
   /// Fallback is university-wide: if the selected university has any papers,
-  /// empty subjects stay empty. Only swap to KUHS when that university has
-  /// zero papers in the catalog.
-  ///
-  /// Do not SELECT `is_fallback` — that column is added by
-  /// `geckomed_ux.sql`. A live project that has not applied it returns
-  /// PostgREST 42703 and the subject screen never leaves the spinner.
-  /// KUHS by `code` is the v1 fallback bank either way.
+  /// empty subjects stay empty. Only swap to the `is_fallback` bank when that
+  /// university has zero papers in the catalog.
   Future<({String? contentUni, bool usingFallback})> _resolveContentUniversity(
     String? universityId,
   ) async {
     final uniRows = await _client
         .from(Tables.universities)
         .select(
-          '${UniversityColumns.id},${UniversityColumns.code}',
+          '${UniversityColumns.id},${UniversityColumns.isFallback}',
         );
     final unis = (uniRows as List<dynamic>).cast<Map<String, dynamic>>();
     String? fallbackId;
     for (final u in unis) {
-      if (u[UniversityColumns.code] == 'KUHS') {
+      if (u[UniversityColumns.isFallback] == true) {
         fallbackId = u[UniversityColumns.id] as String;
         break;
       }

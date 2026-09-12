@@ -1,6 +1,6 @@
 /// Exam-paper format inferred from `questions.kind` + `marks`.
 ///
-/// KUHS theory papers: essays ~10 marks, short notes ~5, VSAs ~2.
+/// Typical theory papers: essays ~10 marks, short notes ~5, VSAs ~2.
 enum QuestionFormat {
   essay,
   shortNote,

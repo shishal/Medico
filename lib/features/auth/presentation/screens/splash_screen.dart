@@ -128,7 +128,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           ),
                           const SizedBox(height: Spacing.xs),
                           Text(
-                            'KUHS exam companion',
+                            'MBBS exam companion',
                             style: textTheme.bodyLarge?.copyWith(
                               color: onCanvas.withValues(alpha: 0.82),
                               letterSpacing: 0.2,

@@ -6,7 +6,6 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
-import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
@@ -117,6 +116,8 @@ class HomeHeroBanner extends ConsumerWidget {
   }
 }
 
+/// Quiet catalog size under the greeting. Fallback copy only when the
+/// student's university has no tagged papers yet.
 class HomeCoverageBanner extends ConsumerWidget {
   const HomeCoverageBanner({super.key});
 
@@ -128,60 +129,20 @@ class HomeCoverageBanner extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       data: (c) {
         final scheme = Theme.of(context).colorScheme;
-        final comic = ComicColors.of(context);
+        final line = c.usingFallback
+            ? 'Showing default PYQs until ${c.selectedUniversityName ?? 'your university'} papers are added.'
+            : '${c.pyqCount} PYQs · ${c.paperCount} papers';
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             Spacing.lg,
-            Spacing.md,
+            Spacing.sm,
             Spacing.lg,
             0,
           ),
-          child: ComicCard(
-            color: Color.alphaBlend(
-              scheme.primary.withValues(alpha: 0.22),
-              comic.stickerLift,
-            ),
-            highlighted: true,
-            child: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: scheme.primary,
-                    borderRadius: BorderRadius.circular(99),
-                    boxShadow: [
-                      BoxShadow(
-                        color: scheme.primary.withValues(alpha: 0.45),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: Spacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${c.pyqCount} PYQs · ${c.paperCount} papers indexed',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: scheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: Spacing.xs),
-                      Text(
-                        c.usingFallback
-                            ? 'Showing default PYQs until ${c.selectedUniversityName ?? 'your university'} papers are added.'
-                            : 'Counts are from tagged university papers — not a marketing score.',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          child: Text(
+            line,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: scheme.onSurfaceVariant),
           ),
         );
       },

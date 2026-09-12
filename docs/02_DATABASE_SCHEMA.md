@@ -667,7 +667,6 @@ read the fallback (KUHS) bank. See `docs/00_PRODUCT.md`.
 ```sql
 create type question_kind as enum ('pyq_theory', 'mcq');
 create type mbbs_phase_code as enum ('phase1', 'phase2', 'phase3_part1', 'phase3_part2');
-create type tracker_kind as enum ('university_window', 'custom');
 create type study_event_kind as enum (
   'opened_lesson', 'opened_pyq', 'marked_learnt', 'answered_mcq', 'opened_resource'
 );
@@ -710,21 +709,21 @@ tables above. Editors do not invent UUIDs. See `content/google_sheet/README.md`.
 `plan_expires_at = now() + 4 days`. Authenticated GRANT update is limited to
 name/phone/academic fields — never `plan` / `plan_expires_at`.
 
-### 9.4 Progress and trackers
+### 9.4 Progress
 
 `lesson_progress` / `question_progress` (learnt_at, last_viewed_at),
 `lesson_bookmarks`, append-only `study_events`.
 
-`trackers`: `custom` (owner_user_id required) or `university_window` (owner
-null, shared). `tracker_items` point at lessons/questions.
-`user_tracker_item_done` is per-user completion.
+Trackers (`trackers`, `tracker_items`, `user_tracker_item_done`,
+`tracker_kind`, `tracker_completion`) are **retired**. Drop them with
+`supabase/migrations/20260912120000_drop_trackers.sql`. They were never a
+Google Sheet / CSV tab.
 
 ### 9.5 RPCs (do not reimplement in Dart)
 
 | RPC | Returns |
 |---|---|
 | `get_study_progress()` | streak, 7/30-day counts, subject coverage |
-| `tracker_completion(p_tracker_id)` | `{done, total, percent}` |
 | `search_catalog(p_query)` | subjects, lessons, PYQ teasers |
 | `create_practice_session(..., p_lesson_ids uuid[] default null)` | MCQ-only + optional lesson filter |
 | `mark_lesson_learnt(p_lesson_id)` / `mark_question_learnt(p_question_id)` | progress + study_event |

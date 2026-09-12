@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../theme/comic_colors.dart';
 import '../theme/spacing.dart';
 
-/// Pill bottom bar: Home / Practice / Trackers / Profile.
+/// Pill bottom bar: Home / Practice / Profile.
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.navigationShell});
 
@@ -13,7 +13,6 @@ class AppShell extends StatelessWidget {
   static const _destinations = [
     (Icons.home_outlined, Icons.home_rounded, 'Home'),
     (Icons.quiz_outlined, Icons.quiz_rounded, 'Practice'),
-    (Icons.flag_outlined, Icons.flag_rounded, 'Trackers'),
     (Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
   ];
 

@@ -27,7 +27,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 
 **UG-B.1 — Apply `ug_university_pivot` migration**
 - Description: Run `supabase/migrations/20260830140000_ug_university_pivot.sql`.
-- Expected Outcome: universities, colleges, phases, lessons, appearances, textbook refs, sample-answer table, resources, progress, trackers, RPCs, 4-day trial on new profiles.
+- Expected Outcome: universities, colleges, phases, lessons, appearances, textbook refs, sample-answer table, resources, progress, RPCs, 4-day trial on new profiles.
 - Validation: Table Editor lists the new tables; `select * from universities;` returns KUHS; signup as a test user yields `plan = pro` with `plan_expires_at` ~4 days out.
 
 **UG-B.2 — Practice generator is MCQ-only**
@@ -55,7 +55,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 - Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (fallback KUHS PYQs + banner).
 
 **UG-D.2 — Catalog browse**
-- Description: Home lists subjects for the student’s phase. **Opening a subject shows that subject’s PYQs** (paper / year / format / chapter filters). Topic → lesson remains under **Chapters** for trackers and mark-learnt. See `docs/10_INDIA_MBBS_EXAMS.md`.
+- Description: Home lists subjects for the student’s phase. **Opening a subject shows that subject’s PYQs** (paper / year / format / chapter filters). Topic → lesson remains under **Chapters** for grouping and mark-learnt. See `docs/10_INDIA_MBBS_EXAMS.md`.
 - Validation: a Paper II stem and a Paper I stem appear together on the subject screen; filtering Paper II hides Paper I. Chapters still opens the topic list.
 
 **UG-D.3 — PYQ reader**
@@ -70,9 +70,11 @@ Mini / Subject / Mock / Grand list IA is retired.
 - Description: Search subjects, lessons, PYQ stems. Lesson bookmarks use `lesson_bookmarks`. Mark-learnt writes progress + a `study_events` row via repository (RPC for streak reads).
 - Validation: bookmark a lesson, force-quit, reopen — still bookmarked.
 
-**UG-D.6 — Trackers**
-- Description: Custom tracker (pick lessons) + one published university-window tracker. Completion % from `tracker_completion` RPC.
-- Validation: marking a lesson learnt updates the tracker percent on refresh. Free user can use custom trackers on free lessons.
+**UG-D.6 — Trackers (retired)**
+- Description: Removed. Bottom tab, Dart feature, and SQL (`trackers` /
+  `tracker_items` / `user_tracker_item_done` / `tracker_completion`) are gone.
+  No CSV cleanup — trackers were never a sheet tab. Drop leftover DB objects
+  with `supabase/migrations/20260912120000_drop_trackers.sql`.
 
 **UG-D.7 — Progress**
 - Description: Home strip + progress screen: 7-day / 30-day activity, streak, subject coverage from `get_study_progress` RPC.
@@ -88,7 +90,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 
 **UG-E.1 — KUHS SEO pages** on the existing static site (`/kuhs/`, `/kuhs/anatomy/`, important-questions).
 **UG-E.2 — WhatsApp support** link in the app profile and site header (number is an operator setting, not hardcoded to a competitor).
-**UG-E.3 — Ambassadors page** explaining college-tracker contribution. Do not build a CRM in v1.
+**UG-E.3 — Ambassadors page** explaining campus contribution (papers / dates). Do not build a CRM in v1.
 
 ---
 

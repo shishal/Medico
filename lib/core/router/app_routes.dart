@@ -10,8 +10,6 @@ abstract final class AppRoutes {
   static const practice = '/practice';
   static const search = '/search';
   static const progress = '/progress';
-  static const trackers = '/trackers';
-  static const trackerCreate = '/trackers/new';
   static const subject = '/subjects/:subjectId';
   static const subjectTopics = '/subjects/:subjectId/topics';
   static const subjectYear = '/subjects/:subjectId/years/:year';

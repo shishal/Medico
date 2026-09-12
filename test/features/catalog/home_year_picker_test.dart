@@ -78,10 +78,6 @@ void main() {
           builder: (_, _) => const SizedBox.shrink(),
         ),
         GoRoute(
-          path: AppRoutes.trackers,
-          builder: (_, _) => const SizedBox.shrink(),
-        ),
-        GoRoute(
           path: AppRoutes.progress,
           builder: (_, _) => const SizedBox.shrink(),
         ),
@@ -132,7 +128,6 @@ void main() {
               subjects: [],
             ),
           ),
-          trackerListProvider.overrideWith((ref) async => const []),
           inProgressAttemptsProvider.overrideWith(_NoAttempts.new),
           pendingSubmitSyncProvider.overrideWith(_NoopSync.new),
           universitiesProvider.overrideWith((ref) async => const []),

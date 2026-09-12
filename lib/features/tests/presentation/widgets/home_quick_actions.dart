@@ -6,7 +6,7 @@ import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_card.dart';
 
-/// Secondary shortcuts once the shell owns Practice / Trackers / Profile.
+/// Secondary shortcuts once the shell owns Practice / Profile.
 class HomeQuickActions extends StatelessWidget {
   const HomeQuickActions({super.key});
 

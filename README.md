@@ -2,7 +2,7 @@
 
 Flutter app for **MBBS university exams**: previous-year theory questions
 (with optional sample answers and textbook page citations), lesson-scoped MCQ
-practice, and exam trackers.
+practice.
 
 Planning docs: `docs/00_PRODUCT.md` (read first), then `docs/01`–`03`.
 

@@ -26,7 +26,6 @@ import '../../features/results/presentation/screens/solution_review_screen.dart'
 import '../../features/tests/presentation/screens/home_screen.dart';
 import '../../features/tests/presentation/screens/test_instructions_screen.dart';
 import '../../features/tests/presentation/screens/test_player_screen.dart';
-import '../../features/trackers/presentation/screens/trackers_screen.dart';
 import '../widgets/app_shell.dart';
 import 'app_routes.dart';
 import 'comic_page.dart';
@@ -123,14 +122,6 @@ GoRouter goRouter(Ref ref) {
           StatefulShellBranch(
             routes: [
               comicGoRoute(
-                path: AppRoutes.trackers,
-                builder: (context, state) => const TrackersScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              comicGoRoute(
                 path: AppRoutes.profile,
                 builder: (context, state) => const ProfileScreen(),
               ),
@@ -145,10 +136,6 @@ GoRouter goRouter(Ref ref) {
       comicGoRoute(
         path: AppRoutes.progress,
         builder: (context, state) => const ProgressScreen(),
-      ),
-      comicGoRoute(
-        path: AppRoutes.trackerCreate,
-        builder: (context, state) => const CreateTrackerScreen(),
       ),
       comicGoRoute(
         path: AppRoutes.subjectTopics,

@@ -132,39 +132,6 @@ class CatalogRepository {
     }
   }
 
-  Future<Result<List<LessonPickerItem>>> fetchLessonsForPhase(
-    String? phaseId,
-  ) async {
-    if (_client.auth.currentUser == null) {
-      return const Failure('Not signed in.');
-    }
-    try {
-      final rows = await _client
-          .from(Tables.lessons)
-          .select(
-            '${LessonColumns.id},'
-            '${LessonColumns.name},'
-            '${LessonColumns.topicEmbed}:${Tables.topics}!inner('
-            '${TopicColumns.name},'
-            '${TopicColumns.subjectEmbed}:${Tables.subjects}!inner('
-            '${SubjectColumns.name},'
-            '${SubjectColumns.mbbsPhaseId}'
-            ')'
-            ')',
-          )
-          .eq(LessonColumns.isActive, true)
-          .order(LessonColumns.displayOrder);
-      final items = _map(rows, LessonPickerItem.fromJson)
-          .where((item) => phaseId == null || item.mbbsPhaseId == phaseId)
-          .toList();
-      return Success(items);
-    } catch (e) {
-      return Failure(
-        UserFacingError.from(e, fallback: 'Could not load lessons.'),
-      );
-    }
-  }
-
   Future<Result<void>> recordOpenedLesson(String lessonId) async {
     try {
       await _client.rpc(

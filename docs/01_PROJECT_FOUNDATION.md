@@ -75,10 +75,6 @@ lib/
       data/
       domain/
       presentation/
-    trackers/
-      data/
-      domain/
-      presentation/
     progress/
       data/
       domain/

@@ -1,6 +1,6 @@
 # Medico — MBBS university-exam companion
 
-Flutter app for **MBBS university exams** (PYQs, trackers, textbook page refs,
+Flutter app for **MBBS university exams** (PYQs, textbook page refs,
 MCQ practice). Students pick their affiliating university; v1 **content** is
 **KUHS** (fallback bank) — see `docs/00_PRODUCT.md`.
 

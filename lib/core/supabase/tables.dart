@@ -30,9 +30,6 @@ abstract final class Tables {
   static const questionProgress = 'question_progress';
   static const lessonBookmarks = 'lesson_bookmarks';
   static const studyEvents = 'study_events';
-  static const trackers = 'trackers';
-  static const trackerItems = 'tracker_items';
-  static const userTrackerItemDone = 'user_tracker_item_done';
 
   /// Safe metadata only (title/type/counts) — all authenticated users.
   /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
@@ -217,7 +214,6 @@ abstract final class RpcFunctions {
   static const markQuestionLearnt = 'mark_question_learnt';
   static const recordStudyEvent = 'record_study_event';
   static const getStudyProgress = 'get_study_progress';
-  static const trackerCompletion = 'tracker_completion';
   static const searchCatalog = 'search_catalog';
 }
 
@@ -366,26 +362,6 @@ abstract final class ExamPaperColumns {
   static const universityId = 'university_id';
 }
 
-abstract final class TrackerColumns {
-  static const id = 'id';
-  static const ownerUserId = 'owner_user_id';
-  static const universityId = 'university_id';
-  static const kind = 'kind';
-  static const title = 'title';
-  static const startsOn = 'starts_on';
-  static const endsOn = 'ends_on';
-  static const isActive = 'is_active';
-  static const createdAt = 'created_at';
-}
-
-abstract final class TrackerItemColumns {
-  static const id = 'id';
-  static const trackerId = 'tracker_id';
-  static const lessonId = 'lesson_id';
-  static const questionId = 'question_id';
-  static const displayOrder = 'display_order';
-}
-
 abstract final class LessonBookmarkColumns {
   static const userId = 'user_id';
   static const lessonId = 'lesson_id';
@@ -404,10 +380,6 @@ abstract final class StudyEventParams {
 abstract final class MarkLearntParams {
   static const lessonId = 'p_lesson_id';
   static const questionId = 'p_question_id';
-}
-
-abstract final class TrackerCompletionParams {
-  static const trackerId = 'p_tracker_id';
 }
 
 abstract final class SearchCatalogParams {

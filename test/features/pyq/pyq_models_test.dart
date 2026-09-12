@@ -70,20 +70,6 @@ void main() {
     expect(citation.label, contains('Brachial plexus'));
   });
 
-  test('TrackerSummary reads completion RPC payload', () {
-    final summary = TrackerSummary.fromRow(
-      {
-        TrackerColumns.id: 't1',
-        TrackerColumns.title: 'Anatomy internal',
-        TrackerColumns.kind: 'custom',
-      },
-      {'done': 2, 'total': 4, 'percent': 50.0},
-    );
-    expect(summary.percent, 50.0);
-    expect(summary.done, 2);
-    expect(summary.total, 4);
-  });
-
   test('StudyProgress parses streak JSON from RPC', () {
     final progress = StudyProgress.fromJson({
       'streak': 2,

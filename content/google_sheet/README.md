@@ -36,6 +36,9 @@ python3 scripts/generate_ug_seed_csvs.py
 `TestQuestions`. An older sheet that still has those tabs can keep using the
 legacy validator until you switch the Questions header to the wide columns.
 
+Trackers were never a sheet tab (in-app rows + SQL seed only). Drop leftover
+DB objects with `supabase/migrations/20260912120000_drop_trackers.sql`.
+
 ## Editor tabs
 
 ### `Universities` → `universities`

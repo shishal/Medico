@@ -38,8 +38,8 @@ Medico v1 is for the **university paper** (PYQs tagged to `exam_papers` with
 `exam_type = 'university'`). Internals can be stored the same way
 (`exam_type = 'internal'`) but are not the primary browse.
 
-Students still *revise* chapter-wise before internals. That is why trackers
-need chapters/lessons even though the university paper is mixed.
+Students still *revise* chapter-wise before internals. That is why
+chapters/lessons stay as tags even though the university paper is mixed.
 
 ---
 
@@ -149,7 +149,7 @@ row.
 | View | Student intent | Matches |
 |---|---|---|
 | **Paper-wise** | “Write 2024 Paper I in exam order, timed” | University day; pattern, diagrams, time |
-| **Chapter-wise** | “All Upper Limb PYQs across 5 years, then mark the chapter done” | Internals, last-month revision, trackers, high-yield repeats |
+| **Chapter-wise** | “All Upper Limb PYQs across 5 years, then mark the chapter done” | Internals, last-month revision, high-yield repeats |
 
 A PYQ app that **only** offers Subject → Topic → Lesson → questions hides
 the paper. A student cannot reconstruct what KUHS actually asked in 2024.
@@ -159,8 +159,8 @@ A PYQ app that **only** offers full PDFs with no chapter tags makes
 painful.
 
 GeckoMed-style apps (public copy, not a layout clone): **open a subject →
-start with PYQs**; use chapters/lessons to group questions and to build
-trackers; also list papers by year / Paper I / Paper II.
+start with PYQs**; use chapters/lessons to group questions; also list papers
+by year / Paper I / Paper II.
 
 ---
 
@@ -174,14 +174,13 @@ trackers; also list papers by year / Paper I / Paper II.
 - One sheet row = one appearance (or extra textbook page). Repeat
   `external_id` for another paper. Topic/lesson names on that row **tag**
   the stem; they do not mean the paper is only that lesson.
-- Trackers already point at lessons and/or questions
 
 ### Currently true in the app (browse)
 
 Home → subject → **exam years** → that year’s paper outline (pinned LAQ /
 Short notes / MCQ tabs; Paper I and Paper II merged, labeled on each stem).
-**Filters** (chapters / paper) sit on the year list. Topic → lesson for
-trackers and mark-learnt stays under Trackers, not this screen.
+**Filters** (chapters / paper) sit on the year list. Topic → lesson remains
+the syllabus index (and mark-learnt), not the first tap from Home.
 
 ### Student path (shipped)
 
@@ -203,9 +202,9 @@ through them first. Exam order inside a paper is not stored yet (no
 
 The owner’s understanding is **correct** for India MBBS university exams:
 
-> Open a subject → start with PYQs. Chapters/lessons group those questions
-> and feed trackers. Real papers mix topics, so the paper is the upload
-> unit and the chapter is a tag.
+> Open a subject → start with PYQs. Chapters/lessons group those questions.
+> Real papers mix topics, so the paper is the upload unit and the chapter
+> is a tag.
 
 **Paper I / Paper II / year** are first-class. Year is the browse step;
 paper is a filter plus a label on each stem.

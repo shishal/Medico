@@ -15,7 +15,6 @@ import '../../../practice/domain/practice_builder_draft.dart';
 import '../../../practice/domain/practice_enums.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
-import '../../../progress/presentation/providers/ug_home_providers.dart';
 import '../../../pyq/data/pyq_repository.dart';
 import '../../../pyq/domain/pyq_models.dart';
 import '../../../pyq/domain/question_format.dart';
@@ -256,7 +255,6 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                   };
                   ScaffoldMessenger.of(context)
                       .showSnackBar(SnackBar(content: Text(message)));
-                  ref.invalidate(trackerListProvider);
                 },
                 child: const Text('Mark lesson learnt'),
               ),

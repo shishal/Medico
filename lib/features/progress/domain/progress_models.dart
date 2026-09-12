@@ -1,5 +1,3 @@
-import '../../../core/supabase/tables.dart';
-
 class DayCount {
   const DayCount({required this.date, required this.count});
 
@@ -120,33 +118,4 @@ List<SearchHit> _hits(Object? raw, String kind) {
           lessonId: item['lesson_id'] as String?,
         ),
   ];
-}
-
-class TrackerSummary {
-  const TrackerSummary({
-    required this.id,
-    required this.title,
-    required this.kind,
-    required this.done,
-    required this.total,
-    required this.percent,
-  });
-
-  final String id;
-  final String title;
-  final String kind;
-  final int done;
-  final int total;
-  final num percent;
-
-  factory TrackerSummary.fromRow(Map<String, dynamic> json, Map<String, dynamic> completion) {
-    return TrackerSummary(
-      id: json[TrackerColumns.id] as String,
-      title: json[TrackerColumns.title] as String,
-      kind: json[TrackerColumns.kind] as String,
-      done: _asInt(completion['done']),
-      total: _asInt(completion['total']),
-      percent: completion['percent'] as num? ?? 0,
-    );
-  }
 }

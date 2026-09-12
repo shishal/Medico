@@ -162,41 +162,6 @@ class CatalogLesson {
   }
 }
 
-/// Lesson row plus subject/topic names for the custom-tracker picker.
-class LessonPickerItem {
-  const LessonPickerItem({
-    required this.id,
-    required this.name,
-    required this.topicName,
-    required this.subjectName,
-    this.mbbsPhaseId,
-  });
-
-  final String id;
-  final String name;
-  final String topicName;
-  final String subjectName;
-  final String? mbbsPhaseId;
-
-  factory LessonPickerItem.fromJson(Map<String, dynamic> json) {
-    final topicRaw = json[LessonColumns.topicEmbed];
-    final topic = topicRaw is Map<String, dynamic>
-        ? topicRaw
-        : <String, dynamic>{};
-    final subjectRaw = topic[TopicColumns.subjectEmbed];
-    final subject = subjectRaw is Map<String, dynamic>
-        ? subjectRaw
-        : <String, dynamic>{};
-    return LessonPickerItem(
-      id: json[LessonColumns.id] as String,
-      name: json[LessonColumns.name] as String? ?? 'Lesson',
-      topicName: topic[TopicColumns.name] as String? ?? '',
-      subjectName: subject[SubjectColumns.name] as String? ?? '',
-      mbbsPhaseId: subject[SubjectColumns.mbbsPhaseId] as String?,
-    );
-  }
-}
-
 int _asInt(Object? value) {
   if (value is int) return value;
   if (value is num) return value.toInt();

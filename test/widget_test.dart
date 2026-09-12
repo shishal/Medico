@@ -44,6 +44,6 @@ void main() {
     );
 
     expect(find.text('Medico'), findsWidgets);
-    await tester.pump(const Duration(milliseconds: 1100));
+    await tester.pump(const Duration(milliseconds: 1300));
   });
 }

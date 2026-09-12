@@ -53,9 +53,10 @@ class HomeHeroBanner extends ConsumerWidget {
         children: [
           const ComicMascot(
             asset: BrandAssets.mascotWave,
-            size: 56,
+            size: 64,
             heroTag: BrandAssets.mascotHeroTag,
             bounce: false,
+            circleBackdrop: true,
           ),
           const SizedBox(width: Spacing.md),
           Expanded(

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:medico/core/utils/user_facing_error.dart';
 import 'package:medico/core/widgets/async_status_views.dart';
+import 'package:medico/core/widgets/brand_pulse_loader.dart';
 
 void main() {
   testWidgets('AsyncLoadingView shows a spinner', (tester) async {
@@ -10,7 +11,7 @@ void main() {
       const MaterialApp(home: Scaffold(body: AsyncLoadingView())),
     );
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(BrandPulseLoader), findsOneWidget);
   });
 
   testWidgets('AsyncErrorView shows offline copy and Retry', (tester) async {

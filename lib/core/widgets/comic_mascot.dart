@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/brand_assets.dart';
+import '../theme/comic_colors.dart';
 
 /// Idle-bouncing Docci. Wrap with [Hero] on splash → home using [heroTag].
 class ComicMascot extends StatefulWidget {
@@ -10,12 +11,16 @@ class ComicMascot extends StatefulWidget {
     this.size = 128,
     this.heroTag,
     this.bounce = true,
+    this.circleBackdrop = false,
   });
 
   final String asset;
   final double size;
   final String? heroTag;
   final bool bounce;
+
+  /// Sticker-fill disc behind the PNG so transparent art reads on any canvas.
+  final bool circleBackdrop;
 
   @override
   State<ComicMascot> createState() => _ComicMascotState();
@@ -56,13 +61,36 @@ class _ComicMascotState extends State<ComicMascot>
 
   @override
   Widget build(BuildContext context) {
+    final innerSize = widget.circleBackdrop ? widget.size * 0.86 : widget.size;
     Widget image = Image.asset(
       widget.asset,
-      width: widget.size,
-      height: widget.size,
-      fit: BoxFit.cover,
+      width: innerSize,
+      height: innerSize,
+      fit: BoxFit.contain,
       filterQuality: FilterQuality.medium,
     );
+
+    if (widget.circleBackdrop) {
+      final comic = ComicColors.of(context);
+      image = Container(
+        width: widget.size,
+        height: widget.size,
+        alignment: Alignment.bottomCenter,
+        decoration: BoxDecoration(
+          color: comic.sticker,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: comic.shadow,
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: image,
+      );
+    }
 
     final tag = widget.heroTag;
     if (tag != null) {

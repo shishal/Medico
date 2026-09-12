@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:medico/core/router/app_routes.dart';
 import 'package:medico/core/theme/app_theme.dart';
+import 'package:medico/core/widgets/brand_pulse_loader.dart';
 import 'package:medico/features/auth/presentation/providers/auth_session_provider.dart';
 import 'package:medico/features/auth/presentation/screens/splash_screen.dart';
 
@@ -37,12 +38,12 @@ void main() {
     );
 
     expect(find.text('Medico'), findsOneWidget);
-    expect(find.text('MBBS exam prep'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('KUHS exam companion'), findsOneWidget);
+    expect(find.byType(BrandPulseLoader), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, AppTheme.splashCanvas);
 
-    await tester.pump(const Duration(milliseconds: 1100));
+    await tester.pump(const Duration(milliseconds: 1300));
   });
 }

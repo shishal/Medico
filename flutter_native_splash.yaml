@@ -1,8 +1,8 @@
 # Regenerated from assets/branding/ via:
 #   dart run flutter_native_splash:create
 #
-# Color matches AppTheme.seedColor so the native launch screen and the
-# Flutter SplashScreen don't flash white → teal.
+# Color matches AppTheme.splashCanvas so the native launch screen and the
+# Flutter SplashScreen don't flash white → charcoal.
 flutter_native_splash:
   color: "#121212"
   color_dark: "#121212"

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/spacing.dart';
 import '../utils/user_facing_error.dart';
+import 'brand_pulse_loader.dart';
 
 /// Full-screen spinner for [AsyncValue.loading].
 class AsyncLoadingView extends StatelessWidget {
@@ -9,7 +10,9 @@ class AsyncLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    return Center(
+      child: BrandPulseLoader(color: Theme.of(context).colorScheme.primary),
+    );
   }
 }
 
@@ -52,7 +55,15 @@ class AsyncErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!compact) ...[
-              Icon(resolvedIcon, size: 48, color: colorScheme.primary),
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(resolvedIcon, size: 34, color: colorScheme.primary),
+              ),
               const SizedBox(height: Spacing.md),
             ],
             Text(
@@ -98,7 +109,15 @@ class AsyncEmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: colorScheme.onSurfaceVariant),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 34, color: colorScheme.primary),
+            ),
             const SizedBox(height: Spacing.md),
             Text(
               message,

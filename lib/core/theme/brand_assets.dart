@@ -5,9 +5,11 @@ abstract final class BrandAssets {
   static const mascotName = 'Docci';
   static const mascotHeroTag = 'docci-mascot';
 
-  static const mascotWave = 'assets/illustrations/mascot_wave.jpg';
-  static const mascotStudy = 'assets/illustrations/mascot_study.jpg';
-  static const mascotAvatar = 'assets/illustrations/mascot_avatar.jpg';
+  static const splashLogo = 'assets/branding/splash_logo.png';
+
+  static const mascotWave = 'assets/illustrations/mascot_wave.png';
+  static const mascotStudy = 'assets/illustrations/mascot_study.png';
+  static const mascotAvatar = 'assets/illustrations/mascot_avatar.png';
   static const doodleEquipment = 'assets/illustrations/doodle_equipment.jpg';
   static const yearFirst = 'assets/illustrations/year_first.jpg';
   static const yearSecond = 'assets/illustrations/year_second.jpg';

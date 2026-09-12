@@ -15,6 +15,7 @@ import '../../domain/practice_catalog.dart';
 import '../../domain/practice_clamp_copy.dart';
 import '../providers/practice_catalog_provider.dart';
 import '../providers/practice_plan_context_provider.dart';
+import '../widgets/practice_builder_filter_sheet.dart';
 import '../widgets/practice_builder_form.dart';
 
 /// Form that calls `create_practice_session()` and opens the question player.
@@ -96,6 +97,30 @@ class _PracticeBuilderScreenState extends ConsumerState<PracticeBuilderScreen> {
           },
         ),
         actions: [
+          if (catalogAsync.hasValue &&
+              catalogAsync.requireValue.subjects.isNotEmpty &&
+              planAsync.hasValue)
+            TextButton(
+              onPressed: () {
+                final catalog = catalogAsync.requireValue;
+                final planContext = planAsync.requireValue;
+                final draft = _draft
+                    .alignedWithCatalog(catalog)
+                    .clampedTo(planContext);
+                showPracticeBuilderFilterSheet(
+                  context: context,
+                  draft: draft,
+                  catalog: catalog,
+                  planContext: planContext,
+                  onChanged: (next) => setState(() => _draft = next),
+                  onUpgrade: () =>
+                      context.go(AppRoutes.upgradePath(PlanTier.pro)),
+                );
+              },
+              child: Text(
+                _draft.hasContentFilters ? 'Filters · on' : 'Filters',
+              ),
+            ),
           IconButton(
             tooltip: 'Refresh',
             onPressed: () {

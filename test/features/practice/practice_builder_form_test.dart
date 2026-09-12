@@ -71,6 +71,8 @@ void main() {
         ),
       ),
     );
+    await tester.tap(find.textContaining('Filters'));
+    await tester.pumpAndSettle();
   }
 
   testWidgets('free plan shows locked controls with upgrade hints', (tester) async {
@@ -85,6 +87,8 @@ void main() {
     );
     expect(find.textContaining('Free plan allows up to 10 per session'), findsOneWidget);
 
+    expect(find.text('Subjects'), findsOneWidget);
+    expect(find.text('Topics'), findsOneWidget);
     // Tags are visible (not hidden) even though locked.
     expect(find.text('#PYQ'), findsOneWidget);
     // Difficulty stays available on free.
@@ -122,6 +126,8 @@ void main() {
         ),
       ),
     );
+    await tester.tap(find.textContaining('Filters'));
+    await tester.pumpAndSettle();
 
     expect(find.text('10 questions'), findsOneWidget);
     expect(find.text('Previously Incorrect'), findsOneWidget);

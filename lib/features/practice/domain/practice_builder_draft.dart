@@ -42,6 +42,13 @@ class PracticeBuilderDraft {
   /// When set, the generator only picks MCQs on these lessons.
   final Set<String> lessonIds;
 
+  /// True when any subject / topic / tag / difficulty chip is on.
+  bool get hasContentFilters =>
+      selectedSubjectIds.isNotEmpty ||
+      selectedTopicIds.isNotEmpty ||
+      selectedTagIds.isNotEmpty ||
+      selectedDifficulties.isNotEmpty;
+
   /// Rebuilds the form from a practice `tests` row.
   ///
   /// Prefers the student's *requested* count/explanation from the JSON so a
@@ -166,6 +173,13 @@ class PracticeBuilderDraft {
   PracticeBuilderDraft toggleDifficulty(QuestionDifficulty difficulty) =>
       copyWith(
         selectedDifficulties: _toggle(selectedDifficulties, difficulty),
+      );
+
+  PracticeBuilderDraft clearContentFilters() => copyWith(
+        selectedSubjectIds: const {},
+        selectedTopicIds: const {},
+        selectedTagIds: const {},
+        selectedDifficulties: const {},
       );
 
   PracticeBuilderDraft withQuestionCount(int count) {

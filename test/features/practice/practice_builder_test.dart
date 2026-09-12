@@ -53,6 +53,22 @@ void main() {
       expect(clamped.negativeMarking, isFalse);
     });
 
+    test('hasContentFilters is true when any chip set is non-empty', () {
+      expect(const PracticeBuilderDraft().hasContentFilters, isFalse);
+      expect(
+        const PracticeBuilderDraft(
+          selectedSubjectIds: {'med'},
+        ).hasContentFilters,
+        isTrue,
+      );
+      expect(
+        const PracticeBuilderDraft(selectedSubjectIds: {'med'})
+            .clearContentFilters()
+            .hasContentFilters,
+        isFalse,
+      );
+    });
+
     test('caps to remaining daily quota when lower than session max', () {
       const draft = PracticeBuilderDraft(questionCount: 10);
 

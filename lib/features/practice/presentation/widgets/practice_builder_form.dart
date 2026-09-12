@@ -6,6 +6,7 @@ import '../../domain/plan_limits.dart';
 import '../../domain/practice_builder_draft.dart';
 import '../../domain/practice_catalog.dart';
 import '../../domain/practice_enums.dart';
+import 'practice_builder_filter_sheet.dart';
 
 /// The Practice Builder fields from spec §1. Each locked control stays visible
 /// with an upgrade hint — never silently greyed out or hidden.
@@ -29,8 +30,6 @@ class PracticeBuilderForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topics = catalog.topicsForSubjects(draft.selectedSubjectIds);
-
     return ListView(
       padding: const EdgeInsets.all(Spacing.lg),
       children: [
@@ -39,80 +38,17 @@ class PracticeBuilderForm extends StatelessWidget {
           onSelected: (value) => onChanged(draft.copyWith(sourceFilter: value)),
         ),
         const SizedBox(height: Spacing.lg),
-        _ChipSection(
-          title: 'Subjects',
-          helper: draft.selectedSubjectIds.isEmpty
-              ? 'None chosen — all subjects'
-              : null,
-          children: [
-            for (final subject in catalog.subjects)
-              FilterChip(
-                label: Text(subject.name),
-                selected: draft.selectedSubjectIds.contains(subject.id),
-                onSelected: (_) =>
-                    onChanged(draft.toggleSubject(subject.id, catalog)),
-              ),
-          ],
-        ),
-        const SizedBox(height: Spacing.md),
-        _ChipSection(
-          title: 'Topics',
-          helper: draft.selectedTopicIds.isEmpty
-              ? 'None chosen — all topics in the selected subjects'
-              : null,
-          children: [
-            if (topics.isEmpty)
-              Text(
-                'No topics for the selected subjects yet.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              )
-            else
-              for (final topic in topics)
-                FilterChip(
-                  label: Text(topic.name),
-                  selected: draft.selectedTopicIds.contains(topic.id),
-                  onSelected: (_) => onChanged(draft.toggleTopic(topic.id)),
-                ),
-          ],
-        ),
-        const SizedBox(height: Spacing.lg),
-        _ChipSection(
-          title: 'Tags',
-          locked: !_limits.allowTagFilter,
-          upgradeHint: 'Upgrade to filter by tags',
-          onUpgrade: onUpgrade,
-          children: [
-            for (final tag in catalog.tags)
-              FilterChip(
-                label: Text(tag.chipLabel),
-                selected: draft.selectedTagIds.contains(tag.id),
-                onSelected: _limits.allowTagFilter
-                    ? (_) => onChanged(draft.toggleTag(tag.id))
-                    : null,
-              ),
-          ],
-        ),
-        const SizedBox(height: Spacing.lg),
-        _ChipSection(
-          title: 'Difficulty',
-          helper: draft.selectedDifficulties.isEmpty
-              ? 'None chosen — all difficulties'
-              : null,
-          locked: !_limits.allowDifficultyFilter,
-          upgradeHint: 'Upgrade to filter by difficulty',
-          onUpgrade: onUpgrade,
-          children: [
-            for (final difficulty in QuestionDifficulty.values)
-              FilterChip(
-                label: Text(difficulty.label),
-                selected: draft.selectedDifficulties.contains(difficulty),
-                onSelected: _limits.allowDifficultyFilter
-                    ? (_) => onChanged(draft.toggleDifficulty(difficulty))
-                    : null,
-              ),
-          ],
+        _FiltersEntry(
+          draft: draft,
+          catalog: catalog,
+          onOpen: () => showPracticeBuilderFilterSheet(
+            context: context,
+            draft: draft,
+            catalog: catalog,
+            planContext: planContext,
+            onChanged: onChanged,
+            onUpgrade: onUpgrade,
+          ),
         ),
         const SizedBox(height: Spacing.lg),
         _QuestionCountSection(
@@ -157,6 +93,86 @@ class PracticeBuilderForm extends StatelessWidget {
       ],
     );
   }
+}
+
+class _FiltersEntry extends StatelessWidget {
+  const _FiltersEntry({
+    required this.draft,
+    required this.catalog,
+    required this.onOpen,
+  });
+
+  final PracticeBuilderDraft draft;
+  final PracticeCatalog catalog;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return ComicCard(
+      onTap: onOpen,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  draft.hasContentFilters ? 'Filters · on' : 'Filters',
+                  style: textTheme.titleMedium,
+                ),
+                const SizedBox(height: Spacing.xs),
+                Text(
+                  _summary(draft, catalog),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.tune),
+        ],
+      ),
+    );
+  }
+}
+
+String _summary(PracticeBuilderDraft draft, PracticeCatalog catalog) {
+  if (!draft.hasContentFilters) {
+    return 'Difficulty, subjects, topics, and tags';
+  }
+  final parts = <String>[];
+  if (draft.selectedDifficulties.isNotEmpty) {
+    parts.add(
+      draft.selectedDifficulties.map((d) => d.label).join(', '),
+    );
+  }
+  if (draft.selectedSubjectIds.isNotEmpty) {
+    parts.add(
+      catalog.subjects
+          .where((s) => draft.selectedSubjectIds.contains(s.id))
+          .map((s) => s.name)
+          .join(', '),
+    );
+  }
+  if (draft.selectedTopicIds.isNotEmpty) {
+    parts.add(
+      catalog.topics
+          .where((t) => draft.selectedTopicIds.contains(t.id))
+          .map((t) => t.name)
+          .join(', '),
+    );
+  }
+  if (draft.selectedTagIds.isNotEmpty) {
+    parts.add(
+      catalog.tags
+          .where((t) => draft.selectedTagIds.contains(t.id))
+          .map((t) => t.chipLabel)
+          .join(', '),
+    );
+  }
+  return parts.join(' · ');
 }
 
 class _SourceFilterSection extends StatelessWidget {
@@ -263,68 +279,6 @@ class _SourceCard extends StatelessWidget {
                   : colorScheme.onSurfaceVariant,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ChipSection extends StatelessWidget {
-  const _ChipSection({
-    required this.title,
-    required this.children,
-    this.helper,
-    this.locked = false,
-    this.upgradeHint,
-    this.onUpgrade,
-  });
-
-  final String title;
-  final List<Widget> children;
-  final String? helper;
-  final bool locked;
-  final String? upgradeHint;
-  final VoidCallback? onUpgrade;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return ComicCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: Text(title, style: textTheme.titleMedium)),
-              if (locked)
-                Icon(
-                  Icons.lock_outline,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-            ],
-          ),
-          if (helper != null && !locked) ...[
-            const SizedBox(height: Spacing.xs),
-            Text(
-              helper!,
-              style: textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-          const SizedBox(height: Spacing.sm),
-          Opacity(
-            opacity: locked ? 0.55 : 1,
-            child: Wrap(
-              spacing: Spacing.sm,
-              runSpacing: Spacing.sm,
-              children: children,
-            ),
-          ),
-          if (locked && upgradeHint != null)
-            _UpgradeHint(message: upgradeHint!, onUpgrade: onUpgrade),
         ],
       ),
     );

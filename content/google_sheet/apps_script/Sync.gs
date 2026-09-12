@@ -11,7 +11,10 @@ function checkConfiguration() {
       'Configuration OK',
       'SUPABASE_URL is set (' +
         cfg.url +
-        ').\nSUPABASE_SERVICE_ROLE_KEY is set (value hidden).\n\nRun the Phase 2.2 migration before the first sync so upsert keys exist.',
+        ').\nSUPABASE_SERVICE_ROLE_KEY is set (value hidden).\n\n' +
+        'Editor tabs: Universities, Colleges, Phases, Textbooks, Questions ' +
+        '(wide — no Subjects tab). Optional: LessonResources.\n\n' +
+        'Run the UG + Phase 2.2 migrations before the first sync.',
       ui.ButtonSet.OK
     );
   } catch (e) {

@@ -10,9 +10,12 @@ import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
+import '../../../../core/widgets/markdown_copy.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../bookmarks/presentation/widgets/bookmark_icon_button.dart';
+import '../../../security/domain/capture_event.dart';
+import '../../../security/presentation/widgets/content_capture_guard.dart';
 import '../../data/pyq_repository.dart';
 import '../../domain/pyq_models.dart';
 import '../providers/preferred_textbook_provider.dart';
@@ -26,18 +29,21 @@ class PyqReaderScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(pyqDetailProvider(questionId));
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PYQ'),
-        actions: [BookmarkIconButton(questionId: questionId)],
-      ),
-      body: detail.when(
-        loading: () => const AsyncLoadingView(),
-        error: (e, _) => AsyncErrorView(
-          message: UserFacingError.display(e),
-          onAction: () => ref.invalidate(pyqDetailProvider(questionId)),
+    return ContentCaptureGuard(
+      screen: ContentScreens.pyqReader,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('PYQ'),
+          actions: [BookmarkIconButton(questionId: questionId)],
         ),
-        data: (value) => _PyqBody(detail: value, questionId: questionId),
+        body: detail.when(
+          loading: () => const AsyncLoadingView(),
+          error: (e, _) => AsyncErrorView(
+            message: UserFacingError.display(e),
+            onAction: () => ref.invalidate(pyqDetailProvider(questionId)),
+          ),
+          data: (value) => _PyqBody(detail: value, questionId: questionId),
+        ),
       ),
     );
   }
@@ -139,14 +145,18 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
         if (d.isMcq)
           _showSample
               ? ComicCard(
-                  child: Text(
-                    [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       if (d.correctOption != null)
-                        'Correct option: ${d.correctOption}',
+                        Text('Correct option: ${d.correctOption}'),
                       if (d.explanationText != null &&
-                          d.explanationText!.trim().isNotEmpty)
-                        d.explanationText!,
-                    ].join('\n\n'),
+                          d.explanationText!.trim().isNotEmpty) ...[
+                        if (d.correctOption != null)
+                          const SizedBox(height: Spacing.sm),
+                        MarkdownCopy(data: d.explanationText!),
+                      ],
+                    ],
                   ),
                 )
               : OutlinedButton(
@@ -171,7 +181,7 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
             child: const Text('Show sample answer'),
           )
         else
-          ComicCard(child: Text(d.sampleAnswer!)),
+          ComicCard(child: MarkdownCopy(data: d.sampleAnswer!)),
         if (citations.isNotEmpty) ...[
           const SizedBox(height: Spacing.lg),
           Text('Textbook pages', style: Theme.of(context).textTheme.titleSmall),

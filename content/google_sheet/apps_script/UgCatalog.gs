@@ -35,9 +35,17 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
   }
 
   var uniRaw = readTabObjects_(TAB.UNIVERSITIES);
-  var colRaw = readTabObjects_(TAB.COLLEGES);
-  var phRaw = readTabObjects_(TAB.PHASES);
-  var lesRaw = readTabObjects_(TAB.LESSONS);
+  var colRaw = sheetExists_(TAB.COLLEGES)
+    ? readTabObjects_(TAB.COLLEGES)
+    : { headers: [], rows: [] };
+  var phRaw = sheetExists_(TAB.PHASES)
+    ? readTabObjects_(TAB.PHASES)
+    : { headers: [], rows: [] };
+  // Lessons tab is retired; wide Questions invents lesson rows. Keep reading
+  // it only when an older sheet still has the tab.
+  var lesRaw = sheetExists_(TAB.LESSONS)
+    ? readTabObjects_(TAB.LESSONS)
+    : { headers: [], rows: [] };
   var lrRaw = sheetExists_(TAB.LESSON_RESOURCES)
     ? readTabObjects_(TAB.LESSON_RESOURCES)
     : { headers: [], rows: [] };
@@ -60,19 +68,25 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
   var hdr;
   hdr = requireHeaders_(TAB.UNIVERSITIES, uniRaw.headers, ['code', 'name', 'state', 'slug']);
   if (hdr) errors.push(hdr);
-  hdr = requireHeaders_(TAB.COLLEGES, colRaw.headers, ['university_code', 'name']);
-  if (hdr) errors.push(hdr);
-  hdr = requireHeaders_(TAB.PHASES, phRaw.headers, ['code', 'name', 'display_order']);
-  if (hdr) errors.push(hdr);
-  hdr = requireHeaders_(TAB.LESSONS, lesRaw.headers, [
-    'external_id',
-    'topic_name',
-    'name',
-    'display_order',
-    'required_plan',
-    'is_active',
-  ]);
-  if (hdr) errors.push(hdr);
+  if (colRaw.headers.length) {
+    hdr = requireHeaders_(TAB.COLLEGES, colRaw.headers, ['university_code', 'name']);
+    if (hdr) errors.push(hdr);
+  }
+  if (phRaw.headers.length) {
+    hdr = requireHeaders_(TAB.PHASES, phRaw.headers, ['code', 'name', 'display_order']);
+    if (hdr) errors.push(hdr);
+  }
+  if (lesRaw.headers.length) {
+    hdr = requireHeaders_(TAB.LESSONS, lesRaw.headers, [
+      'external_id',
+      'topic_name',
+      'name',
+      'display_order',
+      'required_plan',
+      'is_active',
+    ]);
+    if (hdr) errors.push(hdr);
+  }
 
   var universities = [];
   var uniByCode = {};
@@ -91,7 +105,6 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
       name: name,
       state: state,
       slug: slug,
-      is_fallback: trimStr_(row.is_fallback).toUpperCase() === 'TRUE' || code === 'KUHS',
     });
   });
 
@@ -173,7 +186,7 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
   var textbooks = [];
   var tbByKey = {};
   tbRaw.rows.forEach(function (row) {
-    var key = trimStr_(row.sheet_key);
+    var key = rowField_(row, ['sheet_key', 'textbook_key', 'key']);
     var title = trimStr_(row.title);
     if (!key || !title) {
       errors.push(TAB.TEXTBOOKS + ' row ' + row.__row + ': sheet_key and title are required');
@@ -328,20 +341,30 @@ function syncUgCatalog_(ug, subjectIdByKey, topicIdByKey, questionIdByExt) {
     phaseIdByCode[normKey_(row.code)] = row.id;
   });
 
-  var lessonRows = ug.lessons.map(function (l) {
+  var seenLesson = {};
+  var lessonRows = [];
+  ug.lessons.forEach(function (l) {
     var tid = topicIdByKey[normKey_(l.topic_name)];
     if (!tid) throw new Error('Lesson "' + l.external_id + '": topic_name not resolved');
-    return {
+    // Natural key is (topic_id, name). Deduping here avoids a 409 when the
+    // sheet invented two external_ids for the same chapter.
+    var dup = tid + '|' + normKey_(l.name);
+    if (seenLesson[dup]) return;
+    seenLesson[dup] = true;
+    lessonRows.push({
       external_id: l.external_id,
       topic_id: tid,
       name: l.name,
       display_order: l.display_order,
       required_plan: l.required_plan,
       is_active: l.is_active,
-    };
+    });
   });
+  // Upsert on the unique (topic_id, name), not external_id. An older seed
+  // can already have "Humerus fractures" under that topic with a different
+  // external_id; on_conflict=external_id would INSERT and hit 23505.
   var lessonReturned = lessonRows.length
-    ? supabaseUpsert_('lessons', lessonRows, 'external_id')
+    ? supabaseUpsert_('lessons', lessonRows, 'topic_id,name')
     : [];
   var lessonIdByExt = {};
   lessonReturned.forEach(function (row) {

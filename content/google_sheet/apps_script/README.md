@@ -36,9 +36,11 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 ## What Sync does
 
 1. Reads editor tabs: `Universities`, `Colleges`, `Phases`, `Textbooks`,
-   `Questions` (wide), optional `LessonResources`. If Questions still has the
-   old headers (`topic_name` without `university_code` + `subject_name`), the
-   legacy Subjects/Topics path runs instead.
+   `Questions` (wide), optional `LessonResources`. **Do not recreate**
+   `Subjects` / `Topics` / `Lessons` — those are inferred from `subject_name`,
+   `topic_name`, and `lesson_name` on Questions. If Questions still has the
+   old headers (`topic_name` without `university_code` + `subject_name`) *and*
+   a Subjects tab exists, the legacy path runs instead.
 2. Validates **all** rows (collects every error — does not stop at the first).
    Theory rows skip options; MCQ rows still require them. Sample answers over
    ~400 words are a warning, not a reject.
@@ -68,7 +70,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 | question_sample_answers | `question_id` |
 | universities | `code` |
 | colleges | `university_id,name` |
-| lessons | `external_id` |
+| lessons | `topic_id,name` |
 | lesson_resources | `lesson_id,url` |
 | textbooks | `sheet_key` |
 | exam_papers | `external_id` |

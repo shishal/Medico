@@ -44,4 +44,22 @@ void main() {
     expect(uni.isFallback, isFalse);
     expect(uni.code, 'KUHS');
   });
+
+  test('University equality is by id so the picker checkmark works', () {
+    const a = University(
+      id: 'u1',
+      code: 'KUHS',
+      name: 'Kerala University of Health Sciences',
+      state: 'Kerala',
+      slug: 'kuhs',
+    );
+    const b = University(
+      id: 'u1',
+      code: 'KUHS',
+      name: 'Kerala University of Health Sciences',
+      state: 'Kerala',
+      slug: 'kuhs',
+    );
+    expect(a, equals(b));
+  });
 }

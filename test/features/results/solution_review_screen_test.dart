@@ -83,7 +83,7 @@ void main() {
     expect(find.text('Incorrect'), findsOneWidget);
     expect(find.text('Your answer: B'), findsOneWidget);
     expect(find.text('Correct answer: A'), findsOneWidget);
-    expect(find.text(_explanation), findsOneWidget);
+    expect(find.text(_explanation, findRichText: true), findsOneWidget);
     expect(find.text('Mitochondria'), findsOneWidget);
     expect(find.text('Ribosome'), findsOneWidget);
   });
@@ -99,7 +99,7 @@ void main() {
     );
 
     expect(find.text('Correct answer: A'), findsOneWidget);
-    expect(find.text(_explanation), findsNothing);
+    expect(find.text(_explanation, findRichText: true), findsNothing);
   });
 
   testWidgets('plan-locked question fails gracefully', (tester) async {
@@ -110,7 +110,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Upgrade'), findsOneWidget);
-    expect(find.text(_explanation), findsNothing);
+    expect(find.text(_explanation, findRichText: true), findsNothing);
     expect(find.text('Which organelle produces ATP?'), findsNothing);
   });
 

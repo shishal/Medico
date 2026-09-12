@@ -15,11 +15,28 @@ class CatalogRepository {
 
   final SupabaseClient _client;
 
-  Future<Result<List<University>>> fetchUniversities() => _list(
-        Tables.universities,
-        University.fromJson,
-        order: UniversityColumns.name,
+  Future<Result<List<University>>> fetchUniversities() async {
+    if (_client.auth.currentUser == null) {
+      return const Failure('Not signed in.');
+    }
+    try {
+      // Do not SELECT `is_fallback` — that column is added by
+      // `geckomed_ux.sql`. A live project without it 400s the whole picker.
+      final rows = await _client
+          .from(Tables.universities)
+          .select(
+            '${UniversityColumns.id},${UniversityColumns.code},'
+            '${UniversityColumns.name},${UniversityColumns.state},'
+            '${UniversityColumns.slug}',
+          )
+          .order(UniversityColumns.name);
+      return Success(_map(rows, University.fromJson));
+    } catch (e) {
+      return Failure(
+        UserFacingError.from(e, fallback: 'Could not load universities.'),
       );
+    }
+  }
 
   Future<Result<List<MbbsPhase>>> fetchPhases() => _list(
         Tables.mbbsPhases,
@@ -190,13 +207,19 @@ class CatalogRepository {
       return const Failure('Not signed in.');
     }
     try {
-      final uniRows = await _client.from(Tables.universities).select();
+      final uniRows = await _client
+          .from(Tables.universities)
+          .select(
+            '${UniversityColumns.id},${UniversityColumns.code},'
+            '${UniversityColumns.name},${UniversityColumns.state},'
+            '${UniversityColumns.slug}',
+          );
       final unis = _map(uniRows, University.fromJson);
       University? selected;
       University? fallback;
       for (final u in unis) {
         if (u.id == selectedUniversityId) selected = u;
-        if (u.isFallback) fallback = u;
+        if (u.code == 'KUHS') fallback = u;
       }
       fallback ??= unis.where((u) => u.code == 'KUHS').firstOrNull ?? unis.firstOrNull;
       if (fallback == null) {

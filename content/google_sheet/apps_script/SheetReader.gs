@@ -17,6 +17,11 @@ function ensureUgGlobals_() {
   if (typeof TAB === 'undefined') {
     TAB = {};
   }
+  TAB.SUBJECTS = TAB.SUBJECTS || 'Subjects';
+  TAB.TOPICS = TAB.TOPICS || 'Topics';
+  TAB.QUESTIONS = TAB.QUESTIONS || 'Questions';
+  TAB.TESTS = TAB.TESTS || 'Tests';
+  TAB.TEST_QUESTIONS = TAB.TEST_QUESTIONS || 'TestQuestions';
   TAB.UNIVERSITIES = TAB.UNIVERSITIES || 'Universities';
   TAB.COLLEGES = TAB.COLLEGES || 'Colleges';
   TAB.PHASES = TAB.PHASES || 'Phases';
@@ -29,15 +34,59 @@ function ensureUgGlobals_() {
   TAB.QUESTION_RESOURCES = TAB.QUESTION_RESOURCES || 'QuestionResources';
 }
 
+function headerKey_(h) {
+  // CSV BOM on the first column, Title Case, or "University Code" must still
+  // match university_code / subject_name so the wide Questions path runs.
+  return trimStr_(h)
+    .replace(/^\uFEFF/, '')
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
+}
+
+/** First non-empty cell among header aliases (already headerKey_'d). */
+function rowField_(row, names) {
+  if (typeof names === 'string') names = [names];
+  for (var i = 0; i < names.length; i++) {
+    var s = trimStr_(row[names[i]]);
+    if (s) return s;
+  }
+  return '';
+}
+
 function sheetExists_(sheetName) {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName) != null;
 }
+
+var RETIRED_TABS = {
+  Subjects: true,
+  Topics: true,
+  Lessons: true,
+  ExamPapers: true,
+  Appearances: true,
+  TextbookRefs: true,
+  QuestionResources: true,
+  Tests: true,
+  TestQuestions: true,
+};
 
 function readTabObjects_(sheetName) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
-    throw new Error('Missing tab "' + sheetName + '". Rename sheets to match content/google_sheet/tabs/.');
+    if (RETIRED_TABS[sheetName]) {
+      throw new Error(
+        'Missing tab "' +
+          sheetName +
+          '". That tab is retired — subjects/topics/lessons come from the Questions tab. ' +
+          'Update Apps Script from content/google_sheet/apps_script/ (especially Validate.gs) and Sync again.'
+      );
+    }
+    throw new Error(
+      'Missing tab "' +
+        sheetName +
+        '". Rename sheets to match content/google_sheet/tabs/ ' +
+        '(Universities, Colleges, Phases, Textbooks, Questions, optional LessonResources).'
+    );
   }
 
   var values = sheet.getDataRange().getValues();
@@ -45,10 +94,7 @@ function readTabObjects_(sheetName) {
     return { headers: [], rows: [] };
   }
 
-  var headers = values[0].map(function (h) {
-    // Headers are matched case-insensitively so "Kind" still maps to row.kind.
-    return trimStr_(h).toLowerCase();
-  });
+  var headers = values[0].map(headerKey_);
 
   var rows = [];
   for (var r = 1; r < values.length; r++) {

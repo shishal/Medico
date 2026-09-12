@@ -621,7 +621,7 @@ iOS cannot prevent screenshots. The question player and solution review still de
 create table screenshot_events (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  screen text not null,          -- 'test_player' | 'solution_review'
+  screen text not null,          -- 'test_player' | 'solution_review' | 'pyq_reader'
   event_type text not null check (event_type in ('screenshot', 'screen_recording')),
   created_at timestamptz not null default now()
 );

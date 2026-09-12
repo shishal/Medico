@@ -3,15 +3,23 @@
  * Returns { ok, errors, data } where data is normalized payloads for upsert.
  */
 
+function headerHas_(headers, name) {
+  return headers.indexOf(name) >= 0;
+}
+
+/** Wide Questions row infers subjects/topics/lessons — no Subjects tab. */
+function isWideQuestions_(headers) {
+  return headerHas_(headers, 'subject_name') &&
+    (headerHas_(headers, 'university_code') || headerHas_(headers, 'lesson_name'));
+}
+
 function validateAllTabs_() {
   ensureUgGlobals_();
   var errors = [];
   var warnings = [];
 
   var questionsRaw = readTabObjects_(TAB.QUESTIONS);
-  var wide =
-    questionsRaw.headers.indexOf('university_code') >= 0 &&
-    questionsRaw.headers.indexOf('subject_name') >= 0;
+  var wide = isWideQuestions_(questionsRaw.headers) || !sheetExists_(TAB.SUBJECTS);
   if (wide) {
     return validateWideSheet_(errors, warnings, questionsRaw);
   }

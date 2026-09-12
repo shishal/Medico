@@ -54,4 +54,31 @@ void main() {
     expect(find.text('College 3'), findsWidgets);
     expect(find.text('College 0'), findsNothing);
   });
+
+  testWidgets('eight universities stay reachable by scrolling', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const unis = [
+      'KUHS · Kerala University of Health Sciences',
+      'RGUHS · Rajiv Gandhi University of Health Sciences',
+      'NTRUHS · Dr. NTR University of Health Sciences',
+      'KNRUHS · Kaloji Narayana Rao University of Health Sciences',
+      'TNMGRMU · Tamil Nadu Dr. M.G.R. Medical University',
+      'WBUHS · West Bengal University of Health Sciences',
+      'RUHS · Rajasthan University of Health Sciences',
+      'MUHS · Maharashtra University of Health Sciences',
+    ];
+    await _openSheet(tester, items: unis);
+
+    expect(find.text(unis.first), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(unis.last),
+      80,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.text(unis.last), findsOneWidget);
+  });
 }

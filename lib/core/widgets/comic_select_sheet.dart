@@ -72,9 +72,16 @@ class _ComicSelectSheetState<T> extends State<_ComicSelectSheet<T>> {
         : widget.items
               .where((item) => widget.labelOf(item).toLowerCase().contains(q))
               .toList();
+    final media = MediaQuery.of(context);
+    // Give the list a real height. A min-size Column + maxHeight ConstrainedBox
+    // was collapsing to ~one row once the keyboard opened.
+    final listHeight = (visible.length * 76.0).clamp(
+      0.0,
+      media.size.height * 0.55,
+    );
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -92,7 +99,6 @@ class _ComicSelectSheetState<T> extends State<_ComicSelectSheet<T>> {
                 const SizedBox(height: Spacing.md),
                 TextField(
                   controller: _query,
-                  autofocus: true,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.search,
                   // Flutter enables stylus handwriting by default; on API 34+
@@ -118,12 +124,9 @@ class _ComicSelectSheetState<T> extends State<_ComicSelectSheet<T>> {
                   child: Text('No matches.'),
                 )
               else
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.sizeOf(context).height * 0.5,
-                  ),
+                SizedBox(
+                  height: listHeight,
                   child: ListView.separated(
-                    shrinkWrap: true,
                     itemCount: visible.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: Spacing.sm),

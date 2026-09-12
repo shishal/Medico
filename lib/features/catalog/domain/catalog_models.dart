@@ -23,11 +23,18 @@ class University {
       id: json[UniversityColumns.id] as String,
       code: json[UniversityColumns.code] as String,
       name: json[UniversityColumns.name] as String,
-      state: json[UniversityColumns.state] as String,
-      slug: json[UniversityColumns.slug] as String,
-      isFallback: json[UniversityColumns.isFallback] as bool? ?? false,
+      state: json[UniversityColumns.state] as String? ?? '',
+      slug: json[UniversityColumns.slug] as String? ?? '',
+      isFallback: json[UniversityColumns.isFallback] == true,
     );
   }
+
+  // Value equality by id so the picker checkmark matches the selected row.
+  @override
+  bool operator ==(Object other) => other is University && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class MbbsPhase {

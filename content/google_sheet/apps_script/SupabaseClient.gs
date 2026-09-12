@@ -28,6 +28,30 @@ function supabaseHeaders_(key, prefer) {
 }
 
 /**
+ * Columns the Flutter app / DB can live without. If PostgREST 400s with
+ * PGRST204 (schema cache missing that column), drop it and retry the upsert
+ * so a live project that has not applied a later migration still syncs.
+ */
+var OPTIONAL_UPSERT_COLUMNS = {
+  is_fallback: true,
+};
+
+function missingColumnFromPgrst_(body) {
+  var m = String(body || '').match(/Could not find the '([^']+)' column/);
+  return m ? m[1] : '';
+}
+
+function stripColumn_(rows, column) {
+  return rows.map(function (row) {
+    var copy = {};
+    Object.keys(row).forEach(function (k) {
+      if (k !== column) copy[k] = row[k];
+    });
+    return copy;
+  });
+}
+
+/**
  * Upsert rows. onConflict is the PostgREST on_conflict query value
  * (comma-separated column names matching a UNIQUE constraint / index).
  */
@@ -42,20 +66,34 @@ function supabaseUpsert_(table, rows, onConflict) {
     '?on_conflict=' +
     encodeURIComponent(onConflict);
 
-  var response = UrlFetchApp.fetch(endpoint, {
-    method: 'post',
-    contentType: 'application/json',
-    headers: supabaseHeaders_(cfg.key, 'resolution=merge-duplicates,return=representation'),
-    payload: JSON.stringify(rows),
-    muteHttpExceptions: true,
-  });
-
-  var code = response.getResponseCode();
-  var body = response.getContentText();
-  if (code < 200 || code >= 300) {
-    throw new Error('Supabase upsert ' + table + ' failed (' + code + '): ' + body);
+  var payload = rows;
+  var lastCode = 0;
+  var lastBody = '';
+  var attempt;
+  for (attempt = 0; attempt < 6; attempt++) {
+    var response = UrlFetchApp.fetch(endpoint, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: supabaseHeaders_(
+        cfg.key,
+        'resolution=merge-duplicates,return=representation'
+      ),
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true,
+    });
+    lastCode = response.getResponseCode();
+    lastBody = response.getContentText();
+    if (lastCode >= 200 && lastCode < 300) {
+      return lastBody ? JSON.parse(lastBody) : [];
+    }
+    var missing = lastCode === 400 ? missingColumnFromPgrst_(lastBody) : '';
+    if (!missing || !OPTIONAL_UPSERT_COLUMNS[missing]) break;
+    payload = stripColumn_(payload, missing);
   }
-  return body ? JSON.parse(body) : [];
+
+  throw new Error(
+    'Supabase upsert ' + table + ' failed (' + lastCode + '): ' + lastBody
+  );
 }
 
 function supabaseDeleteEq_(table, column, value) {

@@ -64,7 +64,6 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       name: name,
       state: state,
       slug: slug,
-      is_fallback: !!isFallback,
     });
   });
 
@@ -81,8 +80,19 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
 
   var textbooks = [];
   var tbByKey = {};
+  if (tbRaw.headers.length) {
+    if (
+      !headerHas_(tbRaw.headers, 'sheet_key') &&
+      !headerHas_(tbRaw.headers, 'textbook_key')
+    ) {
+      errors.push(
+        TAB.TEXTBOOKS +
+          ': missing column sheet_key (Questions.textbook_key must match this, e.g. TB-BDCHAURASIA-VOL3-8)'
+      );
+    }
+  }
   tbRaw.rows.forEach(function (row) {
-    var key = trimStr_(row.sheet_key);
+    var key = rowField_(row, ['sheet_key', 'textbook_key', 'key']);
     var title = trimStr_(row.title);
     if (!key || !title) {
       errors.push(TAB.TEXTBOOKS + ' row ' + row.__row + ': sheet_key and title are required');
@@ -112,6 +122,7 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
   var seenApp = {};
   var textbookRefs = [];
   var seenRef = {};
+  var missingTb = {};
 
   questionsRaw.rows.forEach(function (row) {
     var ext = trimStr_(row.external_id);
@@ -246,11 +257,14 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       }
     }
 
-    var tbKey = trimStr_(row.textbook_key);
+    var tbKey = rowField_(row, ['textbook_key', 'sheet_key']);
     var page = trimStr_(row.page);
     if (tbKey && page) {
       if (!tbByKey[normKey_(tbKey)]) {
-        errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': textbook_key not on Textbooks tab');
+        if (!missingTb[normKey_(tbKey)]) {
+          missingTb[normKey_(tbKey)] = { key: tbKey, rows: [] };
+        }
+        missingTb[normKey_(tbKey)].rows.push(row.__row);
       }
       var refKey = normKey_(ext) + '|' + normKey_(tbKey) + '|' + page;
       if (!seenRef[refKey]) {
@@ -264,6 +278,32 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       }
     }
   });
+
+  var missingKeys = Object.keys(missingTb);
+  if (missingKeys.length) {
+    if (!sheetExists_(TAB.TEXTBOOKS) || textbooks.length === 0) {
+      errors.push(
+        'Textbooks tab is missing or has no sheet_key rows, but Questions cites textbook_key. ' +
+          'File → Import ' +
+          'content/google_sheet/tabs/Textbooks.csv, name the tab exactly Textbooks, ' +
+          'and keep column sheet_key (e.g. TB-BDCHAURASIA-VOL3-8).'
+      );
+    }
+    missingKeys.forEach(function (k) {
+      var m = missingTb[k];
+      errors.push(
+        'textbook_key "' +
+          m.key +
+          '" is not on Textbooks.sheet_key (' +
+          m.rows.length +
+          ' Questions row' +
+          (m.rows.length === 1 ? '' : 's') +
+          ', first: ' +
+          m.rows[0] +
+          ')'
+      );
+    });
+  }
 
   var lessonResources = [];
   lrRaw.rows.forEach(function (row) {

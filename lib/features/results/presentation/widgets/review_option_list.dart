@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/markdown_copy.dart';
 import '../../../tests/domain/question_option.dart';
 import '../../../tests/presentation/widgets/option_list.dart';
 import '../../../tests/presentation/widgets/player_colors.dart';
@@ -86,10 +87,7 @@ class ReviewStatusBanner extends StatelessWidget {
               ],
               if (explanation != null) ...[
                 const SizedBox(height: Spacing.sm),
-                Text(
-                  explanation,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                MarkdownCopy(data: explanation),
               ],
               if (videoUrl != null) ...[
                 const SizedBox(height: Spacing.sm),

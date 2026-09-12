@@ -42,12 +42,13 @@ var CORRECT_OPTIONS = { A: true, B: true, C: true, D: true };
  * Content teams often change capitalization; matching must not silently miss.
  */
 function normKey_(value) {
-  return String(value == null ? '' : value).trim().toLowerCase();
+  return trimStr_(value).toLowerCase();
 }
 
 function trimStr_(value) {
   if (value == null) return '';
-  return String(value).trim();
+  // Sheets often pastes NBSP; treat it as a normal space so keys still match.
+  return String(value).replace(/\u00a0/g, ' ').trim();
 }
 
 function onOpen() {

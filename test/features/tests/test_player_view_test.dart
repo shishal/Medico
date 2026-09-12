@@ -93,7 +93,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Correct'), findsOneWidget);
-    expect(find.text(_explanation), findsOneWidget);
+    expect(find.text(_explanation, findRichText: true), findsOneWidget);
     expect(find.byIcon(Icons.check_circle), findsWidgets);
 
     await tester.tap(find.byKey(const Key('option-B')));
@@ -116,7 +116,7 @@ void main() {
 
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
-    expect(find.text(_explanation), findsNothing);
+    expect(find.text(_explanation, findRichText: true), findsNothing);
     expect(find.byIcon(Icons.check_circle), findsNothing);
     expect(find.byIcon(Icons.cancel), findsNothing);
     expect(find.textContaining('Tutor Mode'), findsNothing);
@@ -126,7 +126,7 @@ void main() {
 
     expect(session.value.currentAnswer.selectedOption, QuestionOption.b);
     expect(find.text('Correct'), findsNothing);
-    expect(find.text(_explanation), findsNothing);
+    expect(find.text(_explanation, findRichText: true), findsNothing);
   });
 
   testWidgets('Tutor Mode palette reports correct, not generic answered', (
@@ -214,7 +214,7 @@ void main() {
     expect(session.value.currentIndex, 0);
     expect(session.value.currentAnswer.selectedOption, QuestionOption.b);
     expect(find.text('Correct'), findsNothing);
-    expect(find.text(_explanation), findsNothing);
+    expect(find.text(_explanation, findRichText: true), findsNothing);
   });
 
   testWidgets('timed session shows a countdown; untimed practice does not', (

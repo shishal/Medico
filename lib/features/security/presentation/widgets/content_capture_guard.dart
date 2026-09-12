@@ -14,8 +14,9 @@ import 'content_watermark.dart';
 /// Blocks screenshots/recording while mounted, warns on iOS detection,
 /// logs the event, and tiles a faint identity watermark (Phase 8.2).
 ///
-/// Wrap only screens that show question content — not marketing, auth,
-/// or the home catalog.
+/// Wrap screens that show question content. Android FLAG_SECURE stays on
+/// for the whole app (see `AppScreenshotLock`); this widget still watermarks
+/// and logs iOS capture attempts.
 class ContentCaptureGuard extends ConsumerStatefulWidget {
   const ContentCaptureGuard({
     super.key,

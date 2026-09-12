@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/markdown_copy.dart';
 import '../../domain/player_session_state.dart';
 import 'player_colors.dart';
 
@@ -47,10 +48,7 @@ class TutorFeedbackPanel extends StatelessWidget {
               ),
               if (reveal.explanationText != null) ...[
                 const SizedBox(height: Spacing.sm),
-                Text(
-                  reveal.explanationText!,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                MarkdownCopy(data: reveal.explanationText!),
               ],
             ],
           ),

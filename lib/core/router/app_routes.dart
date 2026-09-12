@@ -14,6 +14,7 @@ abstract final class AppRoutes {
   static const trackerCreate = '/trackers/new';
   static const subject = '/subjects/:subjectId';
   static const subjectTopics = '/subjects/:subjectId/topics';
+  static const subjectYear = '/subjects/:subjectId/years/:year';
   static const topic = '/topics/:topicId';
   static const lesson = '/lessons/:lessonId';
   static const pyq = '/pyq/:questionId';
@@ -31,6 +32,12 @@ abstract final class AppRoutes {
   static String subjectTopicsPath(String id, String title) =>
       Uri(
         path: '/subjects/$id/topics',
+        queryParameters: {'title': title},
+      ).toString();
+
+  static String subjectYearPath(String id, int year, String title) =>
+      Uri(
+        path: '/subjects/$id/years/$year',
         queryParameters: {'title': title},
       ).toString();
 

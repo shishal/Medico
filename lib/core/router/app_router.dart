@@ -19,6 +19,7 @@ import '../../features/progress/presentation/screens/progress_screens.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/pyq/presentation/screens/pyq_reader_screen.dart';
 import '../../features/pyq/presentation/screens/subject_pyq_screen.dart';
+import '../../features/pyq/presentation/screens/year_paper_outline_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/results/presentation/screens/solution_review_screen.dart';
@@ -155,6 +156,20 @@ GoRouter goRouter(Ref ref) {
           final id = state.pathParameters['subjectId']!;
           final title = state.uri.queryParameters['title'] ?? 'Subject';
           return SubjectListScreen(subjectId: id, title: title);
+        },
+      ),
+      comicGoRoute(
+        path: AppRoutes.subjectYear,
+        builder: (context, state) {
+          final id = state.pathParameters['subjectId']!;
+          final year =
+              int.tryParse(state.pathParameters['year'] ?? '') ?? 0;
+          final title = state.uri.queryParameters['title'] ?? 'Subject';
+          return YearPaperOutlineScreen(
+            subjectId: id,
+            year: year,
+            title: title,
+          );
         },
       ),
       comicGoRoute(

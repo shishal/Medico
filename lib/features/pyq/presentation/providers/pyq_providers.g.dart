@@ -173,6 +173,113 @@ final class SubjectPyqsFamily extends $Family
   String toString() => r'subjectPyqsProvider';
 }
 
+/// Chapter / paper filters for one subject's year list and paper outline.
+
+@ProviderFor(SubjectPyqFilters)
+final subjectPyqFiltersProvider = SubjectPyqFiltersFamily._();
+
+/// Chapter / paper filters for one subject's year list and paper outline.
+final class SubjectPyqFiltersProvider
+    extends $NotifierProvider<SubjectPyqFilters, SubjectPyqFilter> {
+  /// Chapter / paper filters for one subject's year list and paper outline.
+  SubjectPyqFiltersProvider._({
+    required SubjectPyqFiltersFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'subjectPyqFiltersProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$subjectPyqFiltersHash();
+
+  @override
+  String toString() {
+    return r'subjectPyqFiltersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  SubjectPyqFilters create() => SubjectPyqFilters();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SubjectPyqFilter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SubjectPyqFilter>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SubjectPyqFiltersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$subjectPyqFiltersHash() => r'e5ddea503b809eb924de758c4aec23b4cfe6a4e9';
+
+/// Chapter / paper filters for one subject's year list and paper outline.
+
+final class SubjectPyqFiltersFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          SubjectPyqFilters,
+          SubjectPyqFilter,
+          SubjectPyqFilter,
+          SubjectPyqFilter,
+          String
+        > {
+  SubjectPyqFiltersFamily._()
+    : super(
+        retry: null,
+        name: r'subjectPyqFiltersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: false,
+      );
+
+  /// Chapter / paper filters for one subject's year list and paper outline.
+
+  SubjectPyqFiltersProvider call(String subjectId) =>
+      SubjectPyqFiltersProvider._(argument: subjectId, from: this);
+
+  @override
+  String toString() => r'subjectPyqFiltersProvider';
+}
+
+/// Chapter / paper filters for one subject's year list and paper outline.
+
+abstract class _$SubjectPyqFilters extends $Notifier<SubjectPyqFilter> {
+  late final _$args = ref.$arg as String;
+  String get subjectId => _$args;
+
+  SubjectPyqFilter build(String subjectId);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<SubjectPyqFilter, SubjectPyqFilter>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<SubjectPyqFilter, SubjectPyqFilter>,
+              SubjectPyqFilter,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}
+
 @ProviderFor(pyqDetail)
 final pyqDetailProvider = PyqDetailFamily._();
 

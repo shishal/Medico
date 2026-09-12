@@ -84,8 +84,8 @@ onboarding never blocks.
 | `question_text` | yes | Stem. |
 | `option_a` … `option_d` | if `mcq` | All four non-empty for MCQ. Blank on theory. |
 | `correct_option` | if `mcq` | Exactly `A`, `B`, `C`, or `D`. |
-| `explanation_text` | no | MCQ tutor write-up. **Not** the theory sample answer. |
-| `sample_answer_text` | no | ~250-word model answer. Stored in `question_sample_answers`. |
+| `explanation_text` | no | **EX** for any kind (theory or MCQ). Tutor write-up; not the direct answer. |
+| `sample_answer_text` | no | **DA** for any kind. Model / short answer. Stored in `question_sample_answers`. |
 | `difficulty` | yes | `easy` / `medium` / `hard`. |
 | `required_plan` | yes | `free` / `pro` / `elite`. |
 | `is_active` | yes | `TRUE` / `FALSE`. |

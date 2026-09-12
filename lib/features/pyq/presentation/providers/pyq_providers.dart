@@ -6,6 +6,7 @@ import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../data/pyq_repository.dart';
 import '../../domain/pyq_models.dart';
+import '../../domain/subject_pyq_filters.dart';
 
 part 'pyq_providers.g.dart';
 
@@ -35,6 +36,25 @@ Future<PyqSubjectFeed> subjectPyqs(Ref ref, String subjectId) async {
     Success(:final value) => value,
     Failure(:final message) => throw Exception(message),
   };
+}
+
+/// Chapter / paper filters for one subject's year list and paper outline.
+@Riverpod(keepAlive: true)
+class SubjectPyqFilters extends _$SubjectPyqFilters {
+  @override
+  SubjectPyqFilter build(String subjectId) => const SubjectPyqFilter();
+
+  void setPaperName(String? paperName) {
+    state = SubjectPyqFilter(paperName: paperName, topicId: state.topicId);
+  }
+
+  void setTopicId(String? topicId) {
+    state = SubjectPyqFilter(paperName: state.paperName, topicId: topicId);
+  }
+
+  void clear() {
+    state = const SubjectPyqFilter();
+  }
 }
 
 @riverpod

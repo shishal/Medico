@@ -1,0 +1,70 @@
+import 'pyq_models.dart';
+import 'question_format.dart';
+import 'subject_pyq_filters.dart';
+
+/// Question-type tabs on a year's paper outline (Screen 3).
+enum PaperOutlineTab {
+  longAnswer,
+  shortNotes,
+  mcq;
+
+  String get label => switch (this) {
+        PaperOutlineTab.longAnswer => 'LAQ',
+        PaperOutlineTab.shortNotes => 'Short notes',
+        PaperOutlineTab.mcq => 'MCQ',
+      };
+
+  String emptyMessage(int year) => switch (this) {
+        PaperOutlineTab.longAnswer => 'No long answers in $year.',
+        PaperOutlineTab.shortNotes => 'No short notes in $year.',
+        PaperOutlineTab.mcq => 'No MCQs in $year.',
+      };
+}
+
+bool matchesOutlineTab(PyqTeaser teaser, PaperOutlineTab tab) {
+  return switch (tab) {
+    PaperOutlineTab.longAnswer => teaser.format == QuestionFormat.essay,
+    PaperOutlineTab.shortNotes =>
+      teaser.format == QuestionFormat.shortNote ||
+          teaser.format == QuestionFormat.vsa,
+    PaperOutlineTab.mcq => teaser.format == QuestionFormat.mcq,
+  };
+}
+
+/// Teasers for one year + tab, merged across Paper I / II.
+List<PyqTeaser> teasersForOutlineTab({
+  required List<PyqTeaser> teasers,
+  required int year,
+  required PaperOutlineTab tab,
+  String? paperName,
+  String? topicId,
+}) {
+  final filtered = filterSubjectPyqs(
+    teasers: teasers,
+    paperName: paperName,
+    year: year,
+    topicId: topicId,
+  );
+  final matching = [
+    for (final t in filtered)
+      if (matchesOutlineTab(t, tab)) t,
+  ];
+  matching.sort((a, b) {
+    final byPaper = a.paperNames.join(',').compareTo(b.paperNames.join(','));
+    if (byPaper != 0) return byPaper;
+    return (b.marks ?? 0).compareTo(a.marks ?? 0);
+  });
+  return matching;
+}
+
+/// Long answer if that list is non-empty, otherwise the first tab with questions.
+int defaultPaperOutlineTabIndex({
+  required List<PyqTeaser> longAnswer,
+  required List<PyqTeaser> shortNotes,
+  required List<PyqTeaser> mcq,
+}) {
+  if (longAnswer.isNotEmpty) return 0;
+  if (shortNotes.isNotEmpty) return 1;
+  if (mcq.isNotEmpty) return 2;
+  return 0;
+}

@@ -41,15 +41,17 @@ university paper mixes many topics in one sitting — see
 | Kind | What it is | Player |
 |---|---|---|
 | `pyq_theory` | University / internal written stem (essay / short note / VSA by marks) | PYQ reader — not scored |
-| `mcq` | Four-option recall item | PYQ reader “Show answer” **or** the existing tutor/exam practice player |
+| `mcq` | Four-option recall item | PYQ reader **DA** / **EX**, **or** the existing tutor/exam practice player |
 
 ## Sample answers and reference links
 
-- **Theory sample answer** (~250 words) is optional, collapsed until the
-  student taps “Show sample answer.” Pro-gated (separate table). Missing
-  content shows “No sample answer yet” — never invent text in the client.
-- **MCQ answer** is the correct option + `explanation_text`, collapsed behind
-  the same “Show answer” pattern. Do not put the key on teasers.
+- **Direct answer (DA)** is `sample_answer_text` for theory or MCQ, collapsed
+  until the student taps **DA**. Pro-gated (separate table). Missing content
+  shows “No direct answer yet” — never invent text in the client. MCQ DA also
+  shows the correct option.
+- **Explanation (EX)** is `explanation_text` plus textbook citations and
+  “More on this topic” links, for either kind. Collapsed until **EX**. Do not
+  put the MCQ key on teasers.
 - **Textbook refs** are citations (book + edition + page). Never store PDFs.
 - **Lesson resources** are https “read more” links. `is_free` links are
   visible without Pro.
@@ -61,8 +63,9 @@ orange CTAs, indigo-purple chrome, gold Pro chips) while keeping **Docci** and
 the Medico name. Theme is **System / Light / Dark**, persisted, **Light default**.
 
 Home is a PYQ dashboard (coverage banner, year + university, subject cards).
-Opening a subject starts with **that subject’s PYQs** (paper / year / chapter
-filters). Topic → lesson is for grouping and trackers, not the first tap.
+Opening a subject starts with **exam years**, then that year’s paper outline
+(LAQ / Short notes / MCQ tabs). Chapter and Paper I/II live in Filters.
+Topic → lesson is for grouping and trackers, not the first tap.
 
 ## Monetization
 

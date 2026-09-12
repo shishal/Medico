@@ -4,7 +4,7 @@ Reference for product and catalog decisions. The app’s job is to help a
 student pass **affiliating-university professional exams** (and the college
 internals that feed them), not NEET-PG.
 
-**Status:** research note plus shipped subject-first PYQ browse (see §6–7).
+**Status:** research note plus shipped year-first PYQ browse (see §6–7).
 
 Sources (Aug 2023–2025, not a substitute for the current university
 notification):
@@ -178,24 +178,25 @@ trackers; also list papers by year / Paper I / Paper II.
 
 ### Currently true in the app (browse)
 
-Home → subject → **that subject’s PYQs**, with paper / year / format / chapter
-chips. **Chapters** opens topic → lesson for trackers and mark-learnt.
+Home → subject → **exam years** → that year’s paper outline (pinned LAQ /
+Short notes / MCQ tabs; Paper I and Paper II merged, labeled on each stem).
+**Filters** (chapter / paper) sit on the year list. **Chapters** opens
+topic → lesson for trackers and mark-learnt.
 
 ### Student path (shipped)
 
 1. Home → tap **subject** (Anatomy)
-2. Land on **that subject’s PYQs** (university-filtered, KUHS fallback
+2. Land on **that subject’s exam years** (university-filtered, KUHS fallback
    banner when needed)
-3. **Group / filter**, do not hide the list:
-   - Paper I / Paper II / year (reconstruct a real paper)
-   - Essay / Short / VSA / MCQ
-   - Chapter (revision; Trackers still pick lessons)
+3. Open a year to reconstruct the sitting:
+   - Long answer / Short notes (includes VSA) / MCQ tabs
+   - Paper I and Paper II stems together, labeled
+   - Chapter / paper via Filters on the year list
 4. **Chapters** in the app bar still opens topic → lesson for mark-learnt
 
 Topic/lesson stay the syllabus index. Opening a subject no longer funnels
 through them first. Exam order inside a paper is not stored yet (no
-`order_index` on appearances); a Paper+year filter sorts essay → short →
-VSA → MCQ.
+`order_index` on appearances); each tab sorts by paper name, then marks.
 
 ---
 
@@ -207,9 +208,9 @@ The owner’s understanding is **correct** for India MBBS university exams:
 > and feed trackers. Real papers mix topics, so the paper is the upload
 > unit and the chapter is a tag.
 
-**Paper I / Paper II / year** are first-class filters.
+**Paper I / Paper II / year** are first-class. Year is the browse step;
+paper is a filter plus a label on each stem.
 
-**Shipped browse:** Home → subject → that subject’s PYQs, with paper / year /
-format / chapter chips. **Chapters** still opens topic → lesson for trackers
-and mark-learnt. Database is unchanged (`exam_papers` + appearances +
-lesson/topic tags).
+**Shipped browse:** Home → subject → exam years → year outline tabs.
+**Chapters** still opens topic → lesson for trackers and mark-learnt.
+Database is unchanged (`exam_papers` + appearances + lesson/topic tags).

@@ -442,26 +442,24 @@ class PyqRepository {
       String? optionD;
       String? correctOption;
       String? explanationText;
-      if (teaser.kind == 'mcq') {
-        final qRows = await _client
-            .from(Tables.questions)
-            .select(
-              '${QuestionColumns.optionA},${QuestionColumns.optionB},'
-              '${QuestionColumns.optionC},${QuestionColumns.optionD},'
-              '${QuestionColumns.correctOption},${QuestionColumns.explanationText}',
-            )
-            .eq(QuestionColumns.id, questionId)
-            .limit(1);
-        final qList = (qRows as List<dynamic>).cast<Map<String, dynamic>>();
-        if (qList.isNotEmpty) {
-          final q = qList.first;
-          optionA = q[QuestionColumns.optionA] as String?;
-          optionB = q[QuestionColumns.optionB] as String?;
-          optionC = q[QuestionColumns.optionC] as String?;
-          optionD = q[QuestionColumns.optionD] as String?;
-          correctOption = q[QuestionColumns.correctOption] as String?;
-          explanationText = q[QuestionColumns.explanationText] as String?;
-        }
+      final qRows = await _client
+          .from(Tables.questions)
+          .select(
+            '${QuestionColumns.optionA},${QuestionColumns.optionB},'
+            '${QuestionColumns.optionC},${QuestionColumns.optionD},'
+            '${QuestionColumns.correctOption},${QuestionColumns.explanationText}',
+          )
+          .eq(QuestionColumns.id, questionId)
+          .limit(1);
+      final qList = (qRows as List<dynamic>).cast<Map<String, dynamic>>();
+      if (qList.isNotEmpty) {
+        final q = qList.first;
+        optionA = q[QuestionColumns.optionA] as String?;
+        optionB = q[QuestionColumns.optionB] as String?;
+        optionC = q[QuestionColumns.optionC] as String?;
+        optionD = q[QuestionColumns.optionD] as String?;
+        correctOption = q[QuestionColumns.correctOption] as String?;
+        explanationText = q[QuestionColumns.explanationText] as String?;
       }
 
       String? sample;

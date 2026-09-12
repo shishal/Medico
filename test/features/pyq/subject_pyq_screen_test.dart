@@ -8,7 +8,6 @@ import 'package:medico/core/utils/result.dart';
 import 'package:medico/features/bookmarks/presentation/providers/bookmarks_provider.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/pyq/domain/pyq_models.dart';
-import 'package:medico/features/pyq/domain/question_format.dart';
 import 'package:medico/features/pyq/domain/subject_pyq_filters.dart';
 import 'package:medico/features/pyq/presentation/providers/pyq_providers.dart';
 import 'package:medico/features/pyq/presentation/screens/subject_pyq_screen.dart';
@@ -34,6 +33,35 @@ PyqTeaser _teaser({
     appearanceYears: years,
     paperNames: papers,
     topicName: topicName,
+  );
+}
+
+PyqSubjectFeed _feed() {
+  return PyqSubjectFeed(
+    teasers: [
+      _teaser(
+        id: 'q1',
+        text: 'Describe the femoral triangle.',
+        topicId: 'll',
+        topicName: 'Lower limb',
+        papers: const ['Paper II'],
+      ),
+      _teaser(
+        id: 'q2',
+        text: 'Brachial plexus',
+        topicId: 'ul',
+        topicName: 'Upper limb',
+        papers: const ['Paper I'],
+        years: const [2023],
+      ),
+    ],
+    usingFallback: false,
+    paperNames: const ['Paper I', 'Paper II'],
+    years: const [2024, 2023],
+    chapters: const [
+      PyqChapter(id: 'ul', name: 'Upper limb'),
+      PyqChapter(id: 'll', name: 'Lower limb'),
+    ],
   );
 }
 
@@ -104,7 +132,90 @@ void main() {
     expect(ordered.last.id, 'mcq');
   });
 
-  testWidgets('subject screen shows PYQs without opening a topic first', (
+  test('yearsWithMatchingPyqs drops years that the chapter filter empties', () {
+    final teasers = [
+      _teaser(
+        id: 'q1',
+        text: 'Femoral triangle',
+        topicId: 'll',
+        topicName: 'Lower limb',
+        years: const [2024],
+      ),
+      _teaser(
+        id: 'q2',
+        text: 'Brachial plexus',
+        topicId: 'ul',
+        topicName: 'Upper limb',
+        years: const [2023],
+      ),
+    ];
+    expect(
+      yearsWithMatchingPyqs(teasers: teasers),
+      [2024, 2023],
+    );
+    expect(
+      yearsWithMatchingPyqs(teasers: teasers, topicId: 'ul'),
+      [2023],
+    );
+  });
+
+  testWidgets('subject screen lists years, not a flat PYQ dump', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final router = GoRouter(
+      initialLocation: AppRoutes.subjectPath('anat', 'Anatomy'),
+      routes: [
+        GoRoute(
+          path: AppRoutes.subject,
+          builder: (_, state) => SubjectPyqScreen(
+            subjectId: state.pathParameters['subjectId']!,
+            title: state.uri.queryParameters['title'] ?? 'Subject',
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.subjectYear,
+          builder: (_, state) =>
+              Text('Outline ${state.pathParameters['year']}'),
+        ),
+        GoRoute(
+          path: AppRoutes.subjectTopics,
+          builder: (_, _) => const Text('Chapter list'),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          subjectPyqsProvider.overrideWith((ref, id) async {
+            expect(id, 'anat');
+            return _feed();
+          }),
+          bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Previous year questions'), findsOneWidget);
+    expect(find.text('2024'), findsOneWidget);
+    expect(find.text('2023'), findsOneWidget);
+    expect(find.text('Describe the femoral triangle.'), findsNothing);
+    expect(find.text('Brachial plexus'), findsNothing);
+
+    await tester.tap(find.text('2024'));
+    await tester.pumpAndSettle();
+    expect(find.text('Outline 2024'), findsOneWidget);
+  });
+
+  testWidgets('Filters sheet hides years that do not match the paper', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(400, 900);
@@ -126,10 +237,6 @@ void main() {
           path: AppRoutes.subjectTopics,
           builder: (_, _) => const Text('Chapter list'),
         ),
-        GoRoute(
-          path: AppRoutes.pyq,
-          builder: (_, _) => const SizedBox.shrink(),
-        ),
       ],
     );
     addTearDown(router.dispose);
@@ -137,35 +244,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          subjectPyqsProvider.overrideWith((ref, id) async {
-            expect(id, 'anat');
-            return PyqSubjectFeed(
-              teasers: [
-                _teaser(
-                  id: 'q1',
-                  text: 'Describe the femoral triangle.',
-                  topicId: 'll',
-                  topicName: 'Lower limb',
-                  papers: const ['Paper II'],
-                ),
-                _teaser(
-                  id: 'q2',
-                  text: 'Brachial plexus',
-                  topicId: 'ul',
-                  topicName: 'Upper limb',
-                  papers: const ['Paper I'],
-                  years: const [2023],
-                ),
-              ],
-              usingFallback: false,
-              paperNames: const ['Paper I', 'Paper II'],
-              years: const [2024, 2023],
-              chapters: const [
-                PyqChapter(id: 'ul', name: 'Upper limb'),
-                PyqChapter(id: 'll', name: 'Lower limb'),
-              ],
-            );
-          }),
+          subjectPyqsProvider.overrideWith((ref, id) async => _feed()),
           bookmarkedIdsProvider.overrideWith(_StubBookmarkedIds.new),
         ],
         child: MaterialApp.router(routerConfig: router),
@@ -173,21 +252,16 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Describe the femoral triangle.'), findsOneWidget);
-    expect(find.text('Brachial plexus'), findsOneWidget);
-    expect(find.text('Previous year questions'), findsOneWidget);
-
+    await tester.tap(find.text('Filters'));
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilterChip, 'Paper II'));
     await tester.pumpAndSettle();
-    expect(find.text('Describe the femoral triangle.'), findsOneWidget);
-    expect(find.text('Brachial plexus'), findsNothing);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(FilterChip, 'All papers'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilterChip, 'Upper limb'));
-    await tester.pumpAndSettle();
-    expect(find.text('Brachial plexus'), findsOneWidget);
-    expect(find.text('Describe the femoral triangle.'), findsNothing);
+    expect(find.text('2024'), findsOneWidget);
+    expect(find.text('2023'), findsNothing);
+    expect(find.text('Filters · on'), findsOneWidget);
 
     await tester.tap(find.text('Chapters'));
     await tester.pumpAndSettle();

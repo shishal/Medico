@@ -6,13 +6,13 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
-import '../../domain/question_format.dart';
+import '../../../../core/widgets/comic_card.dart';
 import '../../domain/subject_pyq_filters.dart';
 import '../providers/pyq_providers.dart';
-import '../widgets/pyq_teaser_card.dart';
+import '../widgets/subject_pyq_filter_sheet.dart';
 
-/// Subject → PYQs. Paper / year / chapter chips group a mixed exam paper.
-class SubjectPyqScreen extends ConsumerStatefulWidget {
+/// Subject → exam years. Filters (chapter / paper) carry into the year outline.
+class SubjectPyqScreen extends ConsumerWidget {
   const SubjectPyqScreen({
     super.key,
     required this.subjectId,
@@ -23,25 +23,27 @@ class SubjectPyqScreen extends ConsumerStatefulWidget {
   final String title;
 
   @override
-  ConsumerState<SubjectPyqScreen> createState() => _SubjectPyqScreenState();
-}
-
-class _SubjectPyqScreenState extends ConsumerState<SubjectPyqScreen> {
-  QuestionFormat? _format;
-  String? _paperName;
-  int? _year;
-  String? _topicId;
-
-  @override
-  Widget build(BuildContext context) {
-    final async = ref.watch(subjectPyqsProvider(widget.subjectId));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(subjectPyqsProvider(subjectId));
+    final filter = ref.watch(subjectPyqFiltersProvider(subjectId));
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         actions: [
           TextButton(
+            onPressed: () => async.whenOrNull(
+              data: (feed) => showSubjectPyqFilterSheet(
+                context: context,
+                subjectId: subjectId,
+                paperNames: feed.paperNames,
+                chapters: feed.chapters,
+              ),
+            ),
+            child: Text(filter.isActive ? 'Filters · on' : 'Filters'),
+          ),
+          TextButton(
             onPressed: () => context.push(
-              AppRoutes.subjectTopicsPath(widget.subjectId, widget.title),
+              AppRoutes.subjectTopicsPath(subjectId, title),
             ),
             child: const Text('Chapters'),
           ),
@@ -51,16 +53,13 @@ class _SubjectPyqScreenState extends ConsumerState<SubjectPyqScreen> {
         loading: () => const AsyncLoadingView(),
         error: (e, _) => AsyncErrorView(
           message: UserFacingError.display(e),
-          onAction: () =>
-              ref.invalidate(subjectPyqsProvider(widget.subjectId)),
+          onAction: () => ref.invalidate(subjectPyqsProvider(subjectId)),
         ),
         data: (feed) {
-          final items = filterSubjectPyqs(
+          final years = yearsWithMatchingPyqs(
             teasers: feed.teasers,
-            format: _format,
-            paperName: _paperName,
-            year: _year,
-            topicId: _topicId,
+            paperName: filter.paperName,
+            topicId: filter.topicId,
           );
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
@@ -72,7 +71,7 @@ class _SubjectPyqScreenState extends ConsumerState<SubjectPyqScreen> {
               ),
               const SizedBox(height: Spacing.xs),
               Text(
-                'A university paper mixes chapters. Filter by paper, year, or chapter — chapters are also used on Trackers.',
+                'Pick a year to see that sitting. A university paper mixes chapters.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               if (feed.usingFallback) ...[
@@ -82,105 +81,46 @@ class _SubjectPyqScreenState extends ConsumerState<SubjectPyqScreen> {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
-              const SizedBox(height: Spacing.md),
-              PyqFormatChips(
-                selected: _format,
-                onSelected: (value) => setState(() => _format = value),
-              ),
-              if (feed.paperNames.isNotEmpty) ...[
+              if (filter.isActive) ...[
                 const SizedBox(height: Spacing.sm),
-                _StringChips(
-                  allLabel: 'All papers',
-                  values: feed.paperNames,
-                  selected: _paperName,
-                  onSelected: (value) => setState(() => _paperName = value),
-                ),
-              ],
-              if (feed.years.isNotEmpty) ...[
-                const SizedBox(height: Spacing.sm),
-                _StringChips(
-                  allLabel: 'All years',
-                  values: [for (final y in feed.years) '$y'],
-                  selected: _year?.toString(),
-                  onSelected: (value) => setState(
-                    () => _year = value == null ? null : int.tryParse(value),
-                  ),
-                ),
-              ],
-              if (feed.chapters.isNotEmpty) ...[
-                const SizedBox(height: Spacing.sm),
-                Wrap(
-                  spacing: Spacing.sm,
-                  runSpacing: Spacing.sm,
-                  children: [
-                    FilterChip(
-                      label: const Text('All chapters'),
-                      selected: _topicId == null,
-                      onSelected: (_) => setState(() => _topicId = null),
-                    ),
-                    for (final chapter in feed.chapters)
-                      FilterChip(
-                        label: Text(chapter.name),
-                        selected: _topicId == chapter.id,
-                        onSelected: (_) =>
-                            setState(() => _topicId = chapter.id),
-                      ),
-                  ],
+                Text(
+                  [
+                    if (filter.paperName != null) filter.paperName!,
+                    if (filter.topicId != null)
+                      feed.chapters
+                          .where((c) => c.id == filter.topicId)
+                          .map((c) => c.name)
+                          .firstOrNull,
+                  ].whereType<String>().join(' · '),
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
               ],
               const SizedBox(height: Spacing.md),
-              if (items.isEmpty)
-                const Text('No PYQs match these filters.')
+              if (years.isEmpty)
+                Text(
+                  filter.isActive
+                      ? 'No years match these filters.'
+                      : 'No previous year papers yet.',
+                )
               else
-                for (var i = 0; i < items.length; i++)
+                for (final year in years)
                   Padding(
                     padding: const EdgeInsets.only(bottom: Spacing.sm),
-                    child: PyqTeaserCard(
-                      teaser: items[i],
-                      index: i,
-                      onTap: () =>
-                          context.push(AppRoutes.pyqPath(items[i].id)),
+                    child: ComicCard(
+                      onTap: () => context.push(
+                        AppRoutes.subjectYearPath(subjectId, year, title),
+                      ),
+                      child: Text(
+                        '$year',
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w800),
+                      ),
                     ),
                   ),
             ],
           );
         },
       ),
-    );
-  }
-}
-
-class _StringChips extends StatelessWidget {
-  const _StringChips({
-    required this.allLabel,
-    required this.values,
-    required this.selected,
-    required this.onSelected,
-  });
-
-  final String allLabel;
-  final List<String> values;
-  final String? selected;
-  final ValueChanged<String?> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: Spacing.sm,
-      runSpacing: Spacing.sm,
-      children: [
-        FilterChip(
-          label: Text(allLabel),
-          selected: selected == null,
-          onSelected: (_) => onSelected(null),
-        ),
-        for (final value in values)
-          FilterChip(
-            label: Text(value),
-            selected: selected == value,
-            onSelected: (_) => onSelected(value),
-          ),
-      ],
     );
   }
 }

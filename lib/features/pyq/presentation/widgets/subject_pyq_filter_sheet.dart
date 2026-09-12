@@ -82,7 +82,7 @@ class SubjectPyqFilterSheet extends ConsumerWidget {
               ],
               if (chapters.isNotEmpty) ...[
                 const SizedBox(height: Spacing.md),
-                Text('Chapter', style: Theme.of(context).textTheme.titleSmall),
+                Text('Chapters', style: Theme.of(context).textTheme.titleSmall),
                 const SizedBox(height: Spacing.sm),
                 Wrap(
                   spacing: Spacing.sm,

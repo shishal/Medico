@@ -180,8 +180,8 @@ trackers; also list papers by year / Paper I / Paper II.
 
 Home → subject → **exam years** → that year’s paper outline (pinned LAQ /
 Short notes / MCQ tabs; Paper I and Paper II merged, labeled on each stem).
-**Filters** (chapter / paper) sit on the year list. **Chapters** opens
-topic → lesson for trackers and mark-learnt.
+**Filters** (chapters / paper) sit on the year list. Topic → lesson for
+trackers and mark-learnt stays under Trackers, not this screen.
 
 ### Student path (shipped)
 
@@ -192,7 +192,6 @@ topic → lesson for trackers and mark-learnt.
    - Long answer / Short notes (includes VSA) / MCQ tabs
    - Paper I and Paper II stems together, labeled
    - Chapter / paper via Filters on the year list
-4. **Chapters** in the app bar still opens topic → lesson for mark-learnt
 
 Topic/lesson stay the syllabus index. Opening a subject no longer funnels
 through them first. Exam order inside a paper is not stored yet (no
@@ -212,5 +211,5 @@ The owner’s understanding is **correct** for India MBBS university exams:
 paper is a filter plus a label on each stem.
 
 **Shipped browse:** Home → subject → exam years → year outline tabs.
-**Chapters** still opens topic → lesson for trackers and mark-learnt.
-Database is unchanged (`exam_papers` + appearances + lesson/topic tags).
+Chapter is a **Filters** tag, not a separate year-list button. Database is
+unchanged (`exam_papers` + appearances + lesson/topic tags).

@@ -182,10 +182,6 @@ void main() {
           builder: (_, state) =>
               Text('Outline ${state.pathParameters['year']}'),
         ),
-        GoRoute(
-          path: AppRoutes.subjectTopics,
-          builder: (_, _) => const Text('Chapter list'),
-        ),
       ],
     );
     addTearDown(router.dispose);
@@ -207,6 +203,7 @@ void main() {
     expect(find.text('Previous year questions'), findsOneWidget);
     expect(find.text('2024'), findsOneWidget);
     expect(find.text('2023'), findsOneWidget);
+    expect(find.text('Chapters'), findsNothing);
     expect(find.text('Describe the femoral triangle.'), findsNothing);
     expect(find.text('Brachial plexus'), findsNothing);
 
@@ -232,10 +229,6 @@ void main() {
             subjectId: state.pathParameters['subjectId']!,
             title: state.uri.queryParameters['title'] ?? 'Subject',
           ),
-        ),
-        GoRoute(
-          path: AppRoutes.subjectTopics,
-          builder: (_, _) => const Text('Chapter list'),
         ),
       ],
     );
@@ -263,9 +256,17 @@ void main() {
     expect(find.text('2023'), findsNothing);
     expect(find.text('Filters · on'), findsOneWidget);
 
-    await tester.tap(find.text('Chapters'));
+    await tester.tap(find.text('Filters · on'));
     await tester.pumpAndSettle();
-    expect(find.text('Chapter list'), findsOneWidget);
+    expect(find.text('Chapters'), findsOneWidget);
+    await tester.tap(find.text('Clear all'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, 'Upper limb'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(find.text('2023'), findsOneWidget);
+    expect(find.text('2024'), findsNothing);
   });
 }
 

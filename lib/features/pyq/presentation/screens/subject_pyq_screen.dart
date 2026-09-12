@@ -41,12 +41,6 @@ class SubjectPyqScreen extends ConsumerWidget {
             ),
             child: Text(filter.isActive ? 'Filters · on' : 'Filters'),
           ),
-          TextButton(
-            onPressed: () => context.push(
-              AppRoutes.subjectTopicsPath(subjectId, title),
-            ),
-            child: const Text('Chapters'),
-          ),
         ],
       ),
       body: async.when(

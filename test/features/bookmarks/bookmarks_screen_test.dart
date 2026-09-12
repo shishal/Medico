@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:medico/core/router/app_routes.dart';
 import 'package:medico/core/utils/result.dart';
 import 'package:medico/core/utils/user_facing_error.dart';
 import 'package:medico/features/bookmarks/domain/bookmarked_question.dart';
@@ -152,5 +154,49 @@ void main() {
 
     expect(find.text(UserFacingError.offlineMessage), findsOneWidget);
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets('tapping a bookmark opens the PYQ reader', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final router = GoRouter(
+      initialLocation: AppRoutes.bookmarks,
+      routes: [
+        GoRoute(
+          path: AppRoutes.bookmarks,
+          builder: (_, _) => const BookmarksScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.pyq,
+          builder: (_, state) =>
+              Text('Reader ${state.pathParameters['questionId']}'),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          bookmarksListProvider.overrideWith(
+            (ref) => [
+              _item(id: 'q1', text: 'Which organelle produces ATP?'),
+            ],
+          ),
+          bookmarkedIdsProvider.overrideWith(
+            () => _StubBookmarkedIds({'q1'}),
+          ),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Which organelle produces ATP?'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reader q1'), findsOneWidget);
   });
 }

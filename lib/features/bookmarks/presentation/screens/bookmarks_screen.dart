@@ -141,6 +141,9 @@ class _BookmarkTile extends StatelessWidget {
                   : null)
             : Text(subtitle),
         trailing: BookmarkIconButton(questionId: item.questionId),
+        onTap: item.isPlanLocked
+            ? null
+            : () => context.push(AppRoutes.pyqPath(item.questionId)),
       ),
     );
   }

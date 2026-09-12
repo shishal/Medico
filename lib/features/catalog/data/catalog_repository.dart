@@ -20,14 +20,12 @@ class CatalogRepository {
       return const Failure('Not signed in.');
     }
     try {
-      // `is_fallback` marks the default content bank (any university, not a
-      // hardcoded code). Added by `geckomed_ux.sql`.
       final rows = await _client
           .from(Tables.universities)
           .select(
             '${UniversityColumns.id},${UniversityColumns.code},'
             '${UniversityColumns.name},${UniversityColumns.state},'
-            '${UniversityColumns.slug},${UniversityColumns.isFallback}',
+            '${UniversityColumns.slug}',
           )
           .order(UniversityColumns.name);
       return Success(_map(rows, University.fromJson));
@@ -168,8 +166,8 @@ class CatalogRepository {
     }
   }
 
-  /// Papers + PYQ counts for [selectedUniversityId], falling back to the
-  /// `is_fallback` content bank when that university has no papers.
+  /// Papers + PYQ counts for [selectedUniversityId]. Empty when that
+  /// university has no tagged papers — no substitute bank.
   Future<Result<UniversityCoverage>> fetchCoverage(String? selectedUniversityId) async {
     if (_client.auth.currentUser == null) {
       return const Failure('Not signed in.');
@@ -180,53 +178,27 @@ class CatalogRepository {
           .select(
             '${UniversityColumns.id},${UniversityColumns.code},'
             '${UniversityColumns.name},${UniversityColumns.state},'
-            '${UniversityColumns.slug},${UniversityColumns.isFallback}',
+            '${UniversityColumns.slug}',
           );
       final unis = _map(uniRows, University.fromJson);
       University? selected;
-      University? fallback;
       for (final u in unis) {
         if (u.id == selectedUniversityId) selected = u;
-        if (u.isFallback) fallback = u;
       }
-      fallback ??= unis.firstOrNull;
-      if (fallback == null) {
+      if (selected == null) {
         return const Success(
           UniversityCoverage(
             paperCount: 0,
             pyqCount: 0,
-            usingFallback: false,
             contentUniversityId: '',
           ),
         );
       }
 
-      Future<int> paperCount(String universityId) async {
-        final rows = await _client
-            .from(Tables.examPapers)
-            .select(ExamPaperColumns.id)
-            .eq(ExamPaperColumns.universityId, universityId);
-        return (rows as List<dynamic>).length;
-      }
-
-      final selectedCount = selected == null ? 0 : await paperCount(selected.id);
-      final University content;
-      final bool showingFallback;
-      if (selected != null && selectedCount > 0) {
-        content = selected;
-        showingFallback = false;
-      } else {
-        content = fallback;
-        showingFallback = selected != null && selected.id != fallback.id;
-      }
-      final papers = showingFallback || selected == null
-          ? await paperCount(content.id)
-          : selectedCount;
-
       final paperIds = await _client
           .from(Tables.examPapers)
           .select(ExamPaperColumns.id)
-          .eq(ExamPaperColumns.universityId, content.id);
+          .eq(ExamPaperColumns.universityId, selected.id);
       final ids = (paperIds as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .map((r) => r[ExamPaperColumns.id] as String)
@@ -245,12 +217,11 @@ class CatalogRepository {
 
       return Success(
         UniversityCoverage(
-          paperCount: papers,
+          paperCount: ids.length,
           pyqCount: pyqCount,
-          usingFallback: showingFallback,
-          contentUniversityId: content.id,
-          contentUniversityName: content.name,
-          selectedUniversityName: selected?.name,
+          contentUniversityId: selected.id,
+          contentUniversityName: selected.name,
+          selectedUniversityName: selected.name,
         ),
       );
     } catch (e) {

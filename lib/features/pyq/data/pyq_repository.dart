@@ -92,7 +92,7 @@ class PyqRepository {
           .map(PyqTeaser.fromJson)
           .toList();
       if (all.isEmpty) {
-        return const Success(PyqLessonFeed(teasers: [], usingFallback: false));
+        return const Success(PyqLessonFeed(teasers: []));
       }
 
       final ids = all.map((t) => t.id).toList();
@@ -106,9 +106,7 @@ class PyqRepository {
           )
           .inFilter(AppearanceColumns.questionId, ids);
 
-      final resolved = await _resolveContentUniversity(universityId);
-      final contentUni = resolved.contentUni;
-      final usingFallback = resolved.usingFallback;
+      final contentUni = universityId;
 
       final yearsByQuestionUni = <String, Map<String, List<int>>>{};
       final unisByQuestion = <String, Set<String>>{};
@@ -167,9 +165,7 @@ class PyqRepository {
         );
       }
 
-      return Success(
-        PyqLessonFeed(teasers: teasers, usingFallback: usingFallback),
-      );
+      return Success(PyqLessonFeed(teasers: teasers));
     } catch (e) {
       return Failure(
         UserFacingError.from(e, fallback: 'Could not load PYQs.'),
@@ -202,9 +198,7 @@ class PyqRepository {
       ];
       final topicNameById = {for (final c in chapters) c.id: c.name};
       if (chapters.isEmpty) {
-        return const Success(
-          PyqSubjectFeed(teasers: [], usingFallback: false),
-        );
+        return const Success(PyqSubjectFeed(teasers: []));
       }
 
       final topicIds = chapters.map((c) => c.id).toList();
@@ -240,14 +234,7 @@ class PyqRepository {
       );
       final all = questionRows.map(PyqTeaser.fromJson).toList();
       if (all.isEmpty) {
-        final resolved = await _resolveContentUniversity(universityId);
-        return Success(
-          PyqSubjectFeed(
-            teasers: const [],
-            usingFallback: resolved.usingFallback,
-            chapters: chapters,
-          ),
-        );
+        return Success(PyqSubjectFeed(teasers: const [], chapters: chapters));
       }
 
       final ids = all.map((t) => t.id).toList();
@@ -268,7 +255,6 @@ class PyqRepository {
       // before this try/catch runs.
       late final List<Map<String, dynamic>> appRows;
       late final List<Map<String, dynamic>> refRows;
-      late final ({String? contentUni, bool usingFallback}) resolved;
       await Future.wait([
         _inFilterSelect(
           table: Tables.questionAppearances,
@@ -290,10 +276,8 @@ class PyqRepository {
             TextbookRefColumns.textbookId,
           ],
         ).then((v) => refRows = v),
-        _resolveContentUniversity(universityId).then((v) => resolved = v),
       ]);
-      final contentUni = resolved.contentUni;
-      final usingFallback = resolved.usingFallback;
+      final contentUni = universityId;
 
       final yearsByQuestionUni = <String, Map<String, List<int>>>{};
       final papersByQuestionUni = <String, Map<String, Set<String>>>{};
@@ -370,7 +354,6 @@ class PyqRepository {
       return Success(
         PyqSubjectFeed(
           teasers: teasers,
-          usingFallback: usingFallback,
           paperNames: paperList,
           years: yearList,
           chapters: chapters,
@@ -570,45 +553,6 @@ class PyqRepository {
       }
     }
     return rows;
-  }
-
-  /// Fallback is university-wide: if the selected university has any papers,
-  /// empty subjects stay empty. Only swap to the `is_fallback` bank when that
-  /// university has zero papers in the catalog.
-  Future<({String? contentUni, bool usingFallback})> _resolveContentUniversity(
-    String? universityId,
-  ) async {
-    final uniRows = await _client
-        .from(Tables.universities)
-        .select(
-          '${UniversityColumns.id},${UniversityColumns.isFallback}',
-        );
-    final unis = (uniRows as List<dynamic>).cast<Map<String, dynamic>>();
-    String? fallbackId;
-    for (final u in unis) {
-      if (u[UniversityColumns.isFallback] == true) {
-        fallbackId = u[UniversityColumns.id] as String;
-        break;
-      }
-    }
-
-    var contentUni = universityId;
-    var usingFallback = false;
-    if (contentUni != null && contentUni.isNotEmpty) {
-      final paperRows = await _client
-          .from(Tables.examPapers)
-          .select(ExamPaperColumns.id)
-          .eq(ExamPaperColumns.universityId, contentUni)
-          .limit(1);
-      final hasPapers = (paperRows as List<dynamic>).isNotEmpty;
-      if (!hasPapers && fallbackId != null) {
-        usingFallback = contentUni != fallbackId;
-        contentUni = fallbackId;
-      }
-    } else if (fallbackId != null) {
-      contentUni = fallbackId;
-    }
-    return (contentUni: contentUni, usingFallback: usingFallback);
   }
 
   Future<Result<void>> markLearnt(String questionId) async {

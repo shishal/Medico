@@ -657,16 +657,16 @@ NEET-PG tables above stay. This section is the **current product schema**. Apply
 `supabase/migrations/20260830140000_ug_university_pivot.sql` — do not re-run
 sections 1–8 on a live project.
 
-v1 **content** university: **KUHS** (`is_fallback = true`). The app lists
-other affiliating universities for onboarding/Profile. PYQ lists filter by
-`exam_papers.university_id`; if the student’s university has zero appearances,
-read the fallback (KUHS) bank. See `docs/00_PRODUCT.md`.
+v1 **content** university: **KUHS**. The app lists other affiliating
+universities for onboarding/Profile. PYQ lists filter by
+`exam_papers.university_id`. A university with zero papers shows empty PYQs
+— it does not substitute another bank. See `docs/00_PRODUCT.md`.
 
 ### 9.1 Enums and catalog
 
 ```sql
 create type question_kind as enum ('pyq_theory', 'mcq');
-create type mbbs_phase_code as enum ('phase1', 'phase2', 'phase3_part1', 'phase3_part2');
+create type mbbs_phase_code as enum ('year1', 'year2', 'year3', 'year4');
 create type study_event_kind as enum (
   'opened_lesson', 'opened_pyq', 'marked_learnt', 'answered_mcq', 'opened_resource'
 );
@@ -693,7 +693,9 @@ stem, marks, kind, lesson_id, required_plan, appearance_count — no sample
 answer, no MCQ keys. Includes both `pyq_theory` and `mcq` rows. University
 filter is applied in the client/RPC via appearances → exam_papers.
 
-`universities.is_fallback` marks the default content bank (KUHS).
+`universities.slug` is `lower(code)` from sheet sync (not a sheet column).
+`is_fallback` is retired — drop with
+`supabase/migrations/20260913120000_drop_university_fallback.sql`.
 
 ### 9.2b Editor sheet vs database
 

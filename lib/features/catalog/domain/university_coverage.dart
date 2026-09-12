@@ -3,7 +3,6 @@ class UniversityCoverage {
   const UniversityCoverage({
     required this.paperCount,
     required this.pyqCount,
-    required this.usingFallback,
     required this.contentUniversityId,
     this.contentUniversityName,
     this.selectedUniversityName,
@@ -11,7 +10,6 @@ class UniversityCoverage {
 
   final int paperCount;
   final int pyqCount;
-  final bool usingFallback;
   final String contentUniversityId;
   final String? contentUniversityName;
   final String? selectedUniversityName;

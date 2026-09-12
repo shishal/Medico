@@ -105,12 +105,6 @@ def check_migration(conn) -> list[str]:
             "(PostgREST cannot upsert on the Phase 4B partial title index)"
         )
 
-    if not column_exists(conn, "universities", "is_fallback"):
-        errors.append(
-            "universities.is_fallback column missing — run "
-            "supabase/migrations/20260906120000_geckomed_ux.sql"
-        )
-
     return errors
 
 
@@ -142,14 +136,6 @@ def check_synced_content(conn) -> list[str]:
         errors.append(
             f"universities: expected at least {EXPECTED['universities_min']}, got {universities}"
         )
-
-    fallback = conn.execute(
-        "select code from public.universities where is_fallback is true"
-    ).fetchone()
-    if not fallback:
-        errors.append("universities.is_fallback: expected one fallback row (KUHS)")
-    elif fallback[0] != "KUHS":
-        errors.append(f"universities.is_fallback: expected KUHS, got {fallback[0]!r}")
 
     for ext_id in EXPECTED["sample_external_ids"]:
         row = conn.execute(

@@ -33,6 +33,7 @@ abstract final class BrandAssets {
   static bool _looksFinal(String blob, int order) =>
       blob.contains('final') ||
       blob.contains('phase4') ||
+      blob.contains('year4') ||
       blob.contains('year 4') ||
       blob.contains('4th') ||
       order >= 4;
@@ -40,6 +41,7 @@ abstract final class BrandAssets {
   static bool _looksThird(String blob, int order) =>
       blob.contains('third') ||
       blob.contains('phase3') ||
+      blob.contains('year3') ||
       blob.contains('year 3') ||
       blob.contains('3rd') ||
       blob.contains('part 1') ||
@@ -48,6 +50,7 @@ abstract final class BrandAssets {
   static bool _looksSecond(String blob, int order) =>
       blob.contains('second') ||
       blob.contains('phase2') ||
+      blob.contains('year2') ||
       blob.contains('year 2') ||
       blob.contains('2nd') ||
       order == 2;

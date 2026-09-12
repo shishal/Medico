@@ -52,7 +52,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 
 **UG-D.1 — Onboarding**
 - Description: After signup, stepped form: theme, name, MBBS year, **university picker**, college search for that university, batch year. Writes `profiles` academic columns + `onboarding_completed_at`. Profile can change the same fields later.
-- Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (fallback KUHS PYQs + banner).
+- Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (empty PYQs until papers are added).
 
 **UG-D.2 — Catalog browse**
 - Description: Home lists subjects for the student’s phase. **Opening a subject shows that subject’s PYQs** (paper / year / format / chapter filters). Topic → lesson remains under **Chapters** for grouping and mark-learnt. See `docs/10_INDIA_MBBS_EXAMS.md`.
@@ -109,8 +109,8 @@ Work top to bottom. One task at a time.
 - Validation: grep the app IA for Mini/Mock/Grand list — none. Start a 10-question practice session.
 
 **10.3 — Denormalized sheet + university-scoped PYQs**
-- Description: Wide Questions tab; sync writes normalized tables. `universities.is_fallback`. Teasers include `kind`. Filter PYQs by selected university; fall back to KUHS.
-- Expected Outcome: A content person can add a PYQ as one spreadsheet row (names, not UUIDs). A non-KUHS profile sees KUHS PYQs plus a fallback banner until that university has papers.
+- Description: Wide Questions tab; sync writes normalized tables. Teasers include `kind`. Filter PYQs by selected university; empty lists stay empty.
+- Expected Outcome: A content person can add a PYQ as one spreadsheet row (names, not UUIDs). A university with no papers sees empty PYQs until rows are added.
 - Validation: upsert two rows with the same `external_id` and different papers — one question, two appearances.
 
 **10.4 — Onboarding + Profile university picker**
@@ -118,8 +118,8 @@ Work top to bottom. One task at a time.
 - Validation: change university on Profile; college that does not belong to the new university is cleared; Home follows the new id.
 
 **10.5 — Home dashboard**
-- Description: Docci + name + year + university; honest coverage banner; fallback banner when showing KUHS PYQs for another university.
-- Validation: KUHS profile shows KUHS counts; a university with zero papers shows the fallback banner, not a blank Home.
+- Description: Docci + name + year + university; honest coverage banner (PYQ and paper counts for the selected university).
+- Validation: KUHS profile shows KUHS counts; a university with zero papers shows 0 PYQs, not another university’s bank.
 
 **10.6 — PYQ list chips + cards**
 - Description: All / Essay / Short / VSA / MCQ chips; high-yield when appearance_count ≥ 2; textbook line; bookmark.

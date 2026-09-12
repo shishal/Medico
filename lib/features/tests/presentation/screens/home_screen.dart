@@ -21,6 +21,8 @@ class HomeScreen extends ConsumerWidget {
     final subjects = ref.watch(phaseSubjectsProvider);
     final coverage =
         ref.watch(studyProgressProvider).value?.subjects ?? const [];
+    final hasUniversityPapers =
+        (ref.watch(universityCoverageProvider).value?.paperCount ?? 0) > 0;
     ref.watch(pendingSubmitSyncProvider);
 
     return Scaffold(
@@ -45,6 +47,7 @@ class HomeScreen extends ConsumerWidget {
                   key: ValueKey(items.map((s) => s.id).join(',')),
                   subjects: items,
                   coverage: coverage,
+                  showLessonProgress: hasUniversityPapers,
                 ),
                 loading: () => const Padding(
                   key: ValueKey('subjects-loading'),

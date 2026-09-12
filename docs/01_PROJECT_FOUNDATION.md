@@ -5,7 +5,7 @@ Cursor (or you) later suggests deviating from one of these, treat it as a flag
 to stop and think, not a default to accept.
 
 **Product:** MBBS university-exam companion. Students pick their university;
-v1 **content** is KUHS (fallback bank). The stack below was chosen for a
+v1 **content** is KUHS. The stack below was chosen for a
 timer-driven MCQ player; that player is now **practice-only**. Do not
 reintroduce a NEET-PG catalog as the home screen.
 

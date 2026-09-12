@@ -185,8 +185,8 @@ the syllabus index (and mark-learnt), not the first tap from Home.
 ### Student path (shipped)
 
 1. Home → tap **subject** (Anatomy)
-2. Land on **that subject’s exam years** (university-filtered, KUHS fallback
-   banner when needed)
+2. Land on **that subject’s exam years** (university-filtered; empty if that
+   university has no papers yet)
 3. Open a year to reconstruct the sitting:
    - Long answer / Short notes (includes VSA) / MCQ tabs
    - Paper I and Paper II stems together, labeled

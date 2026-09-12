@@ -38,6 +38,8 @@ legacy validator until you switch the Questions header to the wide columns.
 
 Trackers were never a sheet tab (in-app rows + SQL seed only). Drop leftover
 DB objects with `supabase/migrations/20260912120000_drop_trackers.sql`.
+University `is_fallback` is retired; drop with
+`supabase/migrations/20260913120000_drop_university_fallback.sql`.
 
 ## Editor tabs
 
@@ -47,9 +49,9 @@ DB objects with `supabase/migrations/20260912120000_drop_trackers.sql`.
 |---|---|---|
 | `code` | yes | e.g. `KUHS`. Natural upsert key. |
 | `name` | yes | Full university name. |
-| `state` | yes | |
-| `slug` | yes | URL-safe, lowercase. |
-| `is_fallback` | no | `TRUE` on exactly one row (KUHS). Blank defaults to KUHS. |
+| `state` | yes | Stored with the university. |
+
+`universities.slug` is **not a sheet column**. Sync writes `lower(code)` (so `KUHS` → `kuhs`) for website URLs. An old `slug` or `is_fallback` column is ignored. If a university has no papers, the app shows empty PYQs — it does not substitute another bank.
 
 ### `Colleges` → `colleges`
 
@@ -58,8 +60,9 @@ onboarding never blocks.
 
 ### `Phases` → `mbbs_phases`
 
-`code` (`phase1` / `phase2` / `phase3_part1` / `phase3_part2`), `name`,
-`display_order`. Seeded by migration; the sheet is the human list.
+Optional. Migration already seeds the four MBBS years. Re-import this tab
+only if you need to rename them. Sync reads `mbbs_phases` from Supabase;
+it does not require this sheet.
 
 ### `Textbooks` → `textbooks`
 
@@ -74,51 +77,81 @@ onboarding never blocks.
 `question_appearances`, `question_textbook_refs`, and
 `question_sample_answers`.
 
+Headers with a default are named like `kind(Default-MCQ)` so the sheet itself
+shows the fallback. Sync strips the `(Default-…)` suffix.
+
 | Column | Required | Notes |
 |---|---|---|
 | `university_code` | if paper filled | Must match `Universities.code`. |
-| `phase_code` | no | `phase1` / `phase2` / `phase3_part1` / `phase3_part2`. |
+| `phase_code` | no | `year1` / `year2` / `year3` / `year4`. |
 | `subject_name` | yes | Created on sync if new. |
 | `topic_name` | yes | Created on sync if new. |
 | `lesson_name` | yes | Created on sync if new. |
 | `external_id` | yes | Stable ID you invent (e.g. `Q-ANAT-PYQ-001`). |
-| `kind` | no | `mcq` (default) or `pyq_theory`. |
+| `kind(Default-MCQ)` | no | `mcq` or `pyq_theory`. Blank: theory if all options + `correct_option` are empty, else MCQ. |
 | `marks` | no | Theory paper marks. Essay ≥10, short 4–9, VSA ≤3. |
 | `question_text` | yes | Stem. |
 | `option_a` … `option_d` | if `mcq` | All four non-empty for MCQ. Blank on theory. |
 | `correct_option` | if `mcq` | Exactly `A`, `B`, `C`, or `D`. |
 | `explanation_text` | no | **EX** for any kind (theory or MCQ). Tutor write-up; not the direct answer. |
 | `sample_answer_text` | no | **DA** for any kind. Model / short answer. Stored in `question_sample_answers`. |
-| `difficulty` | yes | `easy` / `medium` / `hard`. |
-| `required_plan` | yes | `free` / `pro` / `elite`. |
-| `is_active` | yes | `TRUE` / `FALSE`. |
+| `difficulty(Default-medium)` | no | `easy` / `medium` / `hard`. |
+| `required_plan(Default-free)` | no | `free` / `pro` / `elite`. |
+| `is_active(Default-TRUE)` | no | `TRUE` / `FALSE`. |
 | `exam_year` | no | Blank OK for bank MCQs. |
 | `paper_name` | no | e.g. `Paper I`. Blank skips the appearance. |
-| `exam_type` | no | `university` / `internal`. Default `university`. |
+| `exam_type(Default-university)` | no | `university` / `internal`. |
 | `textbook_key` | no | Must match `Textbooks.sheet_key`. |
 | `page` | no | Integer page citation. |
 | `section_heading` | no | |
 
 ### `LessonResources` → `lesson_resources` (optional)
 
-URL lists do not fit a question row. `lesson_external_id` must match the id
-sync invents from names (`L-SUBJECT-TOPIC-LESSON`, see
-`inventLessonExternalId_` in Apps Script). `title`, `url` (`https`),
-`source_label`, `display_order`, `is_free`. Do not link copyrighted textbook
-PDFs.
+`subject_name`, `topic_name`, `lesson_name` must match a Questions lesson
+(sync derives the internal `L-…` id). Then `title`, `url` (`https`),
+`source_label`, `display_order(Default-1)`, `is_free(Default-TRUE)`. Do not
+link copyrighted textbook PDFs.
+
+## What you can leave blank
+
+Sync already invents subjects, topics, lessons, exam papers, appearances, and
+textbook refs from the wide Questions row. Extra blanks it now fills:
+
+| Sheet cell | If blank, sync writes |
+|---|---|
+| Universities `slug` | *(column removed)* `lower(code)` |
+| Questions `kind(Default-MCQ)` | `pyq_theory` if no MCQ options; else `mcq` |
+| Questions `difficulty(Default-medium)` | `medium` |
+| Questions `required_plan(Default-free)` | `free` |
+| Questions `is_active(Default-TRUE)` | `TRUE` |
+| Questions `exam_type(Default-university)` | `university` |
+| LessonResources `display_order(Default-1)` | 1, then 2, … per lesson |
+| LessonResources `is_free(Default-TRUE)` | `TRUE` |
+
+**Still type these** — they are content, not metadata: `code` / `name` /
+`state` on Universities; college names; textbook `sheet_key` + title (join
+key for `textbook_key`); question `external_id`, names, stem, MCQ options,
+paper year + paper name, page citations; LessonResources subject/topic/lesson
+names plus title and https URL.
+
+**Not worth dropping yet:** `state` is unused in the app UI today but NOT
+NULL in Postgres. `phase_code` tags a new subject to an MBBS year (cannot
+guess a new subject). `external_id` must be stable when the same stem
+repeats on another paper.
 
 ## Editor rules (short)
 
-1. Fill **Universities → Colleges → Phases → Textbooks → Questions**. Optional:
-   LessonResources.
+1. Fill **Universities → Colleges → Textbooks → Questions**. Optional:
+   LessonResources. Phases is optional (already seeded in Supabase).
 2. Never invent UUIDs. Repeat `external_id` when the same stem appeared in
    another paper or has another textbook page.
-3. Booleans: `TRUE` / `FALSE` (Google Sheets checkboxes are fine).
+3. Booleans: `TRUE` / `FALSE` (Google Sheets checkboxes are fine). Blank
+   `is_active` means TRUE.
 4. Enums must match the allowed values exactly (lowercase for plans / types /
    difficulty / kind; uppercase A–D for MCQ answers).
 5. Empty optional cells stay blank; do not write `null` or `N/A`.
-6. Theory PYQs do **not** need options. MCQ rows still do. Sample answers are
-   optional — a stem + paper columns is enough to ship.
+6. Theory PYQs do **not** need options or `kind`. MCQ rows still need options.
+   Sample answers are optional — a stem + paper columns is enough to ship.
 7. Bank MCQs can leave `exam_year` / `paper_name` blank.
 
 ## Phase 2.2 — Sync

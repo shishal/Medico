@@ -68,13 +68,6 @@ class SubjectPyqScreen extends ConsumerWidget {
                 'Pick a year to see that sitting. A university paper mixes chapters.',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              if (feed.usingFallback) ...[
-                const SizedBox(height: Spacing.sm),
-                Text(
-                  'Showing default PYQs until your university papers are added.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
               if (filter.isActive) ...[
                 const SizedBox(height: Spacing.sm),
                 Text(

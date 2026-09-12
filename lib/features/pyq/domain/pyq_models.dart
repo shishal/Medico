@@ -83,13 +83,9 @@ class PyqTeaser {
 }
 
 class PyqLessonFeed {
-  const PyqLessonFeed({
-    required this.teasers,
-    required this.usingFallback,
-  });
+  const PyqLessonFeed({required this.teasers});
 
   final List<PyqTeaser> teasers;
-  final bool usingFallback;
 }
 
 class PyqChapter {
@@ -103,14 +99,12 @@ class PyqChapter {
 class PyqSubjectFeed {
   const PyqSubjectFeed({
     required this.teasers,
-    required this.usingFallback,
     this.paperNames = const [],
     this.years = const [],
     this.chapters = const [],
   });
 
   final List<PyqTeaser> teasers;
-  final bool usingFallback;
   final List<String> paperNames;
   final List<int> years;
   final List<PyqChapter> chapters;

@@ -3,13 +3,14 @@
  */
 
 function requireHttpsUrl_(raw, tab, row, field, errors) {
-  var url = trimStr_(raw);
+  var url = coerceHttpsUrl_(raw);
   if (!url) {
-    errors.push(tab + ' row ' + row + ': ' + field + ' is required');
-    return null;
-  }
-  if (url.indexOf('https://') !== 0) {
-    errors.push(tab + ' row ' + row + ': ' + field + ' must start with https://');
+    var had = trimStr_(raw);
+    if (!had) {
+      errors.push(tab + ' row ' + row + ': ' + field + ' is required');
+    } else {
+      errors.push(tab + ' row ' + row + ': ' + field + ' must start with https://');
+    }
     return null;
   }
   return url;
@@ -66,7 +67,7 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
     : { headers: [], rows: [] };
 
   var hdr;
-  hdr = requireHeaders_(TAB.UNIVERSITIES, uniRaw.headers, ['code', 'name', 'state', 'slug']);
+  hdr = requireHeaders_(TAB.UNIVERSITIES, uniRaw.headers, ['code', 'name', 'state']);
   if (hdr) errors.push(hdr);
   if (colRaw.headers.length) {
     hdr = requireHeaders_(TAB.COLLEGES, colRaw.headers, ['university_code', 'name']);
@@ -91,29 +92,22 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
   var universities = [];
   var uniByCode = {};
   uniRaw.rows.forEach(function (row) {
-    var code = trimStr_(row.code).toUpperCase();
-    var name = trimStr_(row.name);
-    var state = trimStr_(row.state);
-    var slug = trimStr_(row.slug).toLowerCase();
-    if (!code || !name || !state || !slug) {
-      errors.push(TAB.UNIVERSITIES + ' row ' + row.__row + ': code, name, state, slug are required');
-      return;
-    }
-    uniByCode[normKey_(code)] = code;
-    universities.push({
-      code: code,
-      name: name,
-      state: state,
-      slug: slug,
-    });
+    var uni = universityFromSheetRow_(row, errors);
+    if (!uni) return;
+    uniByCode[normKey_(uni.code)] = uni.code;
+    universities.push(uni);
   });
 
   var colleges = [];
   colRaw.rows.forEach(function (row) {
-    var ucode = trimStr_(row.university_code).toUpperCase();
+    var rawCode = trimStr_(row.university_code);
     var name = trimStr_(row.name);
-    if (!uniByCode[normKey_(ucode)]) {
+    if (!rawCode && !name) return;
+    var ucode = resolveUniversityCode_(rawCode, uniByCode, universities);
+    if (!ucode) {
+      if (!rawCode || !looksLikeUniversityCode_(rawCode)) return;
       errors.push(TAB.COLLEGES + ' row ' + row.__row + ': university_code not on Universities tab');
+      return;
     }
     if (!name) errors.push(TAB.COLLEGES + ' row ' + row.__row + ': name is required');
     colleges.push({ university_code: ucode, name: name });
@@ -121,11 +115,11 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
 
   var phases = [];
   phRaw.rows.forEach(function (row) {
-    var code = trimStr_(row.code).toLowerCase();
+    var code = canonicalPhaseCode_(row.code);
     var name = trimStr_(row.name);
     var displayOrder = parseIntRequired_(row.display_order, TAB.PHASES, row.__row, 'display_order', errors);
     if (!PHASE_CODES[code]) {
-      errors.push(TAB.PHASES + ' row ' + row.__row + ': code must be a known mbbs_phase_code');
+      errors.push(TAB.PHASES + ' row ' + row.__row + ': code must be year1, year2, year3, or year4');
     }
     phases.push({ code: code, name: name, display_order: displayOrder });
   });
@@ -158,26 +152,36 @@ function validateUgCatalog_(errors, questionByExt, theoryByExt) {
 
   var lessonResources = [];
   lrRaw.rows.forEach(function (row) {
-    var ext = trimStr_(row.lesson_external_id);
-    var title = trimStr_(row.title);
-    var url = requireHttpsUrl_(row.url, TAB.LESSON_RESOURCES, row.__row, 'url', errors);
-    if (!lessonByExt[normKey_(ext)]) {
-      errors.push(TAB.LESSON_RESOURCES + ' row ' + row.__row + ': lesson_external_id not on Lessons tab');
+    var rec = normalizeLessonResourceRow_(row);
+    if (!rec.url && !rec.title && !rec.lessonExt) return;
+    if (!rec.url) return;
+    var ext = rec.lessonExt;
+    var title = rec.title;
+    var url = rec.url;
+    if (ext && !lessonByExt[normKey_(ext)]) {
+      if (rec.shifted) return;
+      errors.push(
+        TAB.LESSON_RESOURCES +
+          ' row ' +
+          row.__row +
+          ': subject/topic/lesson do not match a lesson'
+      );
     }
     if (!title) errors.push(TAB.LESSON_RESOURCES + ' row ' + row.__row + ': title is required');
-    var isFree = parseBool_(row.is_free, TAB.LESSON_RESOURCES, row.__row, 'is_free', errors);
-    var displayOrder = parseIntRequired_(
-      row.display_order,
+    var isFree = parseOptionalBool_(
+      rec.is_free,
       TAB.LESSON_RESOURCES,
       row.__row,
-      'display_order',
-      errors
+      'is_free',
+      errors,
+      true
     );
+    var displayOrder = parseOptionalInt_(rec.display_order, lessonResources.length + 1);
     lessonResources.push({
       lesson_external_id: ext,
       title: title,
       url: url,
-      source_label: optionalTrimmed_(row.source_label),
+      source_label: rec.source_label,
       display_order: displayOrder,
       is_free: isFree,
     });

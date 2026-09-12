@@ -1,5 +1,5 @@
 code,name,display_order
-phase1,1st year,1
-phase2,2nd year,2
-phase3_part1,3rd year,3
-phase3_part2,Final year,4
+year1,1st year,1
+year2,2nd year,2
+year3,3rd year,3
+year4,Final year,4

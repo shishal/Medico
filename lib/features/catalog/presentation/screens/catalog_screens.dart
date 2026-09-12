@@ -292,14 +292,6 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: Spacing.sm),
-              if (feed.usingFallback)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: Spacing.sm),
-                  child: Text(
-                    'Showing default PYQs until your university papers are added.',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
               PyqFormatChips(
                 selected: _formatFilter,
                 onSelected: (value) => setState(() => _formatFilter = value),

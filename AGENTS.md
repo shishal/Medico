@@ -2,7 +2,7 @@
 
 Flutter app for **MBBS university exams** (PYQs, textbook page refs,
 MCQ practice). Students pick their affiliating university; v1 **content** is
-**KUHS** (fallback bank) — see `docs/00_PRODUCT.md`.
+**KUHS** — see `docs/00_PRODUCT.md`.
 
 Full planning docs live in `docs/` — read the relevant one before starting any
 task:

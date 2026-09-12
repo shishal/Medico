@@ -116,8 +116,7 @@ class HomeHeroBanner extends ConsumerWidget {
   }
 }
 
-/// Quiet catalog size under the greeting. Fallback copy only when the
-/// student's university has no tagged papers yet.
+/// Quiet catalog size under the greeting.
 class HomeCoverageBanner extends ConsumerWidget {
   const HomeCoverageBanner({super.key});
 
@@ -129,9 +128,7 @@ class HomeCoverageBanner extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       data: (c) {
         final scheme = Theme.of(context).colorScheme;
-        final line = c.usingFallback
-            ? 'Showing default PYQs until ${c.selectedUniversityName ?? 'your university'} papers are added.'
-            : '${c.pyqCount} PYQs · ${c.paperCount} papers';
+        final line = '${c.pyqCount} PYQs · ${c.paperCount} papers';
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             Spacing.lg,

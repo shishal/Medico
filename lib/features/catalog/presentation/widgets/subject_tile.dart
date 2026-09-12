@@ -17,10 +17,12 @@ class SubjectStickerGrid extends StatelessWidget {
     super.key,
     required this.subjects,
     this.coverage = const [],
+    this.showLessonProgress = true,
   });
 
   final List<CatalogSubject> subjects;
   final List<SubjectCoverage> coverage;
+  final bool showLessonProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,11 @@ class SubjectStickerGrid extends StatelessWidget {
         final subject = subjects[i];
         return StaggeredFade(
           index: i,
-          child: SubjectSticker(subject: subject, coverage: _match(subject)),
+          child: SubjectSticker(
+            subject: subject,
+            coverage: showLessonProgress ? _match(subject) : null,
+            showLessonProgress: showLessonProgress,
+          ),
         );
       },
     );
@@ -61,18 +67,25 @@ class SubjectStickerGrid extends StatelessWidget {
 }
 
 class SubjectSticker extends StatelessWidget {
-  const SubjectSticker({super.key, required this.subject, this.coverage});
+  const SubjectSticker({
+    super.key,
+    required this.subject,
+    this.coverage,
+    this.showLessonProgress = true,
+  });
 
   final CatalogSubject subject;
   final SubjectCoverage? coverage;
+  final bool showLessonProgress;
 
   @override
   Widget build(BuildContext context) {
     final comic = ComicColors.of(context);
     final accent = StickerFills.subjectAccent(subject.name);
     // Display fraction from server learnt/total — not a client-computed score.
-    final total = coverage?.totalLessons ?? 0;
-    final learnt = coverage?.learntLessons ?? 0;
+    // Skip it when this university has no papers; those totals are another bank.
+    final total = showLessonProgress ? (coverage?.totalLessons ?? 0) : 0;
+    final learnt = showLessonProgress ? (coverage?.learntLessons ?? 0) : 0;
     final progress = total == 0 ? 0.0 : learnt / total;
 
     return ComicCard(
@@ -123,9 +136,11 @@ class SubjectSticker extends StatelessWidget {
                 ?.copyWith(fontWeight: FontWeight.w800),
           ),
           Text(
-            total == 0
-                ? 'No lessons yet'
-                : '$learnt of $total lessons learnt',
+            !showLessonProgress
+                ? 'No PYQs yet'
+                : total == 0
+                    ? 'No lessons yet'
+                    : '$learnt of $total lessons learnt',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall,

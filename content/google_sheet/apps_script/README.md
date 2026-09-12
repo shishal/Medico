@@ -68,7 +68,7 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
 | topics | `subject_id,name` |
 | questions | `external_id` |
 | question_sample_answers | `question_id` |
-| universities | `code` |
+| universities | `code` (`slug` is `lower(code)`, not a sheet column) |
 | colleges | `university_id,name` |
 | lessons | `topic_id,name` |
 | lesson_resources | `lesson_id,url` |

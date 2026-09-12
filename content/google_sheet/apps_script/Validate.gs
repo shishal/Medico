@@ -102,10 +102,10 @@ function validateAllTabs_() {
     }
     subjectByKey[key] = { name: name, display_order: displayOrder };
     var phaseCode = optionalTrimmed_(row.phase_code)
-      ? trimStr_(row.phase_code).toLowerCase()
+      ? canonicalPhaseCode_(row.phase_code)
       : null;
     if (phaseCode && !PHASE_CODES[phaseCode]) {
-      errors.push(TAB.SUBJECTS + ' row ' + row.__row + ': phase_code must be phase1, phase2, phase3_part1, or phase3_part2');
+      errors.push(TAB.SUBJECTS + ' row ' + row.__row + ': phase_code must be year1, year2, year3, or year4');
     }
     subjects.push({
       name: name,

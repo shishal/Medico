@@ -8,7 +8,6 @@ class University {
     required this.name,
     required this.state,
     required this.slug,
-    this.isFallback = false,
   });
 
   final String id;
@@ -16,7 +15,6 @@ class University {
   final String name;
   final String state;
   final String slug;
-  final bool isFallback;
 
   factory University.fromJson(Map<String, dynamic> json) {
     return University(
@@ -25,7 +23,6 @@ class University {
       name: json[UniversityColumns.name] as String,
       state: json[UniversityColumns.state] as String? ?? '',
       slug: json[UniversityColumns.slug] as String? ?? '',
-      isFallback: json[UniversityColumns.isFallback] == true,
     );
   }
 

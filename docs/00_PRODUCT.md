@@ -15,10 +15,9 @@ Students pick their **affiliating university** at onboarding and can change it
 on Profile (university, college, MBBS year, batch).
 
 **v1 content bank** is **Kerala University of Health Sciences (KUHS)** —
-code `KUHS`, `universities.is_fallback = true`. Other universities are listed
-so the picker is real; if that university has no tagged papers yet, the app
-shows the KUHS bank with a banner: “Showing default PYQs until [University]
-papers are added.” Adding another university later is new sheet rows, not a
+code `KUHS`. Other universities are listed so the picker is real. If that
+university has no tagged papers yet, PYQ lists for it stay empty until sheet
+rows are added. Adding another university later is new sheet rows, not a
 schema rewrite.
 
 Curriculum (year → subject → topic → lesson) is **shared** across universities

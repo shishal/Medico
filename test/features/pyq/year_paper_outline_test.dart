@@ -143,7 +143,6 @@ void main() {
                   papers: const ['Paper II'],
                 ),
               ],
-              usingFallback: false,
               paperNames: const ['Paper I', 'Paper II'],
               years: const [2024],
             ),

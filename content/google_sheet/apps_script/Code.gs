@@ -24,7 +24,7 @@ var TAB = {
 };
 
 var QUESTION_KINDS = { pyq_theory: true, mcq: true };
-var PHASE_CODES = { phase1: true, phase2: true, phase3_part1: true, phase3_part2: true };
+var PHASE_CODES = { year1: true, year2: true, year3: true, year4: true };
 var EXAM_TYPES = { university: true, internal: true };
 
 var PROP = {

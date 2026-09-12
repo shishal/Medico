@@ -276,7 +276,6 @@ abstract final class UniversityColumns {
   static const name = 'name';
   static const state = 'state';
   static const slug = 'slug';
-  static const isFallback = 'is_fallback';
 }
 
 abstract final class MbbsPhaseColumns {

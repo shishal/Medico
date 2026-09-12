@@ -6,8 +6,12 @@
 /** Fill UG globals if Code.gs in the bound project is an older copy. */
 function ensureUgGlobals_() {
   if (typeof PHASE_CODES === 'undefined') {
-    PHASE_CODES = { phase1: true, phase2: true, phase3_part1: true, phase3_part2: true };
+    PHASE_CODES = { year1: true, year2: true, year3: true, year4: true };
   }
+  PHASE_CODES.year1 = true;
+  PHASE_CODES.year2 = true;
+  PHASE_CODES.year3 = true;
+  PHASE_CODES.year4 = true;
   if (typeof EXAM_TYPES === 'undefined') {
     EXAM_TYPES = { university: true, internal: true };
   }
@@ -35,10 +39,11 @@ function ensureUgGlobals_() {
 }
 
 function headerKey_(h) {
-  // CSV BOM on the first column, Title Case, or "University Code" must still
-  // match university_code / subject_name so the wide Questions path runs.
+  // CSV BOM, Title Case, "University Code", or kind(Default-MCQ) still
+  // match university_code / kind.
   return trimStr_(h)
     .replace(/^\uFEFF/, '')
+    .replace(/\s*\([^)]*default[^)]*\)/i, '')
     .toLowerCase()
     .replace(/[\s-]+/g, '_');
 }
@@ -113,11 +118,127 @@ function readTabObjects_(sheetName) {
   return { headers: headers, rows: rows };
 }
 
+function cellIsEmpty_(v) {
+  if (v == null || v === '') return true;
+  // Extra formatted rows often have leftover checkboxes / numeric 0s.
+  if (v === false) return true;
+  if (typeof v === 'number' && v === 0) return true;
+  return trimStr_(v) === '';
+}
+
 function isBlankRow_(line) {
   for (var i = 0; i < line.length; i++) {
-    if (trimStr_(line[i]) !== '') return false;
+    if (!cellIsEmpty_(line[i])) return false;
   }
   return true;
+}
+
+/** KUHS, MUHS — not a college name pasted into university_code. */
+function looksLikeUniversityCode_(raw) {
+  return /^[A-Za-z0-9]{2,16}$/.test(trimStr_(raw));
+}
+
+function looksLikeQuestionExternalId_(raw) {
+  var s = trimStr_(raw);
+  return /^[A-Za-z0-9][A-Za-z0-9._-]{1,78}$/.test(s);
+}
+
+function looksLikeLessonExternalId_(raw) {
+  return /^L-[A-Za-z0-9][A-Za-z0-9_-]{2,}$/.test(trimStr_(raw));
+}
+
+function looksLikeUrl_(raw) {
+  return /^(https?:\/\/|www\.)/i.test(trimStr_(raw));
+}
+
+function coerceHttpsUrl_(raw) {
+  var url = trimStr_(raw);
+  if (!url) return '';
+  if (url.indexOf('https://') === 0) return url;
+  if (url.indexOf('http://') === 0) return 'https://' + url.substring(7);
+  if (/^www\./i.test(url)) return 'https://' + url;
+  return '';
+}
+
+/**
+ * Match Universities.code, or the university name if someone pasted that instead.
+ */
+function resolveUniversityCode_(raw, uniByCode, universities) {
+  var s = trimStr_(raw);
+  if (!s) return '';
+  if (uniByCode[normKey_(s)]) return uniByCode[normKey_(s)];
+  if (uniByCode[normKey_(s.toUpperCase())]) return uniByCode[normKey_(s.toUpperCase())];
+  for (var i = 0; i < universities.length; i++) {
+    if (normKey_(universities[i].name) === normKey_(s)) return universities[i].code;
+  }
+  return '';
+}
+
+/** TB-DHINGRA-8 can share title/authors with TB-DHINGRA-7 when the 8th row is missing. */
+function siblingTextbookPrefix_(key) {
+  return normKey_(key).replace(/-\d+$/, '');
+}
+
+function ensureTextbookKey_(tbKey, tbByKey, textbooks) {
+  var k = normKey_(tbKey);
+  if (!k) return '';
+  if (tbByKey[k]) return tbByKey[k];
+  var prefix = siblingTextbookPrefix_(tbKey);
+  if (!prefix || prefix === k) return '';
+  for (var i = 0; i < textbooks.length; i++) {
+    var existing = textbooks[i];
+    if (siblingTextbookPrefix_(existing.sheet_key) !== prefix) continue;
+    var editionNum = String(tbKey).match(/-(\d+)$/);
+    textbooks.push({
+      sheet_key: tbKey,
+      title: existing.title,
+      authors: existing.authors,
+      edition: editionNum ? editionNum[1] + 'th' : existing.edition,
+    });
+    tbByKey[k] = tbKey;
+    return tbKey;
+  }
+  return '';
+}
+
+/**
+ * New headers: subject/topic/lesson/title/url.
+ * Leftover old rows: lesson_external_id/title/url sitting in those first columns.
+ */
+function normalizeLessonResourceRow_(row) {
+  var subjectName = trimStr_(row.subject_name);
+  var topicName = trimStr_(row.topic_name);
+  var lessonName = trimStr_(row.lesson_name);
+  var title = trimStr_(row.title);
+  var url = coerceHttpsUrl_(row.url);
+  if (looksLikeLessonExternalId_(subjectName) && looksLikeUrl_(lessonName) && !url) {
+    return {
+      lessonExt: subjectName,
+      title: topicName || title,
+      url: coerceHttpsUrl_(lessonName),
+      source_label: optionalTrimmed_(title),
+      display_order: row.url,
+      is_free: row.source_label,
+      shifted: true,
+    };
+  }
+  var lessonExt = '';
+  if (subjectName && topicName && lessonName) {
+    lessonExt = inventLessonExternalId_(subjectName, topicName, lessonName);
+  } else if (trimStr_(row.lesson_external_id)) {
+    lessonExt = trimStr_(row.lesson_external_id);
+  } else if (looksLikeLessonExternalId_(subjectName)) {
+    lessonExt = subjectName;
+  }
+  return {
+    lessonExt: lessonExt,
+    title: title,
+    url: url,
+    source_label: optionalTrimmed_(row.source_label),
+    display_order: row.display_order,
+    is_free: row.is_free,
+    shifted: false,
+  };
 }
 
 function requireHeaders_(tabName, headers, required) {
@@ -151,6 +272,45 @@ function parseOptionalBool_(raw, tab, row, field, errors, defaultValue) {
   return parseBool_(raw, tab, row, field, errors);
 }
 
+/** URL slug for universities — lowercased `code`. Not a sheet column. */
+function universitySlugFromCode_(code) {
+  return String(code || '').toLowerCase();
+}
+
+/** year1–year4. Old sheet values phase1 / phase3_part1 still map. */
+function canonicalPhaseCode_(raw) {
+  var s = trimStr_(raw).toLowerCase();
+  if (s === 'phase1') return 'year1';
+  if (s === 'phase2') return 'year2';
+  if (s === 'phase3_part1') return 'year3';
+  if (s === 'phase3_part2') return 'year4';
+  return s;
+}
+
+/**
+ * Universities tab: code, name, state required. slug is lowercased code.
+ */
+function universityFromSheetRow_(row, errors) {
+  var code = trimStr_(row.code).toUpperCase();
+  var name = trimStr_(row.name);
+  var state = trimStr_(row.state);
+  if (!code || !name || !state) {
+    errors.push(
+      TAB.UNIVERSITIES +
+        ' row ' +
+        row.__row +
+        ': code, name, and state are required'
+    );
+    return null;
+  }
+  return {
+    code: code,
+    name: name,
+    state: state,
+    slug: universitySlugFromCode_(code),
+  };
+}
+
 /** Stable lesson upsert key from names — keep in sync with generate_ug_seed_csvs.py. */
 function inventLessonExternalId_(subjectName, topicName, lessonName) {
   function token(s) {
@@ -160,6 +320,35 @@ function inventLessonExternalId_(subjectName, topicName, lessonName) {
       .toUpperCase();
   }
   return ('L-' + token(subjectName) + '-' + token(topicName) + '-' + token(lessonName)).substring(0, 80);
+}
+
+/**
+ * LessonResources: derive L-SUBJECT-TOPIC-LESSON from names.
+ * An old lesson_external_id column still works if names are blank.
+ */
+function lessonResourceExternalId_(row, errors) {
+  var subjectName = trimStr_(row.subject_name);
+  var topicName = trimStr_(row.topic_name);
+  var lessonName = trimStr_(row.lesson_name);
+  if (subjectName && topicName && lessonName) {
+    return inventLessonExternalId_(subjectName, topicName, lessonName);
+  }
+  var ext = trimStr_(row.lesson_external_id);
+  if (ext) return ext;
+  errors.push(
+    TAB.LESSON_RESOURCES +
+      ' row ' +
+      row.__row +
+      ': subject_name, topic_name, and lesson_name are required'
+  );
+  return '';
+}
+
+function parseOptionalInt_(raw, defaultValue) {
+  if (raw === '' || raw == null) return defaultValue;
+  var n = typeof raw === 'number' ? raw : Number(trimStr_(raw));
+  if (!isFinite(n) || Math.floor(n) !== n) return defaultValue;
+  return n;
 }
 
 function parseIntRequired_(raw, tab, row, field, errors) {

@@ -55,7 +55,6 @@ PyqSubjectFeed _feed() {
         years: const [2023],
       ),
     ],
-    usingFallback: false,
     paperNames: const ['Paper I', 'Paper II'],
     years: const [2024, 2023],
     chapters: const [

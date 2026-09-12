@@ -8,15 +8,10 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
   var hdr = requireHeaders_(TAB.QUESTIONS, questionsRaw.headers, [
     'external_id',
     'university_code',
-    'phase_code',
     'subject_name',
     'topic_name',
     'lesson_name',
-    'kind',
     'question_text',
-    'difficulty',
-    'required_plan',
-    'is_active',
   ]);
   if (hdr) errors.push(hdr);
 
@@ -33,7 +28,6 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
     'code',
     'name',
     'state',
-    'slug',
   ]);
   if (hdr) errors.push(hdr);
   hdr = requireHeaders_(TAB.COLLEGES, colRaw.headers, ['university_code', 'name']);
@@ -42,37 +36,23 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
   var universities = [];
   var uniByCode = {};
   uniRaw.rows.forEach(function (row) {
-    var code = trimStr_(row.code).toUpperCase();
-    var name = trimStr_(row.name);
-    var state = trimStr_(row.state);
-    var slug = trimStr_(row.slug).toLowerCase();
-    var isFallback = parseOptionalBool_(
-      row.is_fallback,
-      TAB.UNIVERSITIES,
-      row.__row,
-      'is_fallback',
-      errors,
-      code === 'KUHS'
-    );
-    if (!code || !name || !state || !slug) {
-      errors.push(TAB.UNIVERSITIES + ' row ' + row.__row + ': code, name, state, slug are required');
-      return;
-    }
-    uniByCode[normKey_(code)] = code;
-    universities.push({
-      code: code,
-      name: name,
-      state: state,
-      slug: slug,
-    });
+    var uni = universityFromSheetRow_(row, errors);
+    if (!uni) return;
+    uniByCode[normKey_(uni.code)] = uni.code;
+    universities.push(uni);
   });
 
   var colleges = [];
   colRaw.rows.forEach(function (row) {
-    var ucode = trimStr_(row.university_code).toUpperCase();
+    var rawCode = trimStr_(row.university_code);
     var name = trimStr_(row.name);
-    if (!uniByCode[normKey_(ucode)]) {
+    if (!rawCode && !name) return;
+    var ucode = resolveUniversityCode_(rawCode, uniByCode, universities);
+    if (!ucode) {
+      // Leftover cell after a re-import, or a name pasted in the code column.
+      if (!rawCode || !looksLikeUniversityCode_(rawCode)) return;
       errors.push(TAB.COLLEGES + ' row ' + row.__row + ': university_code not on Universities tab');
+      return;
     }
     if (!name) errors.push(TAB.COLLEGES + ' row ' + row.__row + ': name is required');
     colleges.push({ university_code: ucode, name: name });
@@ -126,30 +106,53 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
 
   questionsRaw.rows.forEach(function (row) {
     var ext = trimStr_(row.external_id);
-    var uni = trimStr_(row.university_code).toUpperCase();
-    var phase = trimStr_(row.phase_code).toLowerCase();
+    var rawUni = trimStr_(row.university_code);
+    var uni = resolveUniversityCode_(rawUni, uniByCode, universities);
+    var phase = canonicalPhaseCode_(row.phase_code);
     var subjectName = trimStr_(row.subject_name);
     var topicName = trimStr_(row.topic_name);
     var lessonName = trimStr_(row.lesson_name);
-    var kind = trimStr_(row.kind).toLowerCase() || 'mcq';
+    var kind = trimStr_(row.kind).toLowerCase();
+    if (!kind) {
+      var noMcqFields =
+        !trimStr_(row.option_a) &&
+        !trimStr_(row.option_b) &&
+        !trimStr_(row.option_c) &&
+        !trimStr_(row.option_d) &&
+        !trimStr_(row.correct_option);
+      kind = noMcqFields ? 'pyq_theory' : 'mcq';
+    }
     var stem = trimStr_(row.question_text);
+    if (!ext && !stem && !subjectName) return;
+    if (!looksLikeQuestionExternalId_(ext) && !stem) return;
     if (!ext) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': external_id is required');
     if (!subjectName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': subject_name is required');
     if (!topicName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': topic_name is required');
     if (!lessonName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': lesson_name is required');
     if (!stem) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': question_text is required');
-    if (uni && !uniByCode[normKey_(uni)]) {
-      errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': university_code not on Universities tab');
+    if (rawUni && !uni) {
+      if (!looksLikeUniversityCode_(rawUni)) {
+        uni = '';
+      } else {
+        errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': university_code not on Universities tab');
+      }
     }
     if (phase && !PHASE_CODES[phase]) {
-      errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': phase_code must be a known mbbs_phase_code');
+      errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': phase_code must be year1, year2, year3, or year4');
     }
     if (!QUESTION_KINDS[kind]) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': kind must be mcq or pyq_theory');
     }
     var difficulty = trimStr_(row.difficulty).toLowerCase();
     var plan = trimStr_(row.required_plan).toLowerCase();
-    var isActive = parseBool_(row.is_active, TAB.QUESTIONS, row.__row, 'is_active', errors);
+    var isActive = parseOptionalBool_(
+      row.is_active,
+      TAB.QUESTIONS,
+      row.__row,
+      'is_active',
+      errors,
+      true
+    );
     if (difficulty && !DIFFICULTIES[difficulty]) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': difficulty must be easy, medium, or hard');
     }
@@ -260,6 +263,8 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
     var tbKey = rowField_(row, ['textbook_key', 'sheet_key']);
     var page = trimStr_(row.page);
     if (tbKey && page) {
+      var resolvedTb = ensureTextbookKey_(tbKey, tbByKey, textbooks);
+      if (resolvedTb) tbKey = resolvedTb;
       if (!tbByKey[normKey_(tbKey)]) {
         if (!missingTb[normKey_(tbKey)]) {
           missingTb[normKey_(tbKey)] = { key: tbKey, rows: [] };
@@ -306,16 +311,42 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
   }
 
   var lessonResources = [];
+  var resourceOrder = {};
   lrRaw.rows.forEach(function (row) {
-    var title = trimStr_(row.title);
-    var url = requireHttpsUrl_(row.url, TAB.LESSON_RESOURCES, row.__row, 'url', errors);
+    var rec = normalizeLessonResourceRow_(row);
+    if (!rec.url && !rec.title && !rec.lessonExt) return;
+    // Leftover old-format / shifted columns after a re-import: skip, don't fail sync.
+    if (!rec.url) return;
+    var lessonExt = rec.lessonExt;
+    if (lessonExt && !lessonByKey[normKey_(lessonExt)]) {
+      // http:// or leftover shifted columns — skip instead of blocking sync.
+      if (rec.shifted || trimStr_(row.url).indexOf('https://') !== 0) return;
+      errors.push(
+        TAB.LESSON_RESOURCES +
+          ' row ' +
+          row.__row +
+          ': subject/topic/lesson do not match a Questions lesson'
+      );
+    }
+    var title = rec.title;
+    if (!title) {
+      errors.push(TAB.LESSON_RESOURCES + ' row ' + row.__row + ': title is required');
+    }
+    resourceOrder[lessonExt] = (resourceOrder[lessonExt] || 0) + 1;
     lessonResources.push({
-      lesson_external_id: trimStr_(row.lesson_external_id),
+      lesson_external_id: lessonExt,
       title: title,
-      url: url,
-      source_label: optionalTrimmed_(row.source_label),
-      display_order: parseIntRequired_(row.display_order, TAB.LESSON_RESOURCES, row.__row, 'display_order', errors),
-      is_free: parseBool_(row.is_free, TAB.LESSON_RESOURCES, row.__row, 'is_free', errors),
+      url: rec.url,
+      source_label: rec.source_label,
+      display_order: parseOptionalInt_(rec.display_order, resourceOrder[lessonExt]),
+      is_free: parseOptionalBool_(
+        rec.is_free,
+        TAB.LESSON_RESOURCES,
+        row.__row,
+        'is_free',
+        errors,
+        true
+      ),
     });
   });
 

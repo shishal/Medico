@@ -20,32 +20,32 @@ ROOT = Path(__file__).resolve().parents[1]
 TABS = ROOT / "content" / "google_sheet" / "tabs"
 
 PHASES = [
-    ("phase1", "1st year", 1),
-    ("phase2", "2nd year", 2),
-    ("phase3_part1", "3rd year", 3),
-    ("phase3_part2", "Final year", 4),
+    ("year1", "1st year", 1),
+    ("year2", "2nd year", 2),
+    ("year3", "3rd year", 3),
+    ("year4", "Final year", 4),
 ]
 
 SUBJECTS = [
-    ("Anatomy", 1, "phase1"),
-    ("Physiology", 2, "phase1"),
-    ("Biochemistry", 3, "phase1"),
-    ("Pathology", 4, "phase2"),
-    ("Microbiology", 5, "phase2"),
-    ("Pharmacology", 6, "phase2"),
-    ("Forensic Medicine", 7, "phase2"),
-    ("Community Medicine", 8, "phase3_part1"),
-    ("Medicine", 9, "phase3_part2"),
-    ("Surgery", 10, "phase3_part2"),
-    ("Obstetrics & Gynaecology", 11, "phase3_part2"),
-    ("Pediatrics", 12, "phase3_part2"),
-    ("Ophthalmology", 13, "phase3_part1"),
-    ("ENT", 14, "phase3_part1"),
-    ("Orthopedics", 15, "phase3_part2"),
-    ("Dermatology", 16, "phase3_part2"),
-    ("Psychiatry", 17, "phase3_part2"),
-    ("Anesthesia", 18, "phase3_part2"),
-    ("Radiology", 19, "phase3_part2"),
+    ("Anatomy", 1, "year1"),
+    ("Physiology", 2, "year1"),
+    ("Biochemistry", 3, "year1"),
+    ("Pathology", 4, "year2"),
+    ("Microbiology", 5, "year2"),
+    ("Pharmacology", 6, "year2"),
+    ("Forensic Medicine", 7, "year2"),
+    ("Community Medicine", 8, "year3"),
+    ("Medicine", 9, "year4"),
+    ("Surgery", 10, "year4"),
+    ("Obstetrics & Gynaecology", 11, "year4"),
+    ("Pediatrics", 12, "year4"),
+    ("Ophthalmology", 13, "year3"),
+    ("ENT", 14, "year3"),
+    ("Orthopedics", 15, "year4"),
+    ("Dermatology", 16, "year4"),
+    ("Psychiatry", 17, "year4"),
+    ("Anesthesia", 18, "year4"),
+    ("Radiology", 19, "year4"),
 ]
 
 PREFIX = {
@@ -174,14 +174,14 @@ TOPICS = [
 TOPIC_SUBJECT = {name: subj for subj, name, _ in TOPICS}
 
 UNIVERSITIES = [
-    ("KUHS", "Kerala University of Health Sciences", "Kerala", "kuhs", "TRUE"),
-    ("RGUHS", "Rajiv Gandhi University of Health Sciences", "Karnataka", "rguhs", "FALSE"),
-    ("NTRUHS", "Dr. NTR University of Health Sciences", "Andhra Pradesh", "ntruhs", "FALSE"),
-    ("KNRUHS", "Kaloji Narayana Rao University of Health Sciences", "Telangana", "knruhs", "FALSE"),
-    ("TNMGRMU", "Tamil Nadu Dr. M.G.R. Medical University", "Tamil Nadu", "tnmgrmu", "FALSE"),
-    ("WBUHS", "West Bengal University of Health Sciences", "West Bengal", "wbuhs", "FALSE"),
-    ("RUHS", "Rajasthan University of Health Sciences", "Rajasthan", "ruhs", "FALSE"),
-    ("MUHS", "Maharashtra University of Health Sciences", "Maharashtra", "muhs", "FALSE"),
+    ("KUHS", "Kerala University of Health Sciences", "Kerala"),
+    ("RGUHS", "Rajiv Gandhi University of Health Sciences", "Karnataka"),
+    ("NTRUHS", "Dr. NTR University of Health Sciences", "Andhra Pradesh"),
+    ("KNRUHS", "Kaloji Narayana Rao University of Health Sciences", "Telangana"),
+    ("TNMGRMU", "Tamil Nadu Dr. M.G.R. Medical University", "Tamil Nadu"),
+    ("WBUHS", "West Bengal University of Health Sciences", "West Bengal"),
+    ("RUHS", "Rajasthan University of Health Sciences", "Rajasthan"),
+    ("MUHS", "Maharashtra University of Health Sciences", "Maharashtra"),
 ]
 
 # Starter colleges so onboarding is never empty for a listed university.
@@ -273,6 +273,7 @@ TEXTBOOKS = [
     ("TB-GHAI-9", "Ghai Essential Pediatrics", "Vinod K Paul, Arvind Bagga", "9th"),
     ("TB-KHURANA-7", "Comprehensive Ophthalmology", "AK Khurana", "7th"),
     ("TB-DHINGRA-7", "Diseases of Ear, Nose and Throat", "PL Dhingra", "7th"),
+    ("TB-DHINGRA-8", "Diseases of Ear, Nose and Throat", "PL Dhingra", "8th"),
     ("TB-MAHESHWARI-6", "Essential Orthopaedics", "Maheshwari and Mhaskar", "6th"),
     ("TB-NEENAKHANNA-5", "Illustrated Synopsis of Dermatology and STDs", "Neena Khanna", "5th"),
     ("TB-AHUJA-8", "A Short Textbook of Psychiatry", "Niraj Ahuja", "8th"),
@@ -1561,25 +1562,34 @@ def is_generated_id(external_id: str) -> bool:
     return False
 
 
+def sheet_header_key(name: str) -> str:
+    """kind(Default-MCQ) → kind. Keep in sync with Apps Script headerKey_."""
+    s = (name or "").strip().lstrip("\ufeff")
+    s = re.sub(r"\s*\([^)]*default[^)]*\)", "", s, flags=re.I)
+    return s.strip()
+
+
 def read_existing_questions() -> list[dict]:
     path = TABS / "Questions.csv"
     # utf-8-sig strips a BOM that Google Sheets sometimes writes on export.
     with path.open(newline="", encoding="utf-8-sig") as fh:
-        rows = list(csv.DictReader(fh))
+        reader = csv.DictReader(fh)
+        rows = list(reader)
     cleaned = []
     seen = set()
     for row in rows:
-        ext = (row.get("external_id") or "").strip()
+        keyed = {sheet_header_key(k): v for k, v in row.items()}
+        ext = (keyed.get("external_id") or "").strip()
         if not ext or ext in seen or is_generated_id(ext):
             continue
         seen.add(ext)
-        kind = (row.get("kind") or "").strip().lower()
+        kind = (keyed.get("kind") or "").strip().lower()
         # Never round-trip theory rows (multiline sample answers shift columns).
         if kind == "pyq_theory" or ext.startswith("Q-") and "-PYQ-" in ext:
             continue
         if kind not in ("", "mcq"):
             continue
-        cleaned.append(row)
+        cleaned.append(keyed)
     return cleaned
 
 
@@ -1641,7 +1651,9 @@ def build() -> None:
 
             lesson_resources.append(
                 {
-                    "lesson_external_id": invent_lesson_external_id(subject, topic, lesson_name),
+                    "subject_name": subject,
+                    "topic_name": topic,
+                    "lesson_name": lesson_name,
                     "title": f"{lesson_name} — KUHS topic page",
                     "url": medico_url(subject),
                     "source_label": "Medico topic page",
@@ -1651,7 +1663,9 @@ def build() -> None:
             )
             lesson_resources.append(
                 {
-                    "lesson_external_id": invent_lesson_external_id(subject, topic, lesson_name),
+                    "subject_name": subject,
+                    "topic_name": topic,
+                    "lesson_name": lesson_name,
                     "title": f"Read more: {lesson_name}",
                     "url": wiki_url(wiki.split("#")[0]),
                     "source_label": "Wikipedia (open reference)",
@@ -1906,16 +1920,10 @@ def build() -> None:
     # Static tabs
     write_csv(
         "Universities.csv",
-        ["code", "name", "state", "slug", "is_fallback"],
+        ["code", "name", "state"],
         [
-            {
-                "code": code,
-                "name": name,
-                "state": state,
-                "slug": slug,
-                "is_fallback": fallback,
-            }
-            for code, name, state, slug, fallback in UNIVERSITIES
+            {"code": code, "name": name, "state": state}
+            for code, name, state in UNIVERSITIES
         ],
     )
     write_csv(
@@ -1947,8 +1955,29 @@ def build() -> None:
     )
     write_csv(
         "LessonResources.csv",
-        ["lesson_external_id", "title", "url", "source_label", "display_order", "is_free"],
-        lesson_resources,
+        [
+            "subject_name",
+            "topic_name",
+            "lesson_name",
+            "title",
+            "url",
+            "source_label",
+            "display_order(Default-1)",
+            "is_free(Default-TRUE)",
+        ],
+        [
+            {
+                "subject_name": r["subject_name"],
+                "topic_name": r["topic_name"],
+                "lesson_name": r["lesson_name"],
+                "title": r["title"],
+                "url": r["url"],
+                "source_label": r["source_label"],
+                "display_order(Default-1)": r["display_order"],
+                "is_free(Default-TRUE)": r["is_free"],
+            }
+            for r in lesson_resources
+        ],
     )
 
     subject_phase = {n: p for n, _o, p in SUBJECTS}
@@ -1968,7 +1997,7 @@ def build() -> None:
         "subject_name",
         "topic_name",
         "lesson_name",
-        "kind",
+        "kind(Default-MCQ)",
         "marks",
         "question_text",
         "option_a",
@@ -1978,12 +2007,12 @@ def build() -> None:
         "correct_option",
         "explanation_text",
         "sample_answer_text",
-        "difficulty",
-        "required_plan",
-        "is_active",
+        "difficulty(Default-medium)",
+        "required_plan(Default-free)",
+        "is_active(Default-TRUE)",
         "exam_year",
         "paper_name",
-        "exam_type",
+        "exam_type(Default-university)",
         "textbook_key",
         "page",
         "section_heading",
@@ -2010,7 +2039,7 @@ def build() -> None:
                         "subject_name": subject,
                         "topic_name": topic,
                         "lesson_name": lesson["name"] if lesson else "",
-                        "kind": q.get("kind") or "mcq",
+                        "kind(Default-MCQ)": q.get("kind") or "mcq",
                         "marks": q.get("marks") or "",
                         "question_text": q.get("question_text") or "",
                         "option_a": q.get("option_a") or "",
@@ -2020,12 +2049,12 @@ def build() -> None:
                         "correct_option": q.get("correct_option") or "",
                         "explanation_text": q.get("explanation_text") or "",
                         "sample_answer_text": q.get("sample_answer_text") or "",
-                        "difficulty": q.get("difficulty") or "medium",
-                        "required_plan": q.get("required_plan") or "free",
-                        "is_active": q.get("is_active") or "TRUE",
+                        "difficulty(Default-medium)": q.get("difficulty") or "medium",
+                        "required_plan(Default-free)": q.get("required_plan") or "free",
+                        "is_active(Default-TRUE)": q.get("is_active") or "TRUE",
                         "exam_year": (paper or {}).get("exam_year") or "",
                         "paper_name": (paper or {}).get("paper_name") or "",
-                        "exam_type": (paper or {}).get("exam_type") or "",
+                        "exam_type(Default-university)": (paper or {}).get("exam_type") or "",
                         "textbook_key": (ref or {}).get("textbook_key") or "",
                         "page": (ref or {}).get("page") or "",
                         "section_heading": (ref or {}).get("section_heading") or "",

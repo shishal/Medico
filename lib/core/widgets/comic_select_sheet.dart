@@ -186,7 +186,16 @@ class ComicSelectField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = value == null ? placeholder : labelOf(value as T);
+    final String text;
+    if (value != null) {
+      text = labelOf(value as T);
+    } else if (items.isEmpty) {
+      // Enabled + empty usually means the list is still loading. Disabled +
+      // empty is "pick the previous field first" (state before university).
+      text = enabled ? 'Loading…' : placeholder;
+    } else {
+      text = placeholder;
+    }
     return ComicCard(
       semanticLabel: label,
       onTap: !enabled || items.isEmpty
@@ -210,7 +219,7 @@ class ComicSelectField<T> extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  items.isEmpty && value == null ? 'Loading…' : text,
+                  text,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

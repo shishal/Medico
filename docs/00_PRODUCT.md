@@ -11,8 +11,9 @@ hidden). Practice sessions still create `tests` / `attempts` rows internally.
 
 ## Universities
 
-Students pick their **affiliating university** at onboarding and can change it
-on Profile (university, college, MBBS year, batch).
+Students pick their **state**, then **affiliating university** at onboarding
+(university list is filtered to that state) and can change the same fields
+on Profile (state, university, college, MBBS year, batch).
 
 **v1 content bank** is **Kerala University of Health Sciences (KUHS)** —
 code `KUHS`. Other universities are listed so the picker is real. If that

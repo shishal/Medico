@@ -51,7 +51,7 @@ Mini / Subject / Mock / Grand list IA is retired.
 ## UG-D — App information architecture
 
 **UG-D.1 — Onboarding**
-- Description: After signup, stepped form: theme, name, MBBS year, **university picker**, college search for that university, batch year. Writes `profiles` academic columns + `onboarding_completed_at`. Profile can change the same fields later.
+- Description: After signup, stepped form: theme, name, MBBS year, **state picker**, **university picker** (only universities in that state), college search for that university, batch year. Writes `profiles` academic columns + `onboarding_completed_at`. Profile can change the same fields later. State is not stored on the profile — it is read from `universities.state`.
 - Validation: a profile with null `onboarding_completed_at` cannot reach Home; completing the form lands on Home with that year’s subjects. Picking a university with no papers still reaches Home (empty PYQs until papers are added).
 
 **UG-D.2 — Catalog browse**
@@ -114,8 +114,8 @@ Work top to bottom. One task at a time.
 - Validation: upsert two rows with the same `external_id` and different papers — one question, two appearances.
 
 **10.4 — Onboarding + Profile university picker**
-- Description: Stepped onboarding; Profile shows and edits name, university, college, year, batch.
-- Validation: change university on Profile; college that does not belong to the new university is cleared; Home follows the new id.
+- Description: Stepped onboarding (state before university); Profile shows and edits name, state, university, college, year, batch. Changing state clears university/college; changing university clears college.
+- Validation: pick Kerala — only KUHS (and other Kerala rows) appear; change university on Profile; college that does not belong to the new university is cleared; Home follows the new id.
 
 **10.5 — Home dashboard**
 - Description: Docci + name + year + university; honest coverage banner (PYQ and paper counts for the selected university).

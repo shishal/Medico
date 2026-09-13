@@ -34,6 +34,30 @@ class University {
   int get hashCode => id.hashCode;
 }
 
+/// Distinct states that have at least one university in the catalog, A–Z.
+///
+/// State is a column on [University], not a separate table — the picker
+/// is just this list, then [universitiesInState] for the next field.
+List<String> statesWithUniversities(List<University> universities) {
+  final states = {
+    for (final university in universities)
+      if (university.state.isNotEmpty) university.state,
+  }.toList()..sort();
+  return states;
+}
+
+/// Universities in [state], or empty until a state is chosen.
+List<University> universitiesInState(
+  List<University> universities,
+  String? state,
+) {
+  if (state == null || state.isEmpty) return const [];
+  return [
+    for (final university in universities)
+      if (university.state == state) university,
+  ];
+}
+
 class MbbsPhase {
   const MbbsPhase({
     required this.id,

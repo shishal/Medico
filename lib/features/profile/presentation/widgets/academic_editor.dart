@@ -12,7 +12,7 @@ import '../../data/profile_repository.dart';
 import '../../domain/user_profile.dart';
 import '../providers/user_profile_provider.dart';
 
-/// Lets a student change name, university, year, college, and batch.
+/// Lets a student change name, state, university, year, college, and batch.
 class AcademicEditor extends ConsumerStatefulWidget {
   const AcademicEditor({super.key, required this.profile});
 
@@ -29,6 +29,7 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
   late String? _phaseId = widget.profile.mbbsPhaseId;
   late String? _universityId = widget.profile.universityId;
   late String? _collegeId = widget.profile.collegeId;
+  String? _state;
   late int _batchYear = widget.profile.batchYear ?? DateTime.now().year;
   bool _saving = false;
 
@@ -43,7 +44,9 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
     final phaseId = _phaseId;
     if (universityId == null || phaseId == null) return;
     setState(() => _saving = true);
-    final result = await ref.read(profileRepositoryProvider).updateAcademic(
+    final result = await ref
+        .read(profileRepositoryProvider)
+        .updateAcademic(
           fullName: _nameController.text.trim(),
           universityId: universityId,
           collegeId: _collegeId,
@@ -82,7 +85,7 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
         ),
         const SizedBox(height: Spacing.xs),
         Text(
-          'University, college, year, and batch. Home follows these.',
+          'State, university, college, year, and batch. Home follows these.',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: Spacing.md),
@@ -96,16 +99,44 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
         const SizedBox(height: Spacing.md),
         universities.when(
           data: (items) {
-            final selected = items.where((u) => u.id == _universityId);
-            return ComicSelectField<University>(
-              label: 'University',
-              items: items,
-              value: selected.isEmpty ? null : selected.first,
-              labelOf: (u) => '${u.code} · ${u.name}',
-              onSelected: (u) => setState(() {
-                _universityId = u.id;
-                _collegeId = null;
-              }),
+            final selectedUni = items.where((u) => u.id == _universityId);
+            final state =
+                _state ??
+                (selectedUni.isEmpty ? null : selectedUni.first.state);
+            final inState = universitiesInState(items, state);
+            final selected = inState.where((u) => u.id == _universityId);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ComicSelectField<String>(
+                  label: 'State',
+                  items: statesWithUniversities(items),
+                  value: state,
+                  labelOf: (s) => s,
+                  onSelected: (s) => setState(() {
+                    if (state != s) {
+                      _universityId = null;
+                      _collegeId = null;
+                    }
+                    _state = s;
+                  }),
+                ),
+                const SizedBox(height: Spacing.md),
+                ComicSelectField<University>(
+                  label: 'University',
+                  items: inState,
+                  value: selected.isEmpty ? null : selected.first,
+                  labelOf: (u) => '${u.code} · ${u.name}',
+                  placeholder: state == null
+                      ? 'Pick a state first'
+                      : 'Tap to choose',
+                  enabled: state != null,
+                  onSelected: (u) => setState(() {
+                    _universityId = u.id;
+                    _collegeId = null;
+                  }),
+                ),
+              ],
             );
           },
           loading: () => const LinearProgressIndicator(),

@@ -27,6 +27,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameController = TextEditingController();
   var _step = 0;
+  String? _state;
   String? _universityId;
   String? _collegeId;
   String? _phaseId;
@@ -34,7 +35,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   bool _saving = false;
   String? _error;
 
-  static const _stepCount = 4;
+  static const _stepCount = 5;
 
   @override
   void dispose() {
@@ -57,7 +58,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _error = null;
     });
 
-    final result = await ref.read(profileRepositoryProvider).saveOnboarding(
+    final result = await ref
+        .read(profileRepositoryProvider)
+        .saveOnboarding(
           fullName: name,
           universityId: _universityId!,
           collegeId: _collegeId!,
@@ -85,6 +88,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
     if (_step == 2 && _phaseId == null) {
       setState(() => _error = 'Pick your MBBS year.');
+      return;
+    }
+    if (_step == 3 && _state == null) {
+      setState(() => _error = 'Pick your state.');
       return;
     }
     setState(() {
@@ -161,14 +168,47 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ],
             if (_step == 3) ...[
+              Text(
+                'Which state is your college in?',
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: Spacing.sm),
               universities.when(
                 data: (items) {
-                  final selected = items.where((u) => u.id == _universityId);
+                  final states = statesWithUniversities(items);
+                  return ComicSelectField<String>(
+                    label: 'State',
+                    items: states,
+                    value: _state,
+                    labelOf: (s) => s,
+                    onSelected: (s) => setState(() {
+                      if (_state != s) {
+                        _universityId = null;
+                        _collegeId = null;
+                      }
+                      _state = s;
+                    }),
+                  );
+                },
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text('$e'),
+              ),
+            ],
+            if (_step == 4) ...[
+              universities.when(
+                data: (items) {
+                  final inState = universitiesInState(items, _state);
+                  final selected = inState.where((u) => u.id == _universityId);
                   return ComicSelectField<University>(
                     label: 'University',
-                    items: items,
+                    items: inState,
                     value: selected.isEmpty ? null : selected.first,
                     labelOf: (u) => '${u.code} · ${u.name}',
+                    placeholder: _state == null
+                        ? 'Pick a state first'
+                        : 'Tap to choose',
+                    enabled: _state != null,
                     onSelected: (u) => setState(() {
                       _universityId = u.id;
                       _collegeId = null;

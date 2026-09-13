@@ -638,9 +638,10 @@ NEET-PG tables above stay. This section is the **current product schema**. Apply
 sections 1–8 on a live project.
 
 v1 **content** university: **KUHS**. The app lists other affiliating
-universities for onboarding/Profile. PYQ lists filter by
-`exam_papers.university_id`. A university with zero papers shows empty PYQs
-— it does not substitute another bank. See `docs/00_PRODUCT.md`.
+universities for onboarding/Profile. Students pick **state** first
+(`universities.state`), then only universities in that state. PYQ lists
+filter by `exam_papers.university_id`. A university with zero papers shows
+empty PYQs — it does not substitute another bank. See `docs/00_PRODUCT.md`.
 
 ### 9.1 Enums and catalog
 

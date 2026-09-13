@@ -1,6 +1,8 @@
 # Phase 2.2 — Apps Script sync
 
-Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to App** menu validates every tab, then upserts into Supabase via the REST API using the **service_role** key from Script Properties (never hardcoded).
+Bound this project to your Google Sheet (from Phase 2.1). A **Medico** menu
+offers **Sync to App** (validate + upsert), **Reset Database** (delete
+sheet-synced catalog), and **Check configuration**.
 
 ## Prerequisites
 
@@ -49,6 +51,14 @@ Bound this project to your Google Sheet (from Phase 2.1). A **Medico → Sync to
    row and upserts normalized tables. `Tests` / `TestQuestions` are skipped
    when those tabs are empty or missing (catalog tests are retired; Practice
    still creates `tests` rows from the app).
+
+### Reset Database
+
+**Medico → Reset Database** asks for confirmation, then deletes sheet-synced
+catalog rows (questions, papers, subjects, topics, lessons, universities,
+colleges, textbooks, and dependent bookmarks/answers). It does **not** delete
+auth users or `mbbs_phases`. Profiles keep the account but university/college
+are cleared. Run **Sync to App** afterwards to reload from this sheet.
 
 ### Validation (includes Phase 2.2 required checks)
 

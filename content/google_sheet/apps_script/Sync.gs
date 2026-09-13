@@ -22,6 +22,74 @@ function checkConfiguration() {
   }
 }
 
+/**
+ * Wipe sheet-synced catalog so the next Sync starts clean.
+ * Keeps auth users, profiles (clears university/college), and mbbs_phases.
+ */
+function resetDatabase() {
+  var ui = SpreadsheetApp.getUi();
+  var confirm = ui.alert(
+    'Reset Database',
+    'This deletes all sheet-synced catalog in Supabase:\n' +
+      'questions, papers, subjects, topics, lessons, universities, colleges, textbooks.\n\n' +
+      'Student accounts stay. University/college on each profile is cleared.\n' +
+      'Bookmarks and practice answers that point at those questions are removed too ' +
+      '(Postgres cannot keep them without the questions).\n\n' +
+      'Then run Sync to App to load this sheet again.\n\nContinue?',
+    ui.ButtonSet.YES_NO
+  );
+  if (confirm !== ui.Button.YES) return;
+
+  try {
+    getSupabaseConfig_();
+    performCatalogReset_();
+    ui.alert(
+      'Database reset',
+      'Sheet catalog is gone. Run Medico → Sync to App to load this sheet.',
+      ui.ButtonSet.OK
+    );
+  } catch (e) {
+    ui.alert(
+      'Reset failed',
+      String(e.message || e),
+      ui.ButtonSet.OK
+    );
+  }
+}
+
+function performCatalogReset_() {
+  // Drop FKs that would block deleting universities / subjects.
+  supabasePatchAll_('profiles', 'id', {
+    university_id: null,
+    college_id: null,
+  });
+  supabasePatchAll_('tests', 'subject_id', { subject_id: null });
+
+  // Restrict FKs: answers and test links must go before questions.
+  supabaseDeleteAll_('attempt_answers', 'question_id');
+  supabaseDeleteAll_('test_questions', 'question_id');
+  supabaseDeleteAll_('question_textbook_refs', 'question_id');
+  supabaseDeleteAll_('question_appearances', 'question_id');
+  supabaseDeleteAll_('question_resources', 'id');
+  supabaseDeleteAll_('question_sample_answers', 'question_id');
+  supabaseDeleteAll_('question_tags', 'question_id');
+  supabaseDeleteAll_('question_progress', 'question_id');
+  supabaseDeleteAll_('bookmarks', 'question_id');
+  supabaseDeleteAll_('questions', 'id');
+
+  supabaseDeleteAll_('lesson_resources', 'id');
+  supabaseDeleteAll_('lesson_progress', 'lesson_id');
+  supabaseDeleteAll_('lesson_bookmarks', 'lesson_id');
+  supabaseDeleteAll_('lessons', 'id');
+
+  supabaseDeleteAll_('exam_papers', 'id');
+  supabaseDeleteAll_('textbooks', 'id');
+  supabaseDeleteAll_('topics', 'id');
+  supabaseDeleteAll_('subjects', 'id');
+  supabaseDeleteAll_('colleges', 'id');
+  supabaseDeleteAll_('universities', 'id');
+}
+
 function syncToApp() {
   var ui = SpreadsheetApp.getUi();
 

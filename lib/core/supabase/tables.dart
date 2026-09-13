@@ -30,10 +30,6 @@ abstract final class Tables {
   static const questionProgress = 'question_progress';
   static const lessonBookmarks = 'lesson_bookmarks';
   static const studyEvents = 'study_events';
-
-  /// Safe metadata only (title/type/counts) — all authenticated users.
-  /// See migration `phase4_2_catalog_test_teasers`. Not the full `tests` row.
-  static const catalogTestTeasers = 'catalog_test_teasers';
 }
 
 abstract final class ProfileColumns {

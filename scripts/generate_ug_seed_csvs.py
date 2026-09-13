@@ -1602,6 +1602,79 @@ def write_csv(name: str, fieldnames: list[str], rows: list[dict]) -> None:
             writer.writerow(row)
 
 
+def question_combo_key(row: dict) -> tuple[str, ...]:
+    """One sheet row per subject/topic/kind/difficulty/plan/year/paper/exam type."""
+    kind = (row.get("kind(Default-MCQ)") or row.get("kind") or "").strip()
+    difficulty = (
+        row.get("difficulty(Default-medium)") or row.get("difficulty") or ""
+    ).strip()
+    plan = (
+        row.get("required_plan(Default-free)") or row.get("required_plan") or ""
+    ).strip()
+    exam_type = (
+        row.get("exam_type(Default-university)") or row.get("exam_type") or ""
+    ).strip()
+    return (
+        (row.get("subject_name") or "").strip(),
+        (row.get("topic_name") or "").strip(),
+        kind,
+        difficulty,
+        plan,
+        str(row.get("exam_year") or "").strip(),
+        (row.get("paper_name") or "").strip(),
+        exam_type,
+    )
+
+
+def keep_first_combo(rows: list[dict]) -> list[dict]:
+    seen: set[tuple[str, ...]] = set()
+    kept: list[dict] = []
+    for row in rows:
+        key = question_combo_key(row)
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(row)
+    return kept
+
+
+def keep_year1(rows: list[dict]) -> list[dict]:
+    """Seed content is year 1 only until later years are filled in."""
+    return [
+        row
+        for row in rows
+        if (row.get("phase_code") or "").strip() == "year1"
+    ]
+
+
+def keep_medium_difficulty(rows: list[dict]) -> list[dict]:
+    """Seed content is medium difficulty only until other bands are filled in."""
+    return [
+        row
+        for row in rows
+        if (
+            row.get("difficulty(Default-medium)") or row.get("difficulty") or ""
+        ).strip().lower()
+        == "medium"
+    ]
+
+
+def keep_first_topic(rows: list[dict]) -> list[dict]:
+    """One seed question per subject/topic until more coverage is needed."""
+    seen: set[tuple[str, str]] = set()
+    kept: list[dict] = []
+    for row in rows:
+        key = (
+            (row.get("subject_name") or "").strip(),
+            (row.get("topic_name") or "").strip(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(row)
+    return kept
+
+
 def appearance_years(topic_index: int, lesson_index: int, marks: int) -> list[int]:
     if marks >= 10:
         return [2025, 2023, 2021]
@@ -1945,40 +2018,6 @@ def build() -> None:
         ["university_code", "name"],
         college_rows,
     )
-    write_csv(
-        "Textbooks.csv",
-        ["sheet_key", "title", "authors", "edition"],
-        [
-            {"sheet_key": k, "title": t, "authors": a, "edition": e}
-            for k, t, a, e in TEXTBOOKS
-        ],
-    )
-    write_csv(
-        "LessonResources.csv",
-        [
-            "subject_name",
-            "topic_name",
-            "lesson_name",
-            "title",
-            "url",
-            "source_label",
-            "display_order(Default-1)",
-            "is_free(Default-TRUE)",
-        ],
-        [
-            {
-                "subject_name": r["subject_name"],
-                "topic_name": r["topic_name"],
-                "lesson_name": r["lesson_name"],
-                "title": r["title"],
-                "url": r["url"],
-                "source_label": r["source_label"],
-                "display_order(Default-1)": r["display_order"],
-                "is_free(Default-TRUE)": r["is_free"],
-            }
-            for r in lesson_resources
-        ],
-    )
 
     subject_phase = {n: p for n, _o, p in SUBJECTS}
     lesson_by_id = {L["external_id"]: L for L in lessons}
@@ -2061,7 +2100,65 @@ def build() -> None:
                     }
                 )
         seen_q.add(ext)
+    wide_rows = keep_first_topic(
+        keep_medium_difficulty(keep_year1(keep_first_combo(wide_rows)))
+    )
     write_csv("Questions.csv", wide_fields, wide_rows)
+
+    kept_lessons = {
+        (
+            (r.get("subject_name") or "").strip(),
+            (r.get("topic_name") or "").strip(),
+            (r.get("lesson_name") or "").strip(),
+        )
+        for r in wide_rows
+    }
+    write_csv(
+        "LessonResources.csv",
+        [
+            "subject_name",
+            "topic_name",
+            "lesson_name",
+            "title",
+            "url",
+            "source_label",
+            "display_order(Default-1)",
+            "is_free(Default-TRUE)",
+        ],
+        [
+            {
+                "subject_name": r["subject_name"],
+                "topic_name": r["topic_name"],
+                "lesson_name": r["lesson_name"],
+                "title": r["title"],
+                "url": r["url"],
+                "source_label": r["source_label"],
+                "display_order(Default-1)": r["display_order"],
+                "is_free(Default-TRUE)": r["is_free"],
+            }
+            for r in lesson_resources
+            if (
+                (r["subject_name"] or "").strip(),
+                (r["topic_name"] or "").strip(),
+                (r["lesson_name"] or "").strip(),
+            )
+            in kept_lessons
+        ],
+    )
+    cited_tb = {
+        (r.get("textbook_key") or "").strip()
+        for r in wide_rows
+        if (r.get("textbook_key") or "").strip()
+    }
+    write_csv(
+        "Textbooks.csv",
+        ["sheet_key", "title", "authors", "edition"],
+        [
+            {"sheet_key": k, "title": t, "authors": a, "edition": e}
+            for k, t, a, e in TEXTBOOKS
+            if k in cited_tb
+        ],
+    )
 
     # Coverage report
     by_kind = defaultdict(int)

@@ -193,16 +193,9 @@ class _SourceFilterSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Question source', style: textTheme.titleMedium),
-        const SizedBox(height: Spacing.xs),
-        Text(
-          'The filter you will use most — start here.',
-          style: textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
         const SizedBox(height: Spacing.sm),
         for (var i = 0; i < filters.length; i += 2) ...[
-          if (i > 0) const SizedBox(height: Spacing.sm),
+          if (i > 0) const SizedBox(height: Spacing.xs),
           Row(
             children: [
               Expanded(
@@ -212,7 +205,7 @@ class _SourceFilterSection extends StatelessWidget {
                   onTap: () => onSelected(filters[i]),
                 ),
               ),
-              const SizedBox(width: Spacing.sm),
+              const SizedBox(width: Spacing.xs),
               Expanded(
                 child: _SourceCard(
                   filter: filters[i + 1],
@@ -223,6 +216,13 @@ class _SourceFilterSection extends StatelessWidget {
             ],
           ),
         ],
+        const SizedBox(height: Spacing.sm),
+        Text(
+          selected.subtitle,
+          style: textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
@@ -252,31 +252,29 @@ class _SourceCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return ComicCard(
-      color: selected ? colorScheme.primaryContainer : null,
+      highlighted: selected,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.sm,
+        vertical: Spacing.sm,
+      ),
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
           Icon(
             _icon,
-            color: selected
-                ? colorScheme.onPrimaryContainer
-                : colorScheme.primary,
+            size: 18,
+            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: Spacing.sm),
-          Text(
-            filter.label,
-            style: textTheme.titleSmall?.copyWith(
-              color: selected ? colorScheme.onPrimaryContainer : null,
-            ),
-          ),
-          const SizedBox(height: Spacing.xs),
-          Text(
-            filter.subtitle,
-            style: textTheme.bodySmall?.copyWith(
-              color: selected
-                  ? colorScheme.onPrimaryContainer
-                  : colorScheme.onSurfaceVariant,
+          const SizedBox(width: Spacing.xs),
+          Expanded(
+            child: Text(
+              filter.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.labelLarge?.copyWith(
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                color: selected ? colorScheme.primary : null,
+              ),
             ),
           ),
         ],

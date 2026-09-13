@@ -55,6 +55,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Medico')
     .addItem('Sync to App', 'syncToApp')
+    .addItem('Reset Database', 'resetDatabase')
     .addItem('Check configuration', 'checkConfiguration')
     .addToUi();
 }

@@ -121,6 +121,70 @@ function supabaseDeleteEq_(table, column, value) {
   }
 }
 
+/** True when PostgREST has no such table (older project / retired table). */
+function isMissingTable_(code, body) {
+  return (
+    code === 404 ||
+    (code === 400 && /PGRST205|Could not find the table|relation .* does not exist/i.test(body))
+  );
+}
+
+/**
+ * Delete every row in a table. filterColumn must be non-null on all rows
+ * (`id`, or a NOT NULL FK like question_id).
+ */
+function supabaseDeleteAll_(table, filterColumn) {
+  var col = filterColumn || 'id';
+  var cfg = getSupabaseConfig_();
+  var endpoint =
+    cfg.url +
+    '/rest/v1/' +
+    encodeURIComponent(table) +
+    '?' +
+    encodeURIComponent(col) +
+    '=not.is.null';
+
+  var response = UrlFetchApp.fetch(endpoint, {
+    method: 'delete',
+    headers: supabaseHeaders_(cfg.key, 'return=minimal'),
+    muteHttpExceptions: true,
+  });
+
+  var code = response.getResponseCode();
+  var body = response.getContentText();
+  if (isMissingTable_(code, body)) return;
+  if (code < 200 || code >= 300) {
+    throw new Error('Supabase delete ' + table + ' failed (' + code + '): ' + body);
+  }
+}
+
+/** PATCH every matching row. Used to clear FKs before deleting catalog tables. */
+function supabasePatchAll_(table, filterColumn, payload) {
+  var cfg = getSupabaseConfig_();
+  var endpoint =
+    cfg.url +
+    '/rest/v1/' +
+    encodeURIComponent(table) +
+    '?' +
+    encodeURIComponent(filterColumn) +
+    '=not.is.null';
+
+  var response = UrlFetchApp.fetch(endpoint, {
+    method: 'patch',
+    contentType: 'application/json',
+    headers: supabaseHeaders_(cfg.key, 'return=minimal'),
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
+  });
+
+  var code = response.getResponseCode();
+  var body = response.getContentText();
+  if (isMissingTable_(code, body)) return;
+  if (code < 200 || code >= 300) {
+    throw new Error('Supabase patch ' + table + ' failed (' + code + '): ' + body);
+  }
+}
+
 function supabaseInsert_(table, rows) {
   if (!rows || !rows.length) return [];
 

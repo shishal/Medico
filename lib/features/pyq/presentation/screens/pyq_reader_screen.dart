@@ -62,7 +62,8 @@ class _PyqBody extends ConsumerStatefulWidget {
 }
 
 class _PyqBodyState extends ConsumerState<_PyqBody> {
-  _ReaderPanel _panel = _ReaderPanel.none;
+  // DA (direct answer) is open on first view; EX stays collapsed until tapped.
+  _ReaderPanel _panel = _ReaderPanel.directAnswer;
   late bool _learnt;
 
   @override
@@ -259,10 +260,7 @@ class _DirectAnswerPanel extends StatelessWidget {
 }
 
 class _ExplanationPanel extends ConsumerWidget {
-  const _ExplanationPanel({
-    required this.detail,
-    required this.onOpenLink,
-  });
+  const _ExplanationPanel({required this.detail, required this.onOpenLink});
 
   final PyqDetail detail;
   final ValueChanged<ResourceLink> onOpenLink;
@@ -295,10 +293,7 @@ class _ExplanationPanel extends ConsumerWidget {
         if (hasExplanation) ComicCard(child: MarkdownCopy(data: explanation)),
         if (citations.isNotEmpty) ...[
           const SizedBox(height: Spacing.lg),
-          Text(
-            'Textbook pages',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
+          Text('Textbook pages', style: Theme.of(context).textTheme.titleSmall),
           if (keys.length > 1) ...[
             const SizedBox(height: Spacing.sm),
             Wrap(

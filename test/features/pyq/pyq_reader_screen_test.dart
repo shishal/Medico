@@ -104,7 +104,7 @@ Future<void> _pumpReader(
 }
 
 void main() {
-  testWidgets('reader starts on the stem; DA and EX reveal separate content', (
+  testWidgets('reader starts with DA open; EX stays collapsed until tapped', (
     tester,
   ) async {
     await _pumpReader(
@@ -113,19 +113,11 @@ void main() {
         teaser: _teaser(id: 'q1', text: 'Define jaundice.'),
         sample: 'Yellow discoloration of skin.',
         explanation: 'Bilirubin deposits in tissues.',
-        textbooks: const [
-          TextbookCitation(title: 'Harrison', page: 42),
-        ],
+        textbooks: const [TextbookCitation(title: 'Harrison', page: 42)],
       ),
     );
 
     expect(find.text('Define jaundice.'), findsOneWidget);
-    expect(find.text('Yellow discoloration of skin.'), findsNothing);
-    expect(find.text('Bilirubin deposits in tissues.'), findsNothing);
-    expect(find.textContaining('Harrison'), findsNothing);
-
-    await tester.tap(find.text('DA'));
-    await tester.pumpAndSettle();
     expect(find.text('Yellow discoloration of skin.'), findsOneWidget);
     expect(find.text('Bilirubin deposits in tissues.'), findsNothing);
     expect(find.textContaining('Harrison'), findsNothing);
@@ -149,8 +141,6 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('DA'));
-    await tester.pumpAndSettle();
     expect(find.text('Direct answer'), findsOneWidget);
     expect(find.text('Included with Pro'), findsOneWidget);
 
@@ -180,10 +170,6 @@ void main() {
     );
 
     expect(find.text('A. Mitochondria'), findsOneWidget);
-    expect(find.text('Correct option: A'), findsNothing);
-
-    await tester.tap(find.text('DA'));
-    await tester.pumpAndSettle();
     expect(find.text('Correct option: A'), findsOneWidget);
     expect(find.text('Mitochondria make ATP.'), findsOneWidget);
     expect(find.text('Oxidative phosphorylation.'), findsNothing);

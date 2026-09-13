@@ -44,10 +44,10 @@ university paper mixes many topics in one sitting — see
 
 ## Sample answers and reference links
 
-- **Direct answer (DA)** is `sample_answer_text` for theory or MCQ, collapsed
-  until the student taps **DA**. Pro-gated (separate table). Missing content
-  shows “No direct answer yet” — never invent text in the client. MCQ DA also
-  shows the correct option.
+- **Direct answer (DA)** is `sample_answer_text` for theory or MCQ. The PYQ
+  reader opens with **DA** already expanded (tap again to collapse).
+  Pro-gated (separate table). Missing content shows “No direct answer yet”
+  — never invent text in the client. MCQ DA also shows the correct option.
 - **Explanation (EX)** is `explanation_text` plus textbook citations and
   “More on this topic” links, for either kind. Collapsed until **EX**. Do not
   put the MCQ key on teasers.

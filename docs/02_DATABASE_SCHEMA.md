@@ -658,8 +658,10 @@ Tables: `universities`, `mbbs_phases`, `colleges`, `lessons` (sheet `external_id
 
 ### 9.2 Dual-kind questions
 
-`questions.kind` (`pyq_theory` | `mcq`), `lesson_id`, `marks`. MCQ options stay
-required only when `kind = 'mcq'` (nullable columns + a check constraint).
+`questions.kind` (`pyq_theory` | `mcq`), `topic_id`, `lesson_id`, `marks`.
+`topic_id` and `lesson_id` are optional syllabus tags — a PYQ can be uploaded
+before the chapter is known. MCQ options stay required only when
+`kind = 'mcq'` (nullable columns + a check constraint).
 
 **Sample answers are not a column on `questions`** — a free SELECT on a free
 PYQ would leak the model answer. They live in `question_sample_answers` with

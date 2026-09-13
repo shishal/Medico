@@ -15,8 +15,8 @@ import 'package:medico/features/pyq/presentation/screens/subject_pyq_screen.dart
 PyqTeaser _teaser({
   required String id,
   required String text,
-  required String topicId,
-  required String topicName,
+  String? topicId,
+  String? topicName,
   List<String> papers = const ['Paper I'],
   List<int> years = const [2024],
   String kind = 'pyq_theory',
@@ -155,6 +155,26 @@ void main() {
     expect(
       yearsWithMatchingPyqs(teasers: teasers, topicId: 'ul'),
       [2023],
+    );
+  });
+
+  test('filterSubjectPyqs keeps untagged stems until a chapter is picked', () {
+    final teasers = [
+      _teaser(
+        id: 'tagged',
+        text: 'Femoral triangle',
+        topicId: 'll',
+        topicName: 'Lower limb',
+      ),
+      _teaser(id: 'untagged', text: 'Write short notes on shock.'),
+    ];
+    expect(
+      filterSubjectPyqs(teasers: teasers).map((t) => t.id),
+      ['tagged', 'untagged'],
+    );
+    expect(
+      filterSubjectPyqs(teasers: teasers, topicId: 'll').single.id,
+      'tagged',
     );
   });
 

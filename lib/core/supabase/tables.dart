@@ -355,6 +355,7 @@ abstract final class ExamPaperColumns {
   static const examYear = 'exam_year';
   static const paperName = 'paper_name';
   static const universityId = 'university_id';
+  static const subjectId = 'subject_id';
 }
 
 abstract final class LessonBookmarkColumns {

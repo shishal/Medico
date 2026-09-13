@@ -85,8 +85,8 @@ shows the fallback. Sync strips the `(Default-…)` suffix.
 | `university_code` | if paper filled | Must match `Universities.code`. |
 | `phase_code` | no | `year1` / `year2` / `year3` / `year4`. |
 | `subject_name` | yes | Created on sync if new. |
-| `topic_name` | yes | Created on sync if new. |
-| `lesson_name` | yes | Created on sync if new. |
+| `topic_name` | no | Created on sync if new. Blank leaves the question untagged. |
+| `lesson_name` | no | Created on sync if new. Needs `topic_name` if filled. |
 | `external_id` | yes | Stable ID you invent (e.g. `Q-ANAT-PYQ-001`). |
 | `kind(Default-MCQ)` | no | `mcq` or `pyq_theory`. Blank: theory if all options + `correct_option` are empty, else MCQ. |
 | `marks` | no | Theory paper marks. Essay ≥10, short 4–9, VSA ≤3. |
@@ -124,15 +124,18 @@ textbook refs from the wide Questions row. Extra blanks it now fills:
 | Questions `difficulty(Default-medium)` | `medium` |
 | Questions `required_plan(Default-free)` | `free` |
 | Questions `is_active(Default-TRUE)` | `TRUE` |
+| Questions `topic_name` | no topic row; `questions.topic_id` stays null |
+| Questions `lesson_name` | no lesson row; `questions.lesson_id` stays null |
 | Questions `exam_type(Default-university)` | `university` |
 | LessonResources `display_order(Default-1)` | 1, then 2, … per lesson |
 | LessonResources `is_free(Default-TRUE)` | `TRUE` |
 
 **Still type these** — they are content, not metadata: `code` / `name` /
 `state` on Universities; college names; textbook `sheet_key` + title (join
-key for `textbook_key`); question `external_id`, names, stem, MCQ options,
-paper year + paper name, page citations; LessonResources subject/topic/lesson
-names plus title and https URL.
+key for `textbook_key`); question `external_id`, `subject_name`, stem, MCQ
+options, paper year + paper name, page citations. `topic_name` / `lesson_name`
+can wait until the chapter is known. LessonResources still need
+subject/topic/lesson names plus title and https URL.
 
 **Not worth dropping yet:** `state` is unused in the app UI today but NOT
 NULL in Postgres. `phase_code` tags a new subject to an MBBS year (cannot

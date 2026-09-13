@@ -209,10 +209,18 @@ function performSync_(data) {
 
   // 3) Questions
   var questionRows = data.questions.map(function (q) {
-    var tid = topicIdByKey[normKey_(q.topic_name)];
-    if (!tid) {
-      // Should be impossible after validation — still fail loudly.
-      throw new Error('Questions: no topic UUID for topic_name "' + q.topic_name + '" (sheet row ' + q.__row + ')');
+    var tid = null;
+    if (q.topic_name) {
+      tid = topicIdByKey[normKey_(q.topic_name)];
+      if (!tid) {
+        throw new Error(
+          'Questions: no topic UUID for topic_name "' +
+            q.topic_name +
+            '" (sheet row ' +
+            q.__row +
+            ')'
+        );
+      }
     }
     var optionA = emptyToNull_(q.option_a);
     var optionB = emptyToNull_(q.option_b);

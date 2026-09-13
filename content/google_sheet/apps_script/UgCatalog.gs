@@ -348,6 +348,7 @@ function syncUgCatalog_(ug, subjectIdByKey, topicIdByKey, questionIdByExt) {
   var seenLesson = {};
   var lessonRows = [];
   ug.lessons.forEach(function (l) {
+    if (!l.topic_name) return;
     var tid = topicIdByKey[normKey_(l.topic_name)];
     if (!tid) throw new Error('Lesson "' + l.external_id + '": topic_name not resolved');
     // Natural key is (topic_id, name). Deduping here avoids a 409 when the

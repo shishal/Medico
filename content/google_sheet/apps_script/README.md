@@ -67,7 +67,7 @@ are cleared. Run **Sync to App** afterwards to reload from this sheet.
 - Theory: options not required; paper columns (`exam_year` + `paper_name`) create the appearance
 - resource `url` must start with `https://`
 - `required_plan` ∈ free/pro/elite
-- `subject_name` / `topic_name` / `lesson_name` on the wide Questions tab create catalog rows
+- `subject_name` is required on the wide Questions tab. `topic_name` / `lesson_name` are optional tags (blank is fine; they create catalog rows only when filled)
 - plus header presence, enums, and `university_code` matching the Universities tab
 
 ### Upsert keys (re-run safe)

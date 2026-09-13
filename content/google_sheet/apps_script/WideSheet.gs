@@ -127,9 +127,15 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
     if (!looksLikeQuestionExternalId_(ext) && !stem) return;
     if (!ext) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': external_id is required');
     if (!subjectName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': subject_name is required');
-    if (!topicName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': topic_name is required');
-    if (!lessonName) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': lesson_name is required');
     if (!stem) errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': question_text is required');
+    if (lessonName && !topicName) {
+      warnings.push(
+        TAB.QUESTIONS +
+          ' row ' +
+          row.__row +
+          ': lesson_name ignored because topic_name is blank'
+      );
+    }
     if (rawUni && !uni) {
       if (!looksLikeUniversityCode_(rawUni)) {
         uni = '';
@@ -181,18 +187,22 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       };
       topics.push(topicByKey[tKey]);
     }
-    var lessonExt = inventLessonExternalId_(subjectName, topicName, lessonName);
-    var lKey = normKey_(lessonExt);
-    if (lessonName && !lessonByKey[lKey]) {
-      lessonByKey[lKey] = {
-        external_id: lessonExt,
-        topic_name: topicName,
-        name: lessonName,
-        display_order: Object.keys(lessonByKey).length + 1,
-        required_plan: plan || 'free',
-        is_active: isActive !== false,
-      };
-      lessons.push(lessonByKey[lKey]);
+    // A lesson belongs to a topic, so skip inventing one until both names exist.
+    var lessonExt = '';
+    if (subjectName && topicName && lessonName) {
+      lessonExt = inventLessonExternalId_(subjectName, topicName, lessonName);
+      var lKey = normKey_(lessonExt);
+      if (!lessonByKey[lKey]) {
+        lessonByKey[lKey] = {
+          external_id: lessonExt,
+          topic_name: topicName,
+          name: lessonName,
+          display_order: Object.keys(lessonByKey).length + 1,
+          required_plan: plan || 'free',
+          is_active: isActive !== false,
+        };
+        lessons.push(lessonByKey[lKey]);
+      }
     }
 
     if (kind === 'mcq' && !questionByExt[normKey_(ext)]) {
@@ -224,7 +234,7 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
         required_plan: plan || 'free',
         is_active: isActive !== false,
         kind: kind,
-        lesson_external_id: lessonByKey[lKey] ? lessonByKey[lKey].external_id : '',
+        lesson_external_id: lessonExt,
         marks: marksRaw === '' ? null : Number(marksRaw),
         sample_answer_text: trimStr_(row.sample_answer_text),
         __row: row.__row,

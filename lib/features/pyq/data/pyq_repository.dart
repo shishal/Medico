@@ -197,10 +197,6 @@ class PyqRepository {
           ),
       ];
       final topicNameById = {for (final c in chapters) c.id: c.name};
-      if (chapters.isEmpty) {
-        return const Success(PyqSubjectFeed(teasers: []));
-      }
-
       final topicIds = chapters.map((c) => c.id).toList();
       final lessonRows = await _inFilterSelect(
         table: Tables.lessons,
@@ -225,14 +221,64 @@ class PyqRepository {
           '${QuestionColumns.topicId},${QuestionColumns.questionText},'
           '${QuestionColumns.marks},${QuestionColumns.requiredPlan},'
           '${QuestionColumns.kind}';
-      final questionRows = await _inFilterSelect(
-        table: Tables.questions,
-        column: QuestionColumns.topicId,
-        ids: topicIds,
-        select: teaserSelect,
-        activeOnly: true,
+      final questionById = <String, Map<String, dynamic>>{};
+      // Nested function: visible only in this method, so topic + paper
+      // lookups share one map without a file-level helper.
+      void addQuestions(List<Map<String, dynamic>> rows) {
+        for (final row in rows) {
+          final id = row[QuestionColumns.id] as String?;
+          if (id != null) questionById[id] = row;
+        }
+      }
+
+      addQuestions(
+        await _inFilterSelect(
+          table: Tables.questions,
+          column: QuestionColumns.topicId,
+          ids: topicIds,
+          select: teaserSelect,
+          activeOnly: true,
+        ),
       );
-      final all = questionRows.map(PyqTeaser.fromJson).toList();
+
+      // Untagged stems still belong to a paper (university + subject + year).
+      final paperRows = await _client
+          .from(Tables.examPapers)
+          .select(ExamPaperColumns.id)
+          .eq(ExamPaperColumns.subjectId, subjectId);
+      final paperIds = [
+        for (final raw in (paperRows as List<dynamic>).cast<Map<String, dynamic>>())
+          if (raw[ExamPaperColumns.id] is String)
+            raw[ExamPaperColumns.id] as String,
+      ];
+      if (paperIds.isNotEmpty) {
+        final appearanceRows = await _inFilterSelect(
+          table: Tables.questionAppearances,
+          column: AppearanceColumns.examPaperId,
+          ids: paperIds,
+          select: AppearanceColumns.questionId,
+          orderColumns: const [
+            AppearanceColumns.questionId,
+            AppearanceColumns.examPaperId,
+          ],
+        );
+        final missingIds = <String>{
+          for (final raw in appearanceRows)
+            if (raw[AppearanceColumns.questionId] is String)
+              raw[AppearanceColumns.questionId] as String,
+        }.difference(questionById.keys.toSet());
+        addQuestions(
+          await _inFilterSelect(
+            table: Tables.questions,
+            column: QuestionColumns.id,
+            ids: missingIds.toList(),
+            select: teaserSelect,
+            activeOnly: true,
+          ),
+        );
+      }
+
+      final all = questionById.values.map(PyqTeaser.fromJson).toList();
       if (all.isEmpty) {
         return Success(PyqSubjectFeed(teasers: const [], chapters: chapters));
       }

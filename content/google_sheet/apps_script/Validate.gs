@@ -198,9 +198,7 @@ function validateAllTabs_() {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': duplicate external_id "' + externalId + '"');
     }
 
-    if (!topicName) {
-      errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': topic_name is required');
-    } else if (!topicByKey[normKey_(topicName)]) {
+    if (topicName && !topicByKey[normKey_(topicName)]) {
       errors.push(
         TAB.QUESTIONS +
           ' row ' +

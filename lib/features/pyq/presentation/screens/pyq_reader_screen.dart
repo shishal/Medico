@@ -134,6 +134,7 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
                       (d.teaser.marks != null
                           ? ' · ${d.teaser.marks} marks'
                           : '') +
+                      ' · ${d.teaser.difficulty.label}' +
                       (d.teaser.appearanceCount > 0
                           ? ' · ${d.teaser.appearanceCount}×'
                           : ''),

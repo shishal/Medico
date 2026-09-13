@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:medico/core/router/app_routes.dart';
 import 'package:medico/core/utils/result.dart';
 import 'package:medico/features/bookmarks/presentation/providers/bookmarks_provider.dart';
+import 'package:medico/features/practice/domain/practice_enums.dart';
 import 'package:medico/features/profile/domain/plan_tier.dart';
 import 'package:medico/features/pyq/domain/pyq_models.dart';
 import 'package:medico/features/pyq/domain/subject_pyq_filters.dart';
@@ -21,6 +22,7 @@ PyqTeaser _teaser({
   List<int> years = const [2024],
   String kind = 'pyq_theory',
   num marks = 10,
+  QuestionDifficulty difficulty = QuestionDifficulty.medium,
 }) {
   return PyqTeaser(
     id: id,
@@ -30,6 +32,7 @@ PyqTeaser _teaser({
     requiredPlan: PlanTier.free,
     appearanceCount: years.length,
     kind: kind,
+    difficulty: difficulty,
     appearanceYears: years,
     paperNames: papers,
     topicName: topicName,
@@ -65,42 +68,50 @@ PyqSubjectFeed _feed() {
 }
 
 void main() {
-  test('filterSubjectPyqs keeps mixed-paper stems until a chapter is picked', () {
-    final mixed = [
-      _teaser(
-        id: 'q1',
-        text: 'Coronary arteries',
-        topicId: 'thorax',
-        topicName: 'Thorax',
-        papers: const ['Paper II'],
-      ),
-      _teaser(
-        id: 'q2',
-        text: 'Femoral triangle',
-        topicId: 'll',
-        topicName: 'Lower limb',
-        papers: const ['Paper II'],
-      ),
+  test(
+    'filterSubjectPyqs keeps mixed-paper stems until a chapter is picked',
+    () {
+      final mixed = [
+        _teaser(
+          id: 'q1',
+          text: 'Coronary arteries',
+          topicId: 'thorax',
+          topicName: 'Thorax',
+          papers: const ['Paper II'],
+        ),
+        _teaser(
+          id: 'q2',
+          text: 'Femoral triangle',
+          topicId: 'll',
+          topicName: 'Lower limb',
+          papers: const ['Paper II'],
+        ),
+      ];
+      expect(filterSubjectPyqs(teasers: mixed).map((t) => t.id), ['q1', 'q2']);
+      expect(filterSubjectPyqs(teasers: mixed, topicId: 'll').single.id, 'q2');
+      expect(filterSubjectPyqs(teasers: mixed, paperName: 'Paper I'), isEmpty);
+      expect(
+        filterSubjectPyqs(
+          teasers: mixed,
+          paperName: 'Paper II',
+          year: 2024,
+        ).map((t) => t.id),
+        ['q1', 'q2'],
+      );
+    },
+  );
+
+  test('filterSubjectPyqs keeps only Must when that priority is chosen', () {
+    final teasers = [
+      _teaser(id: 'must', text: 'Must', difficulty: QuestionDifficulty.hard),
+      _teaser(id: 'could', text: 'Could', difficulty: QuestionDifficulty.easy),
     ];
-    expect(filterSubjectPyqs(teasers: mixed).map((t) => t.id), ['q1', 'q2']);
-    expect(
-      filterSubjectPyqs(teasers: mixed, topicId: 'll').single.id,
-      'q2',
-    );
     expect(
       filterSubjectPyqs(
-        teasers: mixed,
-        paperName: 'Paper I',
-      ),
-      isEmpty,
-    );
-    expect(
-      filterSubjectPyqs(
-        teasers: mixed,
-        paperName: 'Paper II',
-        year: 2024,
-      ).map((t) => t.id),
-      ['q1', 'q2'],
+        teasers: teasers,
+        priorities: {QuestionDifficulty.hard},
+      ).single.id,
+      'must',
     );
   });
 
@@ -148,14 +159,8 @@ void main() {
         years: const [2023],
       ),
     ];
-    expect(
-      yearsWithMatchingPyqs(teasers: teasers),
-      [2024, 2023],
-    );
-    expect(
-      yearsWithMatchingPyqs(teasers: teasers, topicId: 'ul'),
-      [2023],
-    );
+    expect(yearsWithMatchingPyqs(teasers: teasers), [2024, 2023]);
+    expect(yearsWithMatchingPyqs(teasers: teasers, topicId: 'ul'), [2023]);
   });
 
   test('filterSubjectPyqs keeps untagged stems until a chapter is picked', () {
@@ -168,10 +173,10 @@ void main() {
       ),
       _teaser(id: 'untagged', text: 'Write short notes on shock.'),
     ];
-    expect(
-      filterSubjectPyqs(teasers: teasers).map((t) => t.id),
-      ['tagged', 'untagged'],
-    );
+    expect(filterSubjectPyqs(teasers: teasers).map((t) => t.id), [
+      'tagged',
+      'untagged',
+    ]);
     expect(
       filterSubjectPyqs(teasers: teasers, topicId: 'll').single.id,
       'tagged',

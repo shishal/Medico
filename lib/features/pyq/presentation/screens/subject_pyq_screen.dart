@@ -8,6 +8,7 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../domain/subject_pyq_filters.dart';
+import '../../../practice/domain/practice_enums.dart';
 import '../providers/pyq_providers.dart';
 import '../widgets/subject_pyq_filter_sheet.dart';
 
@@ -54,6 +55,7 @@ class SubjectPyqScreen extends ConsumerWidget {
             teasers: feed.teasers,
             paperName: filter.paperName,
             topicId: filter.topicId,
+            priorities: filter.priorities,
           );
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
@@ -78,6 +80,11 @@ class SubjectPyqScreen extends ConsumerWidget {
                           .where((c) => c.id == filter.topicId)
                           .map((c) => c.name)
                           .firstOrNull,
+                    if (filter.priorities.isNotEmpty)
+                      QuestionDifficulty.filterOrder
+                          .where(filter.priorities.contains)
+                          .map((p) => p.label)
+                          .join(', '),
                   ].whereType<String>().join(' · '),
                   style: Theme.of(context).textTheme.labelLarge,
                 ),

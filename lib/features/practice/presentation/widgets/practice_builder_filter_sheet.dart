@@ -4,7 +4,6 @@ import '../../../../core/theme/spacing.dart';
 import '../../domain/plan_limits.dart';
 import '../../domain/practice_builder_draft.dart';
 import '../../domain/practice_catalog.dart';
-import '../../domain/practice_enums.dart';
 
 Future<void> showPracticeBuilderFilterSheet({
   required BuildContext context,
@@ -95,30 +94,6 @@ class _PracticeBuilderFilterSheetState
                   child: ListView(
                     children: [
                       _ChipBlock(
-                        title: 'Difficulty',
-                        helper: _draft.selectedDifficulties.isEmpty
-                            ? 'None chosen — all difficulties'
-                            : null,
-                        locked: !_limits.allowDifficultyFilter,
-                        upgradeHint: 'Upgrade to filter by difficulty',
-                        onUpgrade: widget.onUpgrade,
-                        children: [
-                          for (final difficulty in QuestionDifficulty.values)
-                            FilterChip(
-                              label: Text(difficulty.label),
-                              selected: _draft.selectedDifficulties.contains(
-                                difficulty,
-                              ),
-                              onSelected: _limits.allowDifficultyFilter
-                                  ? (_) => _set(
-                                      _draft.toggleDifficulty(difficulty),
-                                    )
-                                  : null,
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: Spacing.md),
-                      _ChipBlock(
                         title: 'Subjects',
                         helper: _draft.selectedSubjectIds.isEmpty
                             ? 'None chosen — all subjects'
@@ -150,9 +125,9 @@ class _PracticeBuilderFilterSheetState
                             Text(
                               'No topics for the selected subjects yet.',
                               style: textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                             )
                           else

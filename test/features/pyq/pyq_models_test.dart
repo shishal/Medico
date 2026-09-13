@@ -20,6 +20,18 @@ void main() {
     expect(teaser.kind, 'pyq_theory');
     expect(teaser.isHighYield, isTrue);
     expect(teaser.format.label, 'Essay');
+    expect(teaser.difficulty.label, 'Should');
+  });
+
+  test('PyqTeaser maps hard difficulty to Must', () {
+    final teaser = PyqTeaser.fromJson({
+      PyqTeaserColumns.id: 'q-must',
+      PyqTeaserColumns.questionText: 'Name the cranial nerves.',
+      PyqTeaserColumns.requiredPlan: 'free',
+      PyqTeaserColumns.appearanceCount: 1,
+      PyqTeaserColumns.difficulty: 'hard',
+    });
+    expect(teaser.difficulty.label, 'Must');
   });
 
   test('PyqTeaser reads kind for MCQ and is not high-yield at 1×', () {
@@ -44,11 +56,7 @@ void main() {
         {'id': 'l1', 'name': 'Brachial plexus', 'required_plan': 'free'},
       ],
       'questions': [
-        {
-          'id': 'q1',
-          'question_text': 'Describe Erb palsy.',
-          'lesson_id': 'l1',
-        },
+        {'id': 'q1', 'question_text': 'Describe Erb palsy.', 'lesson_id': 'l1'},
       ],
     });
     expect(hits.subjects.single.title, 'Anatomy');

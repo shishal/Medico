@@ -672,9 +672,11 @@ Also: `question_appearances` (frequency = count), `question_textbook_refs`
 (citation only — never PDF bytes).
 
 View `pyq_teasers` (security_invoker = true so questions RLS still applies):
-stem, marks, kind, lesson_id, required_plan, appearance_count — no sample
-answer, no MCQ keys. Includes both `pyq_theory` and `mcq` rows. University
-filter is applied in the client/RPC via appearances → exam_papers.
+stem, marks, kind, difficulty, lesson_id, required_plan, appearance_count —
+no sample answer, no MCQ keys. The app shows difficulty as Must / Should /
+Could (`hard` / `medium` / `easy`). Includes both `pyq_theory` and `mcq`
+rows. University filter is applied in the client/RPC via appearances →
+exam_papers.
 
 `universities.slug` is `lower(code)` from sheet sync (not a sheet column).
 `is_fallback` is retired — drop with

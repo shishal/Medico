@@ -51,7 +51,9 @@ class PyqRepository {
 
   final SupabaseClient _client;
 
-  Future<Result<List<ResourceLink>>> fetchLessonResources(String lessonId) async {
+  Future<Result<List<ResourceLink>>> fetchLessonResources(
+    String lessonId,
+  ) async {
     if (_client.auth.currentUser == null) {
       return const Failure('Not signed in.');
     }
@@ -110,7 +112,8 @@ class PyqRepository {
 
       final yearsByQuestionUni = <String, Map<String, List<int>>>{};
       final unisByQuestion = <String, Set<String>>{};
-      for (final raw in (appRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+      for (final raw
+          in (appRows as List<dynamic>).cast<Map<String, dynamic>>()) {
         final qid = raw[AppearanceColumns.questionId] as String;
         final paper = raw[AppearanceColumns.examPaperEmbed];
         final map = paper is Map<String, dynamic> ? paper : <String, dynamic>{};
@@ -138,7 +141,8 @@ class PyqRepository {
           )
           .inFilter(TextbookRefColumns.questionId, ids);
       final firstRef = <String, String>{};
-      for (final raw in (refRows as List<dynamic>).cast<Map<String, dynamic>>()) {
+      for (final raw
+          in (refRows as List<dynamic>).cast<Map<String, dynamic>>()) {
         final qid = raw[TextbookRefColumns.questionId] as String;
         if (firstRef.containsKey(qid)) continue;
         firstRef[qid] = TextbookCitation.fromJson(raw).label;
@@ -148,13 +152,12 @@ class PyqRepository {
       for (final t in all) {
         final owned = unisByQuestion[t.id];
         final isMcqBank = t.kind == 'mcq' && (owned == null || owned.isEmpty);
-        final matchesUni = contentUni == null ||
+        final matchesUni =
+            contentUni == null ||
             isMcqBank ||
             (owned != null && owned.contains(contentUni));
         if (!matchesUni) continue;
-        final years = {
-          ...?yearsByQuestionUni[t.id]?[contentUni],
-        }.toList()
+        final years = {...?yearsByQuestionUni[t.id]?[contentUni]}.toList()
           ..sort();
         teasers.add(
           t.copyWith(
@@ -167,9 +170,7 @@ class PyqRepository {
 
       return Success(PyqLessonFeed(teasers: teasers));
     } catch (e) {
-      return Failure(
-        UserFacingError.from(e, fallback: 'Could not load PYQs.'),
-      );
+      return Failure(UserFacingError.from(e, fallback: 'Could not load PYQs.'));
     }
   }
 
@@ -187,8 +188,7 @@ class PyqRepository {
           .select()
           .eq(TopicColumns.subjectId, subjectId)
           .order(TopicColumns.displayOrder);
-      final topics = (topicRows as List<dynamic>)
-          .cast<Map<String, dynamic>>();
+      final topics = (topicRows as List<dynamic>).cast<Map<String, dynamic>>();
       final chapters = [
         for (final t in topics)
           PyqChapter(
@@ -220,7 +220,7 @@ class PyqRepository {
           '${QuestionColumns.id},${QuestionColumns.lessonId},'
           '${QuestionColumns.topicId},${QuestionColumns.questionText},'
           '${QuestionColumns.marks},${QuestionColumns.requiredPlan},'
-          '${QuestionColumns.kind}';
+          '${QuestionColumns.kind},${QuestionColumns.difficulty}';
       final questionById = <String, Map<String, dynamic>>{};
       // Nested function: visible only in this method, so topic + paper
       // lookups share one map without a file-level helper.
@@ -247,7 +247,8 @@ class PyqRepository {
           .select(ExamPaperColumns.id)
           .eq(ExamPaperColumns.subjectId, subjectId);
       final paperIds = [
-        for (final raw in (paperRows as List<dynamic>).cast<Map<String, dynamic>>())
+        for (final raw
+            in (paperRows as List<dynamic>).cast<Map<String, dynamic>>())
           if (raw[ExamPaperColumns.id] is String)
             raw[ExamPaperColumns.id] as String,
       ];
@@ -365,21 +366,19 @@ class PyqRepository {
       for (final t in all) {
         final owned = unisByQuestion[t.id];
         final isMcqBank = t.kind == 'mcq' && (owned == null || owned.isEmpty);
-        final matchesUni = contentUni == null ||
+        final matchesUni =
+            contentUni == null ||
             isMcqBank ||
             (owned != null && owned.contains(contentUni));
         if (!matchesUni) continue;
-        final qYears = {
-          ...?yearsByQuestionUni[t.id]?[contentUni],
-        }.toList()
+        final qYears = {...?yearsByQuestionUni[t.id]?[contentUni]}.toList()
           ..sort();
-        final qPapers = {
-          ...?papersByQuestionUni[t.id]?[contentUni],
-        }.toList()
+        final qPapers = {...?papersByQuestionUni[t.id]?[contentUni]}.toList()
           ..sort();
         paperNames.addAll(qPapers);
         years.addAll(qYears);
-        final topicId = t.topicId ??
+        final topicId =
+            t.topicId ??
             (t.lessonId == null ? null : lessonTopicById[t.lessonId]);
         teasers.add(
           t.copyWith(
@@ -389,8 +388,7 @@ class PyqRepository {
             paperNames: qPapers,
             topicId: topicId,
             topicName: topicId == null ? null : topicNameById[topicId],
-            lessonName:
-                t.lessonId == null ? null : lessonNameById[t.lessonId],
+            lessonName: t.lessonId == null ? null : lessonNameById[t.lessonId],
           ),
         );
       }
@@ -406,9 +404,7 @@ class PyqRepository {
         ),
       );
     } catch (e) {
-      return Failure(
-        UserFacingError.from(e, fallback: 'Could not load PYQs.'),
-      );
+      return Failure(UserFacingError.from(e, fallback: 'Could not load PYQs.'));
     }
   }
 
@@ -425,7 +421,8 @@ class PyqRepository {
           .select()
           .eq(PyqTeaserColumns.id, questionId)
           .limit(1);
-      final teasers = (teaserRows as List<dynamic>).cast<Map<String, dynamic>>();
+      final teasers = (teaserRows as List<dynamic>)
+          .cast<Map<String, dynamic>>();
       if (teasers.isEmpty) {
         return const Failure('This question is not available.');
       }
@@ -458,11 +455,13 @@ class PyqRepository {
 
       var lessonRes = <dynamic>[];
       if (lessonId != null) {
-        lessonRes = await _client
-            .from(Tables.lessonResources)
-            .select()
-            .eq(ResourceColumns.lessonId, lessonId)
-            .order(ResourceColumns.displayOrder) as List<dynamic>;
+        lessonRes =
+            await _client
+                    .from(Tables.lessonResources)
+                    .select()
+                    .eq(ResourceColumns.lessonId, lessonId)
+                    .order(ResourceColumns.displayOrder)
+                as List<dynamic>;
       }
 
       String? optionA;
@@ -512,7 +511,8 @@ class PyqRepository {
           .eq('user_id', userId)
           .eq('question_id', questionId)
           .limit(1);
-      final progress = (progressRows as List<dynamic>).cast<Map<String, dynamic>>();
+      final progress = (progressRows as List<dynamic>)
+          .cast<Map<String, dynamic>>();
       final learnt = progress.isNotEmpty && progress.first['learnt_at'] != null;
 
       await _client.rpc(
@@ -582,8 +582,7 @@ class PyqRepository {
       final chunk = ids.sublist(i, end);
       var from = 0;
       while (true) {
-        var query =
-            _client.from(table).select(select).inFilter(column, chunk);
+        var query = _client.from(table).select(select).inFilter(column, chunk);
         if (activeOnly) {
           query = query.eq(QuestionColumns.isActive, true);
         }

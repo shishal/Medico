@@ -9,8 +9,6 @@ import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
-import '../../../practice/domain/practice_builder_draft.dart';
-import '../../../practice/domain/practice_enums.dart';
 import '../../data/bookmarks_repository.dart';
 import '../../domain/bookmarked_lesson.dart';
 import '../../domain/bookmarked_question.dart';
@@ -85,18 +83,7 @@ class BookmarksScreen extends ConsumerWidget {
                   },
                 ),
               ),
-              if (unlocked > 0)
-                _PracticeBar(
-                  count: unlocked,
-                  onPractice: () => context.go(
-                    AppRoutes.practice,
-                    extra: PracticeBuilderDraft(
-                      sourceFilter: QuestionSourceFilter.bookmarked,
-                      questionCount: unlocked,
-                      timerMinutes: unlocked,
-                    ),
-                  ),
-                ),
+              if (unlocked > 0) const _PracticeBar(),
               const _LessonBookmarks(),
             ],
           );
@@ -234,10 +221,7 @@ class _LessonBookmarksState extends ConsumerState<_LessonBookmarks> {
 }
 
 class _PracticeBar extends StatelessWidget {
-  const _PracticeBar({required this.count, required this.onPractice});
-
-  final int count;
-  final VoidCallback onPractice;
+  const _PracticeBar();
 
   @override
   Widget build(BuildContext context) {
@@ -251,13 +235,9 @@ class _PracticeBar extends StatelessWidget {
         ),
         child: SizedBox(
           width: double.infinity,
-          child: FilledButton(
-            onPressed: onPractice,
-            child: Text(
-              count == 1
-                  ? 'Practice 1 bookmarked question'
-                  : 'Practice $count bookmarked questions',
-            ),
+          child: const FilledButton(
+            onPressed: null,
+            child: Text('Practice · upcoming'),
           ),
         ),
       ),

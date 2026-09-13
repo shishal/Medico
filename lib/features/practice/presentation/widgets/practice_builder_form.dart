@@ -140,14 +140,9 @@ class _FiltersEntry extends StatelessWidget {
 
 String _summary(PracticeBuilderDraft draft, PracticeCatalog catalog) {
   if (!draft.hasContentFilters) {
-    return 'Difficulty, subjects, topics, and tags';
+    return 'Subjects, topics, and tags';
   }
   final parts = <String>[];
-  if (draft.selectedDifficulties.isNotEmpty) {
-    parts.add(
-      draft.selectedDifficulties.map((d) => d.label).join(', '),
-    );
-  }
   if (draft.selectedSubjectIds.isNotEmpty) {
     parts.add(
       catalog.subjects
@@ -263,7 +258,9 @@ class _SourceCard extends StatelessWidget {
           Icon(
             _icon,
             size: 18,
-            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: Spacing.xs),
           Expanded(

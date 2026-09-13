@@ -1,6 +1,7 @@
 import 'pyq_models.dart';
 import 'question_format.dart';
 import 'subject_pyq_filters.dart';
+import '../../practice/domain/practice_enums.dart';
 
 /// Question-type tabs on a year's paper outline (Screen 3).
 enum PaperOutlineTab {
@@ -9,16 +10,16 @@ enum PaperOutlineTab {
   mcq;
 
   String get label => switch (this) {
-        PaperOutlineTab.longAnswer => 'LAQ',
-        PaperOutlineTab.shortNotes => 'Short notes',
-        PaperOutlineTab.mcq => 'MCQ',
-      };
+    PaperOutlineTab.longAnswer => 'LAQ',
+    PaperOutlineTab.shortNotes => 'Short notes',
+    PaperOutlineTab.mcq => 'MCQ',
+  };
 
   String emptyMessage(int year) => switch (this) {
-        PaperOutlineTab.longAnswer => 'No long answers in $year.',
-        PaperOutlineTab.shortNotes => 'No short notes in $year.',
-        PaperOutlineTab.mcq => 'No MCQs in $year.',
-      };
+    PaperOutlineTab.longAnswer => 'No long answers in $year.',
+    PaperOutlineTab.shortNotes => 'No short notes in $year.',
+    PaperOutlineTab.mcq => 'No MCQs in $year.',
+  };
 }
 
 bool matchesOutlineTab(PyqTeaser teaser, PaperOutlineTab tab) {
@@ -38,12 +39,14 @@ List<PyqTeaser> teasersForOutlineTab({
   required PaperOutlineTab tab,
   String? paperName,
   String? topicId,
+  Set<QuestionDifficulty> priorities = const {},
 }) {
   final filtered = filterSubjectPyqs(
     teasers: teasers,
     paperName: paperName,
     year: year,
     topicId: topicId,
+    priorities: priorities,
   );
   final matching = [
     for (final t in filtered)

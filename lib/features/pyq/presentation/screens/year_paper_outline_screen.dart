@@ -6,13 +6,12 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
-import '../../../../core/widgets/comic_card.dart';
 import '../../domain/paper_outline.dart';
 import '../../domain/pyq_models.dart';
 import '../providers/pyq_providers.dart';
 import '../widgets/pyq_teaser_card.dart';
 
-/// One exam year: Text vs Image entry, then pinned LAQ / Short notes / MCQ tabs.
+/// One exam year: pinned LAQ / Short notes / MCQ tabs.
 class YearPaperOutlineScreen extends ConsumerWidget {
   const YearPaperOutlineScreen({
     super.key,
@@ -44,6 +43,7 @@ class YearPaperOutlineScreen extends ConsumerWidget {
             tab: tab,
             paperName: filter.paperName,
             topicId: filter.topicId,
+            priorities: filter.priorities,
           );
           return _OutlineBody(
             year: year,
@@ -109,10 +109,6 @@ class _OutlineBodyState extends State<_OutlineBody>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(Spacing.md, Spacing.md, Spacing.md, 0),
-          child: _PaperModeTiles(),
-        ),
         TabBar(
           controller: _tabs,
           isScrollable: true,
@@ -133,48 +129,6 @@ class _OutlineBodyState extends State<_OutlineBody>
                   teasers: _listFor(tab),
                 ),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PaperModeTiles extends StatelessWidget {
-  const _PaperModeTiles();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ComicCard(
-            highlighted: true,
-            child: Text(
-              'Question paper Text',
-              style: Theme.of(context).textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-        const SizedBox(width: Spacing.sm),
-        Expanded(
-          child: ComicCard(
-            child: Column(
-              children: [
-                Text(
-                  'Question paper Image',
-                  style: Theme.of(context).textTheme.titleSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: Spacing.xs),
-                Text(
-                  'Coming later',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
           ),
         ),
       ],

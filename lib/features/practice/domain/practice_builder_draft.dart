@@ -42,12 +42,11 @@ class PracticeBuilderDraft {
   /// When set, the generator only picks MCQs on these lessons.
   final Set<String> lessonIds;
 
-  /// True when any subject / topic / tag / difficulty chip is on.
+  /// True when any subject / topic / tag chip is on.
   bool get hasContentFilters =>
       selectedSubjectIds.isNotEmpty ||
       selectedTopicIds.isNotEmpty ||
-      selectedTagIds.isNotEmpty ||
-      selectedDifficulties.isNotEmpty;
+      selectedTagIds.isNotEmpty;
 
   /// Rebuilds the form from a practice `tests` row.
   ///
@@ -57,13 +56,15 @@ class PracticeBuilderDraft {
   factory PracticeBuilderDraft.fromPracticeTestRow(Map<String, dynamic> row) {
     final criteria = _asMap(row[TestColumns.practiceFilterCriteria]);
 
-    final questionCount = _asNullableInt(
+    final questionCount =
+        _asNullableInt(
           criteria[PracticeFilterCriteriaKeys.requestedQuestionCount],
         ) ??
         _asInt(row[TestColumns.totalQuestions], fallback: 10);
 
-    final hasTimerKey =
-        criteria.containsKey(PracticeFilterCriteriaKeys.timerMinutes);
+    final hasTimerKey = criteria.containsKey(
+      PracticeFilterCriteriaKeys.timerMinutes,
+    );
     final timerMinutesRaw = criteria[PracticeFilterCriteriaKeys.timerMinutes];
     final timerEnabled = hasTimerKey
         ? timerMinutesRaw != null
@@ -73,14 +74,14 @@ class PracticeBuilderDraft {
         : questionCount;
 
     final requestedExplanation =
-        criteria[PracticeFilterCriteriaKeys.requestedExplanationLevel] as String?;
+        criteria[PracticeFilterCriteriaKeys.requestedExplanationLevel]
+            as String?;
 
     return PracticeBuilderDraft(
-      selectedTopicIds: _stringSet(criteria[PracticeFilterCriteriaKeys.topicIds]),
-      selectedTagIds: _stringSet(criteria[PracticeFilterCriteriaKeys.tagIds]),
-      selectedDifficulties: _difficultySet(
-        criteria[PracticeFilterCriteriaKeys.difficulties],
+      selectedTopicIds: _stringSet(
+        criteria[PracticeFilterCriteriaKeys.topicIds],
       ),
+      selectedTagIds: _stringSet(criteria[PracticeFilterCriteriaKeys.tagIds]),
       sourceFilter: QuestionSourceFilter.fromString(
         criteria[PracticeFilterCriteriaKeys.sourceFilter] as String? ??
             QuestionSourceFilter.unattempted.dbValue,
@@ -99,7 +100,7 @@ class PracticeBuilderDraft {
       timerMinutes: timerMinutes < 1 ? 1 : timerMinutes,
       negativeMarking:
           criteria[PracticeFilterCriteriaKeys.negativeMarking] as bool? ??
-              false,
+          false,
       lessonIds: _stringSet(criteria[PracticeFilterCriteriaKeys.lessonIds]),
     );
   }
@@ -110,8 +111,7 @@ class PracticeBuilderDraft {
     final knownTagIds = catalog.tags.map((t) => t.id).toSet();
     final knownSubjectIds = catalog.subjects.map((s) => s.id).toSet();
 
-    final topics =
-        selectedTopicIds.where(topicById.containsKey).toSet();
+    final topics = selectedTopicIds.where(topicById.containsKey).toSet();
     final tags = selectedTagIds.where(knownTagIds.contains).toSet();
     final subjects = selectedSubjectIds.isEmpty
         ? topics.map((id) => topicById[id]!.subjectId).toSet()
@@ -141,11 +141,12 @@ class PracticeBuilderDraft {
   List<String>? get resolvedTagIds =>
       selectedTagIds.isEmpty ? null : selectedTagIds.toList();
 
-  List<QuestionDifficulty>? get resolvedDifficulties =>
-      selectedDifficulties.isEmpty ? null : selectedDifficulties.toList();
+  /// Always null — difficulty is hidden in the app and must not filter sessions.
+  List<QuestionDifficulty>? get resolvedDifficulties => null;
 
   /// Minutes to send: null turns the timer off on the server.
-  int? get resolvedTimerMinutes => timerEnabled ? math.max(timerMinutes, 1) : null;
+  int? get resolvedTimerMinutes =>
+      timerEnabled ? math.max(timerMinutes, 1) : null;
 
   PracticeBuilderDraft toggleSubject(String id, PracticeCatalog catalog) {
     final next = {...selectedSubjectIds};
@@ -170,17 +171,12 @@ class PracticeBuilderDraft {
   PracticeBuilderDraft toggleTag(String id) =>
       copyWith(selectedTagIds: _toggle(selectedTagIds, id));
 
-  PracticeBuilderDraft toggleDifficulty(QuestionDifficulty difficulty) =>
-      copyWith(
-        selectedDifficulties: _toggle(selectedDifficulties, difficulty),
-      );
-
   PracticeBuilderDraft clearContentFilters() => copyWith(
-        selectedSubjectIds: const {},
-        selectedTopicIds: const {},
-        selectedTagIds: const {},
-        selectedDifficulties: const {},
-      );
+    selectedSubjectIds: const {},
+    selectedTopicIds: const {},
+    selectedTagIds: const {},
+    selectedDifficulties: const {},
+  );
 
   PracticeBuilderDraft withQuestionCount(int count) {
     var minutes = timerMinutes;
@@ -212,19 +208,19 @@ class PracticeBuilderDraft {
     final explanation = ctx.limits.allowFullExplanation
         ? explanationLevel
         : (explanationLevel == ExplanationLevel.full
-            ? ExplanationLevel.answerOnly
-            : explanationLevel);
+              ? ExplanationLevel.answerOnly
+              : explanationLevel);
 
     return copyWith(
       selectedTagIds: ctx.limits.allowTagFilter ? selectedTagIds : const {},
-      selectedDifficulties:
-          ctx.limits.allowDifficultyFilter ? selectedDifficulties : const {},
+      selectedDifficulties: const {},
       questionCount: count,
       explanationLevel: explanation,
       timerEnabled: ctx.limits.allowTimerToggle ? timerEnabled : true,
       timerMinutes: minutes,
-      negativeMarking:
-          ctx.limits.allowNegativeMarkingToggle ? negativeMarking : false,
+      negativeMarking: ctx.limits.allowNegativeMarkingToggle
+          ? negativeMarking
+          : false,
     );
   }
 
@@ -269,14 +265,6 @@ class PracticeBuilderDraft {
     return {
       for (final item in value)
         if (item != null) item.toString(),
-    };
-  }
-
-  static Set<QuestionDifficulty> _difficultySet(Object? value) {
-    if (value is! List) return const {};
-    return {
-      for (final item in value)
-        if (item != null) QuestionDifficulty.fromString(item.toString()),
     };
   }
 

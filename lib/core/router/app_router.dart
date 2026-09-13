@@ -13,8 +13,7 @@ import '../../features/profile/domain/plan_tier.dart';
 import '../../features/profile/presentation/providers/user_profile_provider.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/upgrade_prompt_screen.dart';
-import '../../features/practice/domain/practice_builder_draft.dart';
-import '../../features/practice/presentation/screens/practice_builder_screen.dart';
+import '../../features/practice/presentation/screens/practice_upcoming_screen.dart';
 import '../../features/progress/presentation/screens/progress_screens.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/pyq/presentation/screens/pyq_reader_screen.dart';
@@ -108,14 +107,7 @@ GoRouter goRouter(Ref ref) {
             routes: [
               comicGoRoute(
                 path: AppRoutes.practice,
-                builder: (context, state) {
-                  final extra = state.extra;
-                  final draft = extra is PracticeBuilderDraft ? extra : null;
-                  return PracticeBuilderScreen(
-                    key: ValueKey(draft?.hashCode ?? 0),
-                    initialDraft: draft,
-                  );
-                },
+                builder: (context, state) => const PracticeUpcomingScreen(),
               ),
             ],
           ),
@@ -149,8 +141,7 @@ GoRouter goRouter(Ref ref) {
         path: AppRoutes.subjectYear,
         builder: (context, state) {
           final id = state.pathParameters['subjectId']!;
-          final year =
-              int.tryParse(state.pathParameters['year'] ?? '') ?? 0;
+          final year = int.tryParse(state.pathParameters['year'] ?? '') ?? 0;
           final title = state.uri.queryParameters['title'] ?? 'Subject';
           return YearPaperOutlineScreen(
             subjectId: id,

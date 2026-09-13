@@ -52,11 +52,7 @@ void main() {
       _teaser(id: 'short', text: 'Short note', marks: 5),
       _teaser(id: 'vsa', text: 'Very short', marks: 2),
       _teaser(id: 'mcq', text: 'MCQ stem', kind: 'mcq', marks: 1),
-      _teaser(
-        id: 'other-year',
-        text: '2023 essay',
-        years: const [2023],
-      ),
+      _teaser(id: 'other-year', text: '2023 essay', years: const [2023]),
     ];
 
     final laq = teasersForOutlineTab(
@@ -154,8 +150,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Question paper Text'), findsOneWidget);
-    expect(find.text('Coming later'), findsOneWidget);
     expect(find.textContaining('LAQ'), findsOneWidget);
     expect(find.textContaining('Short notes'), findsOneWidget);
     expect(find.textContaining('MCQ'), findsWidgets);

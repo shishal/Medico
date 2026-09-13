@@ -98,7 +98,7 @@ void main() {
     expect(find.text('Which organelle produces ATP?'), findsOneWidget);
     expect(find.text('Anatomy · Cell Biology'), findsOneWidget);
     expect(find.text('What is the first heart sound?'), findsOneWidget);
-    expect(find.text('Practice 2 bookmarked questions'), findsOneWidget);
+    expect(find.text('Practice · upcoming'), findsOneWidget);
   });
 
   testWidgets('plan-locked bookmark fails gracefully', (tester) async {
@@ -113,7 +113,7 @@ void main() {
     expect(find.text('Unavailable on your plan'), findsOneWidget);
     expect(find.text('Upgrade to see this question.'), findsOneWidget);
     expect(find.text('Visible stem'), findsOneWidget);
-    expect(find.text('Practice 1 bookmarked question'), findsOneWidget);
+    expect(find.text('Practice · upcoming'), findsOneWidget);
   });
 
   testWidgets('unbookmark hides the row immediately', (tester) async {
@@ -182,13 +182,9 @@ void main() {
       ProviderScope(
         overrides: [
           bookmarksListProvider.overrideWith(
-            (ref) => [
-              _item(id: 'q1', text: 'Which organelle produces ATP?'),
-            ],
+            (ref) => [_item(id: 'q1', text: 'Which organelle produces ATP?')],
           ),
-          bookmarkedIdsProvider.overrideWith(
-            () => _StubBookmarkedIds({'q1'}),
-          ),
+          bookmarkedIdsProvider.overrideWith(() => _StubBookmarkedIds({'q1'})),
         ],
         child: MaterialApp.router(routerConfig: router),
       ),

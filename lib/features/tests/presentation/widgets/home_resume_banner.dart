@@ -25,7 +25,7 @@ class HomeResumeBanner extends ConsumerWidget {
       children: [
         const ComicSectionTitle(
           title: 'Today',
-          subtitle: 'Resume a session or start practice',
+          subtitle: 'Resume a session when you have one in progress',
         ),
         if (async.hasError)
           Padding(
@@ -67,9 +67,9 @@ class HomeResumeBanner extends ConsumerWidget {
                       ],
                     ),
                     child: const Icon(
-                      Icons.play_arrow_rounded,
+                      Icons.hourglass_empty_rounded,
                       color: Colors.white,
-                      size: 30,
+                      size: 26,
                     ),
                   ),
                   const SizedBox(width: Spacing.md),
@@ -78,11 +78,11 @@ class HomeResumeBanner extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Start practice',
+                          'Practice',
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
-                        const Text('Build a custom MCQ session'),
+                        const Text('Upcoming'),
                       ],
                     ),
                   ),

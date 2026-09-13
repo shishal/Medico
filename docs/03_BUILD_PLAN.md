@@ -134,9 +134,9 @@ Work top to bottom. One task at a time.
 - Validation: both tiles open an external URL (placeholders are fine).
 
 **10.9 — Year-first paper outline**
-- Description: Subject opens exam years (Filters: chapters / paper — no separate Chapters button). A year opens a text outline with pinned LAQ / Short notes / MCQ tabs (Paper I+II merged). PYQ reader uses **EX** (`explanation_text` + textbooks/links) and **DA** (`sample_answer_text`; MCQ also shows the key). Scanned paper image is a disabled placeholder. Onboarding unchanged.
-- Expected Outcome: Home → subject → years → tabbed outline → reader. No flat subject PYQ dump. EX/DA work for theory and MCQ.
-- Validation: open 2024, switch tabs without scrolling to find a section; DA shows sample (Pro lock if free); EX shows explanation + textbook line. Image tile does nothing.
+- Description: Subject opens exam years (Filters: chapters / paper / Must-Should-Could). A year opens a text outline with pinned LAQ / Short notes / MCQ tabs (Paper I+II merged). PYQ reader uses **EX** (`explanation_text` + textbooks/links) and **DA** (`sample_answer_text`; MCQ also shows the key). Scanned paper image is not shown. Onboarding unchanged.
+- Expected Outcome: Home → subject → years → tabbed outline → reader. No flat subject PYQ dump. EX/DA work for theory and MCQ. Practice tab is **Upcoming**.
+- Validation: open 2024, switch tabs without scrolling to find a section; DA shows sample (Pro lock if free); EX shows explanation + textbook line. No Question paper Image tile.
 
 ---
 

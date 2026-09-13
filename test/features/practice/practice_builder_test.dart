@@ -56,9 +56,8 @@ void main() {
     test('hasContentFilters is true when any chip set is non-empty', () {
       expect(const PracticeBuilderDraft().hasContentFilters, isFalse);
       expect(
-        const PracticeBuilderDraft(
-          selectedSubjectIds: {'med'},
-        ).hasContentFilters,
+        const PracticeBuilderDraft(selectedSubjectIds: {'med'})
+            .hasContentFilters,
         isTrue,
       );
       expect(
@@ -216,7 +215,8 @@ void main() {
 
       expect(draft.selectedTopicIds, {'card', 'gi'});
       expect(draft.selectedTagIds, {'pyq'});
-      expect(draft.selectedDifficulties, {QuestionDifficulty.hard});
+      expect(draft.selectedDifficulties, isEmpty);
+      expect(draft.resolvedDifficulties, isNull);
       expect(draft.sourceFilter, QuestionSourceFilter.incorrect);
       expect(draft.questionCount, 40);
       expect(draft.feedbackTiming, FeedbackTiming.onSubmit);
@@ -224,6 +224,19 @@ void main() {
       expect(draft.timerEnabled, isTrue);
       expect(draft.timerMinutes, 25);
       expect(draft.negativeMarking, isTrue);
+    });
+
+    test('never applies stored difficulty to a new session', () {
+      const draft = PracticeBuilderDraft(
+        selectedDifficulties: {QuestionDifficulty.hard},
+      );
+      expect(draft.hasContentFilters, isFalse);
+      expect(draft.resolvedDifficulties, isNull);
+
+      final clamped = draft.clampedTo(
+        const PracticePlanContext(limits: proLimits, questionsUsedToday: 0),
+      );
+      expect(clamped.selectedDifficulties, isEmpty);
     });
 
     test('null JSON arrays mean no filter, timer null means off', () {
@@ -282,15 +295,11 @@ void main() {
 
   group('PracticeBuilderDraft.alignedWithCatalog', () {
     const catalog = PracticeCatalog(
-      subjects: [
-        Subject(id: 'med', name: 'Medicine', displayOrder: 0),
-      ],
+      subjects: [Subject(id: 'med', name: 'Medicine', displayOrder: 0)],
       topics: [
         Topic(id: 'card', subjectId: 'med', name: 'Cardio', displayOrder: 0),
       ],
-      tags: [
-        PracticeTag(id: 'pyq', name: 'PYQ'),
-      ],
+      tags: [PracticeTag(id: 'pyq', name: 'PYQ')],
     );
 
     test('infers subjects from topics and drops unknown ids', () {

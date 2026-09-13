@@ -1,4 +1,5 @@
 import '../../../core/supabase/tables.dart';
+import '../../practice/domain/practice_enums.dart';
 import '../../profile/domain/plan_tier.dart';
 import 'question_format.dart';
 
@@ -12,6 +13,7 @@ class PyqTeaser {
     required this.requiredPlan,
     required this.appearanceCount,
     this.kind = 'pyq_theory',
+    this.difficulty = QuestionDifficulty.medium,
     this.textbookLine,
     this.appearanceYears = const [],
     this.paperNames = const [],
@@ -27,6 +29,7 @@ class PyqTeaser {
   final PlanTier requiredPlan;
   final int appearanceCount;
   final String kind;
+  final QuestionDifficulty difficulty;
   final String? textbookLine;
   final List<int> appearanceYears;
 
@@ -52,6 +55,11 @@ class PyqTeaser {
       ),
       appearanceCount: _asInt(json[PyqTeaserColumns.appearanceCount]),
       kind: json[PyqTeaserColumns.kind] as String? ?? 'pyq_theory',
+      difficulty: QuestionDifficulty.fromString(
+        json[PyqTeaserColumns.difficulty] as String? ??
+            json[QuestionColumns.difficulty] as String? ??
+            QuestionDifficulty.medium.dbValue,
+      ),
     );
   }
 
@@ -63,6 +71,7 @@ class PyqTeaser {
     String? topicName,
     String? lessonName,
     String? topicId,
+    QuestionDifficulty? difficulty,
   }) {
     return PyqTeaser(
       id: id,
@@ -73,6 +82,7 @@ class PyqTeaser {
       requiredPlan: requiredPlan,
       appearanceCount: appearanceCount ?? this.appearanceCount,
       kind: kind,
+      difficulty: difficulty ?? this.difficulty,
       textbookLine: textbookLine ?? this.textbookLine,
       appearanceYears: appearanceYears ?? this.appearanceYears,
       paperNames: paperNames ?? this.paperNames,

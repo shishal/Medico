@@ -79,6 +79,10 @@ class PyqTeaserCard extends StatelessWidget {
                         label: Text('${teaser.marks} marks'),
                         visualDensity: VisualDensity.compact,
                       ),
+                    Chip(
+                      label: Text(teaser.difficulty.label),
+                      visualDensity: VisualDensity.compact,
+                    ),
                     if (teaser.isHighYield)
                       Chip(
                         label: const Text('High yield'),
@@ -109,9 +113,8 @@ class PyqTeaserCard extends StatelessWidget {
                 if (teaser.appearanceCount > 0)
                   '${teaser.appearanceCount}× in papers',
               ].join(' · '),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: comic.ink.withValues(alpha: 0.7),
-              ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: comic.ink.withValues(alpha: 0.7)),
             ),
           ],
           if (teaser.topicName != null) ...[

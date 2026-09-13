@@ -10,15 +10,11 @@ import 'package:medico/features/profile/domain/plan_tier.dart';
 
 void main() {
   const catalog = PracticeCatalog(
-    subjects: [
-      Subject(id: 'med', name: 'Medicine', displayOrder: 0),
-    ],
+    subjects: [Subject(id: 'med', name: 'Medicine', displayOrder: 0)],
     topics: [
       Topic(id: 'card', subjectId: 'med', name: 'Cardio', displayOrder: 0),
     ],
-    tags: [
-      PracticeTag(id: 'pyq', name: 'PYQ'),
-    ],
+    tags: [PracticeTag(id: 'pyq', name: 'PYQ')],
   );
 
   const freeContext = PracticePlanContext(
@@ -49,10 +45,7 @@ void main() {
     questionsUsedToday: 0,
   );
 
-  Future<void> pumpForm(
-    WidgetTester tester,
-    PracticePlanContext ctx,
-  ) async {
+  Future<void> pumpForm(WidgetTester tester, PracticePlanContext ctx) async {
     tester.view.physicalSize = const Size(800, 3000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -75,7 +68,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('free plan shows locked controls with upgrade hints', (tester) async {
+  testWidgets('free plan shows locked controls with upgrade hints', (
+    tester,
+  ) async {
     await pumpForm(tester, freeContext);
 
     expect(find.text('Upgrade to filter by tags'), findsOneWidget);
@@ -85,15 +80,18 @@ void main() {
       find.text('Upgrade to practice with exam-style negative marking'),
       findsOneWidget,
     );
-    expect(find.textContaining('Free plan allows up to 10 per session'), findsOneWidget);
+    expect(
+      find.textContaining('Free plan allows up to 10 per session'),
+      findsOneWidget,
+    );
 
     expect(find.text('Subjects'), findsOneWidget);
     expect(find.text('Topics'), findsOneWidget);
     // Tags are visible (not hidden) even though locked.
     expect(find.text('#PYQ'), findsOneWidget);
-    // Difficulty stays available on free.
+    expect(find.text('Difficulty'), findsNothing);
+    expect(find.text('Easy'), findsNothing);
     expect(find.text('Upgrade to filter by difficulty'), findsNothing);
-    expect(find.text('Easy'), findsOneWidget);
   });
 
   testWidgets('similar-again draft is shown clamped for free', (tester) async {
@@ -136,7 +134,9 @@ void main() {
     expect(find.text('Upgrade to filter by tags'), findsOneWidget);
   });
 
-  testWidgets('pro plan leaves tag/timer/explanation controls unlocked', (tester) async {
+  testWidgets('pro plan leaves tag/timer/explanation controls unlocked', (
+    tester,
+  ) async {
     await pumpForm(tester, proContext);
 
     expect(find.text('Upgrade to filter by tags'), findsNothing);
@@ -146,7 +146,10 @@ void main() {
       find.text('Upgrade to practice with exam-style negative marking'),
       findsNothing,
     );
-    expect(find.textContaining('Pro plan allows up to 50 per session'), findsOneWidget);
+    expect(
+      find.textContaining('Pro plan allows up to 50 per session'),
+      findsOneWidget,
+    );
     expect(find.text('Full explanation'), findsOneWidget);
   });
 }

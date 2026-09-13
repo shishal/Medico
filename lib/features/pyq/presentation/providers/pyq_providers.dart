@@ -7,13 +7,16 @@ import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../data/pyq_repository.dart';
 import '../../domain/pyq_models.dart';
 import '../../domain/subject_pyq_filters.dart';
+import '../../../practice/domain/practice_enums.dart';
 
 part 'pyq_providers.g.dart';
 
 @riverpod
 Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
   final profile = await ref.watch(userProfileProvider.future);
-  final result = await ref.watch(pyqRepositoryProvider).fetchTeasersForLesson(
+  final result = await ref
+      .watch(pyqRepositoryProvider)
+      .fetchTeasersForLesson(
         lessonId: lessonId,
         universityId: profile?.universityId,
       );
@@ -28,7 +31,9 @@ Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
 @Riverpod(keepAlive: true)
 Future<PyqSubjectFeed> subjectPyqs(Ref ref, String subjectId) async {
   final profile = await ref.watch(userProfileProvider.future);
-  final result = await ref.watch(pyqRepositoryProvider).fetchTeasersForSubject(
+  final result = await ref
+      .watch(pyqRepositoryProvider)
+      .fetchTeasersForSubject(
         subjectId: subjectId,
         universityId: profile?.universityId,
       );
@@ -45,11 +50,29 @@ class SubjectPyqFilters extends _$SubjectPyqFilters {
   SubjectPyqFilter build(String subjectId) => const SubjectPyqFilter();
 
   void setPaperName(String? paperName) {
-    state = SubjectPyqFilter(paperName: paperName, topicId: state.topicId);
+    state = SubjectPyqFilter(
+      paperName: paperName,
+      topicId: state.topicId,
+      priorities: state.priorities,
+    );
   }
 
   void setTopicId(String? topicId) {
-    state = SubjectPyqFilter(paperName: state.paperName, topicId: topicId);
+    state = SubjectPyqFilter(
+      paperName: state.paperName,
+      topicId: topicId,
+      priorities: state.priorities,
+    );
+  }
+
+  void togglePriority(QuestionDifficulty value) {
+    final next = {...state.priorities};
+    if (!next.add(value)) next.remove(value);
+    state = SubjectPyqFilter(
+      paperName: state.paperName,
+      topicId: state.topicId,
+      priorities: next,
+    );
   }
 
   void clear() {
@@ -60,10 +83,9 @@ class SubjectPyqFilters extends _$SubjectPyqFilters {
 @riverpod
 Future<PyqDetail> pyqDetail(Ref ref, String questionId) async {
   final plan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
-  final result = await ref.watch(pyqRepositoryProvider).fetchDetail(
-        questionId: questionId,
-        plan: plan,
-      );
+  final result = await ref
+      .watch(pyqRepositoryProvider)
+      .fetchDetail(questionId: questionId, plan: plan);
   return switch (result) {
     Success(:final value) => value,
     Failure(:final message) => throw Exception(message),

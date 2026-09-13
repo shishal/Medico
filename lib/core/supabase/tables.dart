@@ -50,6 +50,7 @@ abstract final class ProfileColumns {
 abstract final class TestColumns {
   static const id = 'id';
   static const title = 'title';
+
   /// Catalog sheet upsert key. NULL on practice sessions.
   static const sheetKey = 'sheet_key';
   static const description = 'description';
@@ -310,6 +311,7 @@ abstract final class PyqTeaserColumns {
   static const isActive = 'is_active';
   static const appearanceCount = 'appearance_count';
   static const kind = 'kind';
+  static const difficulty = 'difficulty';
 }
 
 abstract final class ResourceColumns {
@@ -381,5 +383,3 @@ abstract final class MarkLearntParams {
 abstract final class SearchCatalogParams {
   static const query = 'p_query';
 }
-
-

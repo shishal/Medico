@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/spacing.dart';
+import '../../../practice/domain/practice_enums.dart';
 import '../../domain/pyq_models.dart';
 import '../providers/pyq_providers.dart';
 
@@ -102,6 +103,33 @@ class SubjectPyqFilterSheet extends ConsumerWidget {
                   ],
                 ),
               ],
+              const SizedBox(height: Spacing.md),
+              Text(
+                'Must / Should / Could',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              if (filter.priorities.isEmpty) ...[
+                const SizedBox(height: Spacing.xs),
+                Text(
+                  'None chosen — all questions',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              const SizedBox(height: Spacing.sm),
+              Wrap(
+                spacing: Spacing.sm,
+                runSpacing: Spacing.sm,
+                children: [
+                  for (final priority in QuestionDifficulty.filterOrder)
+                    FilterChip(
+                      label: Text(priority.label),
+                      selected: filter.priorities.contains(priority),
+                      onSelected: (_) => notifier.togglePriority(priority),
+                    ),
+                ],
+              ),
               const SizedBox(height: Spacing.lg),
               Row(
                 children: [

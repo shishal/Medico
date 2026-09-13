@@ -10,9 +10,6 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../bookmarks/presentation/widgets/lesson_bookmark_icon_button.dart';
-import '../../../practice/data/practice_repository.dart';
-import '../../../practice/domain/practice_builder_draft.dart';
-import '../../../practice/domain/practice_enums.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../pyq/data/pyq_repository.dart';
@@ -208,39 +205,9 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
             children: [
-              FilledButton(
-                onPressed: () async {
-                  final catalog = await ref
-                      .read(practiceRepositoryProvider)
-                      .fetchCatalog();
-                  if (!context.mounted) return;
-                  switch (catalog) {
-                    case Failure(:final message):
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(message)));
-                    case Success(:final value):
-                      final created = await ref
-                          .read(practiceRepositoryProvider)
-                          .createSession(
-                            draft: PracticeBuilderDraft(
-                              questionCount: 10,
-                              sourceFilter: QuestionSourceFilter.all,
-                              feedbackTiming: FeedbackTiming.immediate,
-                              lessonIds: {widget.lessonId},
-                            ),
-                            catalog: value,
-                          );
-                      if (!context.mounted) return;
-                      switch (created) {
-                        case Success(:final value):
-                          context.go(AppRoutes.testPlayerPath(value.testId));
-                        case Failure(:final message):
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text(message)));
-                      }
-                  }
-                },
-                child: const Text('Practice MCQs'),
+              const FilledButton(
+                onPressed: null,
+                child: Text('Practice · upcoming'),
               ),
               const SizedBox(height: Spacing.md),
               FilledButton.tonal(

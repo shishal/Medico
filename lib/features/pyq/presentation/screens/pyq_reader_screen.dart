@@ -130,14 +130,10 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  d.teaser.format.label +
-                      (d.teaser.marks != null
-                          ? ' · ${d.teaser.marks} marks'
-                          : '') +
-                      ' · ${d.teaser.difficulty.label}' +
-                      (d.teaser.appearanceCount > 0
-                          ? ' · ${d.teaser.appearanceCount}×'
-                          : ''),
+                  '${d.teaser.format.label}'
+                  '${d.teaser.marks != null ? ' · ${d.teaser.marks} marks' : ''}'
+                  ' · ${d.teaser.difficulty.label}'
+                  '${d.teaser.appearanceCount > 0 ? ' · ${d.teaser.appearanceCount}×' : ''}',
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: Spacing.sm),

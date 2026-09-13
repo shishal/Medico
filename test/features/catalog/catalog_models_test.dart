@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medico/core/supabase/tables.dart';
 import 'package:medico/features/catalog/domain/catalog_models.dart';
 
 void main() {

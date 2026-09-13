@@ -149,8 +149,16 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
     if (!QUESTION_KINDS[kind]) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': kind must be mcq or pyq_theory');
     }
-    var difficulty = trimStr_(row.difficulty).toLowerCase();
-    var plan = trimStr_(row.required_plan).toLowerCase();
+    var difficulty = enumOrDefault_(
+      row.difficulty,
+      DIFFICULTIES,
+      tabDefault_(questionsRaw, 'difficulty', QUESTION_FIELD_DEFAULTS.difficulty)
+    );
+    var plan = enumOrDefault_(
+      row.required_plan,
+      PLANS,
+      tabDefault_(questionsRaw, 'required_plan', QUESTION_FIELD_DEFAULTS.required_plan)
+    );
     var isActive = parseOptionalBool_(
       row.is_active,
       TAB.QUESTIONS,
@@ -159,11 +167,13 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       errors,
       true
     );
-    if (difficulty && !DIFFICULTIES[difficulty]) {
+    if (difficulty === null) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': difficulty must be easy, medium, or hard');
+      difficulty = QUESTION_FIELD_DEFAULTS.difficulty;
     }
-    if (plan && !PLANS[plan]) {
+    if (plan === null) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': required_plan must be free, pro, or elite');
+      plan = QUESTION_FIELD_DEFAULTS.required_plan;
     }
 
     var sKey = normKey_(subjectName);
@@ -230,8 +240,8 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
         option_d: trimStr_(row.option_d),
         correct_option: trimStr_(row.correct_option).toUpperCase(),
         explanation_text: trimStr_(row.explanation_text),
-        difficulty: difficulty || 'medium',
-        required_plan: plan || 'free',
+        difficulty: difficulty,
+        required_plan: plan,
         is_active: isActive !== false,
         kind: kind,
         lesson_external_id: lessonExt,
@@ -248,8 +258,17 @@ function validateWideSheet_(errors, warnings, questionsRaw) {
       paperExt = paperExt.substring(0, 80);
       var pKey = normKey_(paperExt);
       if (!paperByKey[pKey]) {
-        var examType = trimStr_(row.exam_type).toLowerCase() || 'university';
-        if (!EXAM_TYPES[examType]) examType = 'university';
+        var examType = enumOrDefault_(
+          row.exam_type,
+          EXAM_TYPES,
+          tabDefault_(questionsRaw, 'exam_type', QUESTION_FIELD_DEFAULTS.exam_type)
+        );
+        if (examType === null) {
+          errors.push(
+            TAB.QUESTIONS + ' row ' + row.__row + ': exam_type must be university or internal'
+          );
+          examType = QUESTION_FIELD_DEFAULTS.exam_type;
+        }
         paperByKey[pKey] = true;
         examPapers.push({
           external_id: paperExt,

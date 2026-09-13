@@ -62,11 +62,11 @@ are cleared. Run **Sync to App** afterwards to reload from this sheet.
 
 ### Validation (includes Phase 2.2 required checks)
 
-- `kind` ∈ mcq / pyq_theory. Blank kind: if all four options and `correct_option` are empty → `pyq_theory`, otherwise `mcq`. Column header is matched case-insensitively (`Kind` is fine).
+- `kind` ∈ mcq / pyq_theory. Blank kind: if all four options and `correct_option` are empty → `pyq_theory`, otherwise `mcq`. The header `kind(Default-MCQ)` is a label only — it is not written on blank cells.
+- Blank `difficulty` → `medium` (always sent on upsert). Blank `required_plan` → `free`. Blank `is_active` → TRUE. Blank `exam_type` → `university`.
 - MCQ: `correct_option` ∈ A/B/C/D and all four options non-empty
 - Theory: options not required; paper columns (`exam_year` + `paper_name`) create the appearance
 - resource `url` must start with `https://`
-- `required_plan` ∈ free/pro/elite
 - `subject_name` is required on the wide Questions tab. `topic_name` / `lesson_name` are optional tags (blank is fine; they create catalog rows only when filled)
 - plus header presence, enums, and `university_code` matching the Universities tab
 

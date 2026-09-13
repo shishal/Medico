@@ -86,6 +86,7 @@ class SubjectSticker extends StatelessWidget {
     // Skip it when this university has no papers; those totals are another bank.
     final total = showLessonProgress ? (coverage?.totalLessons ?? 0) : 0;
     final learnt = showLessonProgress ? (coverage?.learntLessons ?? 0) : 0;
+    final pyqs = showLessonProgress ? (coverage?.totalPyqs ?? 0) : 0;
     final progress = total == 0 ? 0.0 : learnt / total;
 
     return ComicCard(
@@ -136,11 +137,12 @@ class SubjectSticker extends StatelessWidget {
                 ?.copyWith(fontWeight: FontWeight.w800),
           ),
           Text(
-            !showLessonProgress
-                ? 'No PYQs yet'
-                : total == 0
-                    ? 'No lessons yet'
-                    : '$learnt of $total lessons learnt',
+            subjectTileCaption(
+              showLessonProgress: showLessonProgress,
+              learntLessons: learnt,
+              totalLessons: total,
+              totalPyqs: pyqs,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall,
@@ -149,4 +151,21 @@ class SubjectSticker extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Home sticker subtitle. Lesson progress stays on the ring when chapters
+/// exist; untagged PYQs still get a count so the card is not empty.
+String subjectTileCaption({
+  required bool showLessonProgress,
+  required int learntLessons,
+  required int totalLessons,
+  int totalPyqs = 0,
+}) {
+  if (!showLessonProgress) return 'No PYQs yet';
+  if (totalLessons > 0) {
+    return '$learntLessons of $totalLessons lessons learnt';
+  }
+  if (totalPyqs == 1) return '1 PYQ';
+  if (totalPyqs > 1) return '$totalPyqs PYQs';
+  return 'No PYQs yet';
 }

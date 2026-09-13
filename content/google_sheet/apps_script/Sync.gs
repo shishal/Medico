@@ -153,6 +153,7 @@ function syncToApp() {
 }
 
 function performSync_(data) {
+  ensureUgGlobals_();
   var phaseReturned = supabaseSelect_('mbbs_phases', '?select=id,code');
   var phaseIdByCode = {};
   (phaseReturned || []).forEach(function (row) {
@@ -243,11 +244,11 @@ function performSync_(data) {
       explanation_text: emptyToNull_(q.explanation_text),
       explanation_video_url: emptyToNull_(q.explanation_video_url),
       image_url: emptyToNull_(q.image_url),
-      difficulty: q.difficulty,
+      difficulty: q.difficulty || QUESTION_FIELD_DEFAULTS.difficulty,
       source: emptyToNull_(q.source),
       marks: q.marks == null || q.marks === '' ? null : Number(q.marks),
-      required_plan: q.required_plan,
-      is_active: q.is_active,
+      required_plan: q.required_plan || QUESTION_FIELD_DEFAULTS.required_plan,
+      is_active: q.is_active !== false,
     };
   });
   var questionReturned = supabaseUpsert_('questions', questionRows, 'external_id');

@@ -84,11 +84,13 @@ void main() {
           'name': 'Anatomy',
           'learnt_lessons': 1,
           'total_lessons': 4,
+          'total_pyqs': 12,
         },
       ],
     });
     expect(progress.streak, 2);
     expect(progress.days7.last.count, 3);
     expect(progress.subjects.single.totalLessons, 4);
+    expect(progress.subjects.single.totalPyqs, 12);
   });
 }

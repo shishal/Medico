@@ -18,6 +18,13 @@ function ensureUgGlobals_() {
   if (typeof QUESTION_KINDS === 'undefined') {
     QUESTION_KINDS = { pyq_theory: true, mcq: true };
   }
+  if (typeof QUESTION_FIELD_DEFAULTS === 'undefined') {
+    QUESTION_FIELD_DEFAULTS = {
+      difficulty: 'medium',
+      required_plan: 'free',
+      exam_type: 'university',
+    };
+  }
   if (typeof TAB === 'undefined') {
     TAB = {};
   }
@@ -96,10 +103,18 @@ function readTabObjects_(sheetName) {
 
   var values = sheet.getDataRange().getValues();
   if (!values.length) {
-    return { headers: [], rows: [] };
+    return { headers: [], rows: [], defaults: {} };
   }
 
-  var headers = values[0].map(headerKey_);
+  var displays = sheet.getDataRange().getDisplayValues();
+  var rawHeaders = values[0];
+  var headers = rawHeaders.map(headerKey_);
+  var defaults = {};
+  for (var c = 0; c < rawHeaders.length; c++) {
+    if (!headers[c]) continue;
+    var headerDefault = headerDefaultValue_(rawHeaders[c]);
+    if (headerDefault) defaults[headers[c]] = headerDefault;
+  }
 
   var rows = [];
   for (var r = 1; r < values.length; r++) {
@@ -107,15 +122,40 @@ function readTabObjects_(sheetName) {
     if (isBlankRow_(line)) continue;
 
     var obj = {};
+    var shown = displays[r] || [];
     for (var c = 0; c < headers.length; c++) {
       if (!headers[c]) continue;
-      obj[headers[c]] = line[c];
+      // A dropdown can keep the first item (easy) after the cell looks blank.
+      obj[headers[c]] = trimStr_(shown[c]) === '' ? '' : line[c];
     }
     obj.__row = r + 1; // spreadsheet row number for error messages
     rows.push(obj);
   }
 
-  return { headers: headers, rows: rows };
+  return { headers: headers, rows: rows, defaults: defaults };
+}
+
+/** `difficulty(Default-medium)` → `medium`. */
+function headerDefaultValue_(rawHeader) {
+  var m = String(rawHeader || '').match(/\(\s*default\s*[-:]\s*([^)]+?)\)/i);
+  return m ? trimStr_(m[1]) : '';
+}
+
+/**
+ * Blank → fallback. Non-blank must be in `allowed` (lowercased).
+ * Returns null when the cell has a value that is not allowed.
+ */
+function enumOrDefault_(raw, allowed, fallback) {
+  var s = trimStr_(raw).toLowerCase();
+  if (!s) return fallback;
+  if (allowed[s]) return s;
+  return null;
+}
+
+function tabDefault_(tabRaw, key, hardcoded) {
+  var fromHeader = tabRaw && tabRaw.defaults && tabRaw.defaults[key];
+  if (!fromHeader) return hardcoded;
+  return trimStr_(fromHeader).toLowerCase() || hardcoded;
 }
 
 function cellIsEmpty_(v) {

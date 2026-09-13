@@ -188,9 +188,16 @@ function validateAllTabs_() {
     var optionC = trimStr_(row.option_c);
     var optionD = trimStr_(row.option_d);
     var correct = trimStr_(row.correct_option).toUpperCase();
-    var difficulty = trimStr_(row.difficulty).toLowerCase();
-    var plan = trimStr_(row.required_plan).toLowerCase();
-    var isActive = parseBool_(row.is_active, TAB.QUESTIONS, row.__row, 'is_active', errors);
+    var difficulty = enumOrDefault_(row.difficulty, DIFFICULTIES, 'medium');
+    var plan = enumOrDefault_(row.required_plan, PLANS, 'free');
+    var isActive = parseOptionalBool_(
+      row.is_active,
+      TAB.QUESTIONS,
+      row.__row,
+      'is_active',
+      errors,
+      true
+    );
 
     if (!externalId) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': external_id is required');
@@ -255,11 +262,13 @@ function validateAllTabs_() {
         );
       }
     }
-    if (!DIFFICULTIES[difficulty]) {
+    if (difficulty === null) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': difficulty must be easy, medium, or hard');
+      difficulty = 'medium';
     }
-    if (!PLANS[plan]) {
+    if (plan === null) {
       errors.push(TAB.QUESTIONS + ' row ' + row.__row + ': required_plan must be free, pro, or elite');
+      plan = 'free';
     }
 
     if (externalId) questionByExt[normKey_(externalId)] = true;

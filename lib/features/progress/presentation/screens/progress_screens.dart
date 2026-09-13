@@ -7,6 +7,7 @@ import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/coverage_ring.dart';
+import '../../../catalog/presentation/widgets/subject_tile.dart';
 import '../providers/ug_home_providers.dart';
 
 class ProgressScreen extends ConsumerWidget {
@@ -107,7 +108,12 @@ class ProgressScreen extends ConsumerWidget {
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                '${p.subjects[i].learntLessons}/${p.subjects[i].totalLessons} lessons learnt',
+                                subjectTileCaption(
+                                  showLessonProgress: true,
+                                  learntLessons: p.subjects[i].learntLessons,
+                                  totalLessons: p.subjects[i].totalLessons,
+                                  totalPyqs: p.subjects[i].totalPyqs,
+                                ),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],

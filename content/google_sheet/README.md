@@ -120,8 +120,8 @@ textbook refs from the wide Questions row. Extra blanks it now fills:
 | Sheet cell | If blank, sync writes |
 |---|---|
 | Universities `slug` | *(column removed)* `lower(code)` |
-| Questions `kind(Default-MCQ)` | `pyq_theory` if no MCQ options; else `mcq` |
-| Questions `difficulty(Default-medium)` | `medium` |
+| Questions `kind(Default-MCQ)` | **Not applied.** Blank kind: `pyq_theory` if no MCQ options; else `mcq` |
+| Questions `difficulty(Default-medium)` | `medium` (always written, so a leftover `easy` in the DB is overwritten) |
 | Questions `required_plan(Default-free)` | `free` |
 | Questions `is_active(Default-TRUE)` | `TRUE` |
 | Questions `topic_name` | no topic row; `questions.topic_id` stays null |
@@ -150,8 +150,9 @@ repeats on another paper.
    another paper or has another textbook page.
 3. Booleans: `TRUE` / `FALSE` (Google Sheets checkboxes are fine). Blank
    `is_active` means TRUE.
-4. Enums must match the allowed values exactly (lowercase for plans / types /
-   difficulty / kind; uppercase A–D for MCQ answers).
+4. Enums: `easy` / `medium` / `hard`, `free` / `pro` / `elite`, `mcq` /
+   `pyq_theory` (case-insensitive). Blank difficulty is `medium`, blank plan
+   is `free`. Uppercase A–D for MCQ answers.
 5. Empty optional cells stay blank; do not write `null` or `N/A`.
 6. Theory PYQs do **not** need options or `kind`. MCQ rows still need options.
    Sample answers are optional — a stem + paper columns is enough to ship.

@@ -34,6 +34,13 @@ var PROP = {
 
 var PLANS = { free: true, pro: true, elite: true };
 var DIFFICULTIES = { easy: true, medium: true, hard: true };
+
+/** Blank Questions cells. kind is inferred (not Default-MCQ) — see WideSheet.gs. */
+var QUESTION_FIELD_DEFAULTS = {
+  difficulty: 'medium',
+  required_plan: 'free',
+  exam_type: 'university',
+};
 var TEST_TYPES = { mini: true, subject: true, mock: true, grand: true };
 var CORRECT_OPTIONS = { A: true, B: true, C: true, D: true };
 

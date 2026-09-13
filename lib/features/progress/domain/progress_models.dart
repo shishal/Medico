@@ -18,6 +18,7 @@ class SubjectCoverage {
     required this.name,
     required this.learntLessons,
     required this.totalLessons,
+    this.totalPyqs = 0,
   });
 
   final String id;
@@ -25,12 +26,16 @@ class SubjectCoverage {
   final int learntLessons;
   final int totalLessons;
 
+  /// Distinct active questions on this subject's papers for the student university.
+  final int totalPyqs;
+
   factory SubjectCoverage.fromJson(Map<String, dynamic> json) {
     return SubjectCoverage(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       learntLessons: _asInt(json['learnt_lessons']),
       totalLessons: _asInt(json['total_lessons']),
+      totalPyqs: _asInt(json['total_pyqs']),
     );
   }
 }

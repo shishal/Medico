@@ -1,5 +1,5 @@
-subject_name,question_text,option_a,option_b,option_c,option_d,correct_option,topic_name,lesson_name,marks,exam_year,paper_name,textbook_title,page,explanation_text,sample_answer_text,resource_title,resource_url
-Anatomy,Describe the blood supply of the heart.,,,,,,Thorax Anatomy,Heart and coronary arteries,10,2021,Paper I,Human Anatomy Volume 1 (Upper Limb and Thorax),180,,Right and left coronary arteries arise from the aortic sinuses.,,
-Anatomy,Klumpke palsy typically results from injury to which spinal roots?,C5 and C6,C6 and C7,C7 and C8,C8 and T1,D,Upper Limb Anatomy,Brachial plexus,,,,,,Klumpke palsy is a lower trunk (C8-T1) injury.,,Brachial plexus reference,https://en.wikipedia.org/wiki/Brachial_plexus
-Physiology,Describe resting membrane potential and action potential.,,,,,,,,10,2021,Paper I,,,,,,
-Biochemistry,Which enzyme is deficient in von Gierke disease?,Muscle glycogen phosphorylase,Glucose-6-phosphatase,Debranching enzyme,Lysosomal acid maltase,B,,,,,,,,Glucose-6-phosphatase deficiency causes severe fasting hypoglycaemia.,,,
+subject_name,question_text,option_a,option_b,option_c,option_d,correct_option,topic_name,lesson_name,marks,university_code,exam_year,paper_name,textbook_title,page,explanation_text,sample_answer_text,resource_title,resource_url
+Anatomy,Describe the blood supply of the heart.,,,,,,Thorax Anatomy,Heart and coronary arteries,10,KUHS,2021,Paper I,Human Anatomy Volume 1 (Upper Limb and Thorax),180,,Right and left coronary arteries arise from the aortic sinuses.,,
+Anatomy,Klumpke palsy typically results from injury to which spinal roots?,C5 and C6,C6 and C7,C7 and C8,C8 and T1,D,Upper Limb Anatomy,Brachial plexus,,,,,,,Klumpke palsy is a lower trunk (C8-T1) injury.,,Brachial plexus reference,https://en.wikipedia.org/wiki/Brachial_plexus
+Physiology,Describe resting membrane potential and action potential.,,,,,,,,10,KUHS,2021,Paper I,,,,,,
+Biochemistry,Which enzyme is deficient in von Gierke disease?,Muscle glycogen phosphorylase,Glucose-6-phosphatase,Debranching enzyme,Lysosomal acid maltase,B,,,,,,,,,Glucose-6-phosphatase deficiency causes severe fasting hypoglycaemia.,,,

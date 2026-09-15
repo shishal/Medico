@@ -90,6 +90,21 @@ def check_sample_csv() -> tuple[list[dict[str, str]], list[str]]:
         errors.append("Questions.csv needs a minimal theory example")
     if not any(row.get("option_a") and row.get("correct_option") for row in rows):
         errors.append("Questions.csv needs an MCQ example")
+    for index, row in enumerate(rows, start=2):
+        year = row.get("exam_year", "")
+        paper = row.get("paper_name", "")
+        uni = row.get("university_code", "")
+        filled = sum(1 for value in (year, paper, uni) if value)
+        if filled not in (0, 3):
+            errors.append(
+                f"Questions.csv row {index}: university_code, exam_year, and "
+                "paper_name must be filled together"
+            )
+    if not any(
+        row.get("university_code") and row.get("exam_year") and row.get("paper_name")
+        for row in rows
+    ):
+        errors.append("Questions.csv needs a paper-linked example with university_code")
     return rows, errors
 
 
@@ -134,6 +149,15 @@ def exercise_sync(conn) -> list[str]:
     invalid_cases = [
         ([{"subject_name": "X", "question_text": "Partial MCQ", "option_a": "A"}], "option_b"),
         ([{"subject_name": "X", "question_text": "Partial paper", "exam_year": "2024"}], "paper_name"),
+        (
+            [{
+                "subject_name": "X",
+                "question_text": "Paper without university",
+                "exam_year": "2024",
+                "paper_name": "Paper I",
+            }],
+            "university_code",
+        ),
         ([{"subject_name": "X", "question_text": "Partial book", "textbook_title": "Book"}], "page"),
         ([{"subject_name": "X", "question_text": "Lesson only", "lesson_name": "Lesson"}], "topic_name"),
     ]

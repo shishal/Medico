@@ -2073,7 +2073,7 @@ def build() -> None:
                 wide_rows.append(
                     {
                         "external_id": ext,
-                        "university_code": (paper or {}).get("university_code") or "KUHS",
+                        "university_code": (paper or {}).get("university_code") or "",
                         "phase_code": phase,
                         "subject_name": subject,
                         "topic_name": topic,

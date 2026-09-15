@@ -26,14 +26,14 @@ and are seeded by migration, not by content sync.
 | `topic_name` | no | Syllabus tag; created on sync. |
 | `lesson_name` | no | Needs `topic_name` if filled. |
 | `marks` | no | Theory format: ≥10 essay, 4–9 short, ≤3 VSA. |
-| `exam_year` + `paper_name` | no | Fill both or neither. Defaults university = KUHS. |
+| `university_code` + `exam_year` + `paper_name` | no | Fill all three or none. Code must exist in `universities` (e.g. KUHS). |
 | `textbook_title` + `page` | no | Fill both or neither. |
 | `explanation_text` | no | EX. |
 | `sample_answer_text` | no | DA (Pro-gated table). |
 | `resource_title` + `resource_url` | no | Fill both or neither; `https` only. |
 
 Optional advanced columns (allowed by sync, omitted from the lean template):
-`kind`, `university_code`, `exam_type`, `textbook_authors`, `textbook_edition`,
+`kind`, `exam_type`, `textbook_authors`, `textbook_edition`,
 `section_heading`, `difficulty`, `required_plan`, `is_active`,
 `resource_source_label`, `resource_is_free`.
 
@@ -42,12 +42,14 @@ Optional advanced columns (allowed by sync, omitted from the lean template):
 | Blank cell | Sync uses |
 |---|---|
 | kind | theory if no MCQ cells; else MCQ |
-| university_code (when paper filled) | KUHS |
 | exam_type | university |
 | difficulty | medium |
 | required_plan | free |
 | is_active | TRUE |
 | resource_is_free | TRUE |
+
+There is **no default university**. Paper-linked rows must set `university_code`
+explicitly.
 
 ## Editor rules
 

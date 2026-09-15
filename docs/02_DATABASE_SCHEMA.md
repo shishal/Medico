@@ -689,8 +689,10 @@ Apply migrations through
 
 Routine content entry uses only `content/google_sheet/tabs/Questions.csv`.
 `subject_name` and `question_text` are unconditional; kind is inferred, and
-MCQ options/key are conditionally required. Topic, lesson, paper, marks,
-textbook/page, and resource fields are optional.
+MCQ options/key are conditionally required. Topic, lesson, marks,
+textbook/page, and resource fields are optional. Paper linkage requires
+`university_code` + `exam_year` + `paper_name` together (no default
+university code).
 
 **MBBS year is not a CSV column.** Table `subject_phase_defaults` maps
 subject names (Anatomy, Physiology, …) to `year1`–`year4`. Sync calls

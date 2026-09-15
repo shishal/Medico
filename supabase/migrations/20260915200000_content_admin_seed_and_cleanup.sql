@@ -254,6 +254,7 @@ declare
   v_stem text;
   v_year text;
   v_paper text;
+  v_uni text;
   v_marks text;
   v_page text;
   v_tb_title text;
@@ -417,8 +418,12 @@ begin
 
     v_year := btrim(coalesce(v_row->>'exam_year', ''));
     v_paper := btrim(coalesce(v_row->>'paper_name', ''));
+    v_uni := btrim(coalesce(v_row->>'university_code', ''));
     if (v_year = '') <> (v_paper = '') then
       v_errors := v_errors || jsonb_build_array('Questions row ' || v_row_no || ': exam_year and paper_name must be filled together');
+    end if;
+    if (v_year = '') <> (v_uni = '') then
+      v_errors := v_errors || jsonb_build_array('Questions row ' || v_row_no || ': university_code must be filled together with exam_year and paper_name');
     end if;
     if v_year <> '' then
       if v_year !~ '^[0-9]{4}$' then
@@ -491,9 +496,7 @@ begin
       nullif(btrim(coalesce(v_row->>'topic_name', '')), ''),
       nullif(btrim(coalesce(v_row->>'lesson_name', '')), ''),
       nullif(v_marks, ''),
-      case when v_year = '' then null
-        else upper(coalesce(nullif(btrim(coalesce(v_row->>'university_code', '')), ''), 'KUHS'))
-      end,
+      nullif(upper(v_uni), ''),
       nullif(v_year, ''), nullif(v_paper, ''),
       lower(coalesce(nullif(btrim(coalesce(v_row->>'exam_type', '')), ''), 'university')),
       nullif(v_tb_title, ''),

@@ -66,6 +66,15 @@ def read_rows(path: Path) -> list[dict[str, str]]:
                 if (value or "").strip()
             }
             if any(normalized.values()):
+                year = normalized.get("exam_year", "")
+                paper = normalized.get("paper_name", "")
+                uni = normalized.get("university_code", "")
+                filled = sum(1 for value in (year, paper, uni) if value)
+                if filled not in (0, 3):
+                    raise ValueError(
+                        f"CSV row {row_number}: university_code, exam_year, and "
+                        "paper_name must be filled together (no default university)"
+                    )
                 normalized["_row_number"] = str(row_number)
                 rows.append(normalized)
         return rows

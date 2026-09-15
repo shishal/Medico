@@ -35,8 +35,8 @@ Unknown subject names fail validation.
 - Required: `subject_name`, `question_text`
 - MCQ: options A–D + correct option
 - Theory: leave options blank
-- `exam_year` + `paper_name` together; `textbook_title` + `page` together;
-  `resource_title` + `resource_url` together
+- `university_code` + `exam_year` + `paper_name` together (no default university);
+  `textbook_title` + `page` together; `resource_title` + `resource_url` together
 - Resource URL must be `https://`
 
 ## Security

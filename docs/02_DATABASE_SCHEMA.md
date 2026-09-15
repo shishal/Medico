@@ -682,6 +682,37 @@ exam_papers.
 `is_fallback` is retired — drop with
 `supabase/migrations/20260913120000_drop_university_fallback.sql`.
 
+### 9.2c One-file CSV sync
+
+Apply migrations through
+`supabase/migrations/20260915200000_content_admin_seed_and_cleanup.sql`.
+
+Routine content entry uses only `content/google_sheet/tabs/Questions.csv`.
+`subject_name` and `question_text` are unconditional; kind is inferred, and
+MCQ options/key are conditionally required. Topic, lesson, paper, marks,
+textbook/page, and resource fields are optional.
+
+**MBBS year is not a CSV column.** Table `subject_phase_defaults` maps
+subject names (Anatomy, Physiology, …) to `year1`–`year4`. Sync calls
+`ensure_csv_subject()` so new subjects get `mbbs_phase_id` automatically.
+Unknown subjects fail validation.
+
+Admin seeds (universities, colleges) live under `content/admin/` and are
+applied by the same migration — not by the Questions sync.
+
+Both Google Apps Script and `scripts/sync_content_csv.py` call
+`sync_content_csv(jsonb, boolean)`. Preview (`false`) validates and returns
+insert/update/delete counts without writes. Apply (`true`) repeats validation
+and normalizes the complete snapshot in one transaction. The function is
+granted only to `service_role`.
+
+Question identity is generated from normalized subject + kind + stem.
+CSV-managed rows carry `questions.content_sync_source =
+'questions_csv_v2'`. Rows absent from the next snapshot are deleted with
+dependent history after the client shows preview counts and receives explicit
+confirmation. Changing subject, kind, or stem therefore creates a new
+identity; this destructive behavior is intentional for this pipeline.
+
 ### 9.2b Editor sheet vs database
 
 The Google Sheet is **denormalized** for a non-technical editor: a wide

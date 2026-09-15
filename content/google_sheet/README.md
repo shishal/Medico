@@ -1,174 +1,71 @@
 # Google Sheet content CMS
 
-This folder is the **source of truth for the content CMS layout**. Import the
-CSVs under `tabs/` into a Google Sheet (one CSV → one tab, tab names must
-match exactly). Apps Script validates the sheet and upserts **normalized**
-Supabase tables.
+Routine content entry uses **one file/tab**: `tabs/Questions.csv` → `Questions`.
+Apps Script and `scripts/sync_content_csv.py` both call the same Supabase RPC.
 
-A non-technical editor should only fill cells — **names, not UUIDs**.
+Editors fill names only — never UUIDs. MBBS year (year1–year4) comes from
+`subject_phase_defaults` in Postgres, not from the CSV.
+
+Admin catalogs (universities / colleges) live in [`content/admin/`](../admin/)
+and are seeded by migration, not by content sync.
 
 ## Create the Sheet (one-time)
 
-1. Open [Google Sheets](https://sheets.google.com) → **Blank spreadsheet**.
-2. Rename the file to something like `Medico Content`.
-3. For each file in `tabs/`:
-   - File → Import → Upload → select the CSV.
-   - Import location: **Insert new sheet(s)**.
-   - Separator: Detect automatically.
-4. Rename each imported sheet tab to the CSV stem exactly:
-   - `Universities`, `Colleges`, `Phases`, `Textbooks`, `Questions`,
-     `LessonResources`
-5. Delete the unused default `Sheet1` if it is empty.
-6. (Optional) Add a non-synced `ReadMe` tab and paste the “Editor rules”
-   section below.
+1. Open [Google Sheets](https://sheets.google.com) → blank spreadsheet.
+2. Import `tabs/Questions.csv` and name the tab exactly `Questions`.
+3. Optional: add a non-synced ReadMe tab with the editor rules below.
 
-The CSVs in `tabs/` are a **full KUHS seed** written as a wide `Questions`
-tab. Hierarchy (subjects, topics, lessons, exam papers, appearances, textbook
-refs) is **created on sync**. Import as-is, then edit in the Sheet. To
-regenerate from the Python catalog:
+## Lean `Questions` columns
+
+| Column | Required | Notes |
+|---|---|---|
+| `subject_name` | yes | Must exist in `subject_phase_defaults` (e.g. Anatomy → year1). |
+| `question_text` | yes | Stem. |
+| `option_a` … `option_d` | if MCQ | Blank on theory. Any option/key cell ⇒ MCQ. |
+| `correct_option` | if MCQ | `A` / `B` / `C` / `D`. |
+| `topic_name` | no | Syllabus tag; created on sync. |
+| `lesson_name` | no | Needs `topic_name` if filled. |
+| `marks` | no | Theory format: ≥10 essay, 4–9 short, ≤3 VSA. |
+| `exam_year` + `paper_name` | no | Fill both or neither. Defaults university = KUHS. |
+| `textbook_title` + `page` | no | Fill both or neither. |
+| `explanation_text` | no | EX. |
+| `sample_answer_text` | no | DA (Pro-gated table). |
+| `resource_title` + `resource_url` | no | Fill both or neither; `https` only. |
+
+Optional advanced columns (allowed by sync, omitted from the lean template):
+`kind`, `university_code`, `exam_type`, `textbook_authors`, `textbook_edition`,
+`section_heading`, `difficulty`, `required_plan`, `is_active`,
+`resource_source_label`, `resource_is_free`.
+
+## Defaults
+
+| Blank cell | Sync uses |
+|---|---|
+| kind | theory if no MCQ cells; else MCQ |
+| university_code (when paper filled) | KUHS |
+| exam_type | university |
+| difficulty | medium |
+| required_plan | free |
+| is_active | TRUE |
+| resource_is_free | TRUE |
+
+## Editor rules
+
+1. Only edit `Questions`. Never invent IDs.
+2. Repeat the same subject + stem for another paper/page/resource.
+3. Theory: leave options blank. MCQ: fill all four options + key.
+4. Bank MCQs can omit paper fields (they will not appear in year browsing).
+5. Preview shows destructive removals; type `APPLY` to confirm.
+
+## Sync
+
+See [`apps_script/README.md`](apps_script/README.md).
 
 ```bash
-python3 scripts/generate_ug_seed_csvs.py
+python3 scripts/sync_content_csv.py             # preview
+python3 scripts/sync_content_csv.py --apply     # type APPLY to write
 ```
 
-**Retired editor tabs** (do not recreate): `Subjects`, `Topics`, `Lessons`,
-`ExamPapers`, `Appearances`, `TextbookRefs`, `QuestionResources`, `Tests`,
-`TestQuestions`. An older sheet that still has those tabs can keep using the
-legacy validator until you switch the Questions header to the wide columns.
-
-Trackers were never a sheet tab (in-app rows + SQL seed only). Drop leftover
-DB objects with `supabase/migrations/20260912120000_drop_trackers.sql`.
-University `is_fallback` is retired; drop with
-`supabase/migrations/20260913120000_drop_university_fallback.sql`.
-
-## Editor tabs
-
-### `Universities` → `universities`
-
-| Column | Required | Notes |
-|---|---|---|
-| `code` | yes | e.g. `KUHS`. Natural upsert key. |
-| `name` | yes | Full university name. |
-| `state` | yes | Stored with the university. |
-
-`universities.slug` is **not a sheet column**. Sync writes `lower(code)` (so `KUHS` → `kuhs`) for website URLs. An old `slug` or `is_fallback` column is ignored. If a university has no papers, the app shows empty PYQs — it does not substitute another bank.
-
-### `Colleges` → `colleges`
-
-`university_code`, `name`. Include **Other / not listed** per university so
-onboarding never blocks.
-
-### `Phases` → `mbbs_phases`
-
-Optional. Migration already seeds the four MBBS years. Re-import this tab
-only if you need to rename them. Sync reads `mbbs_phases` from Supabase;
-it does not require this sheet.
-
-### `Textbooks` → `textbooks`
-
-`sheet_key`, `title`, `authors`, `edition`. Citation metadata only — never PDFs.
-`sheet_key` stops title typos on the Questions tab.
-
-### `Questions` → normalized tables
-
-**One row = one question appearance** (or one textbook page). Repeat the same
-`external_id` for extra papers or extra textbook pages. Sync upserts
-`subjects`, `topics`, `lessons`, `questions`, `exam_papers`,
-`question_appearances`, `question_textbook_refs`, and
-`question_sample_answers`.
-
-Headers with a default are named like `kind(Default-MCQ)` so the sheet itself
-shows the fallback. Sync strips the `(Default-…)` suffix.
-
-| Column | Required | Notes |
-|---|---|---|
-| `university_code` | if paper filled | Must match `Universities.code`. |
-| `phase_code` | no | `year1` / `year2` / `year3` / `year4`. |
-| `subject_name` | yes | Created on sync if new. |
-| `topic_name` | no | Created on sync if new. Blank leaves the question untagged. |
-| `lesson_name` | no | Created on sync if new. Needs `topic_name` if filled. |
-| `external_id` | yes | Stable ID you invent (e.g. `Q-ANAT-PYQ-001`). |
-| `kind(Default-MCQ)` | no | `mcq` or `pyq_theory`. Blank: theory if all options + `correct_option` are empty, else MCQ. |
-| `marks` | no | Theory paper marks. Essay ≥10, short 4–9, VSA ≤3. |
-| `question_text` | yes | Stem. |
-| `option_a` … `option_d` | if `mcq` | All four non-empty for MCQ. Blank on theory. |
-| `correct_option` | if `mcq` | Exactly `A`, `B`, `C`, or `D`. |
-| `explanation_text` | no | **EX** for any kind (theory or MCQ). Tutor write-up; not the direct answer. |
-| `sample_answer_text` | no | **DA** for any kind. Model / short answer. Stored in `question_sample_answers`. |
-| `difficulty(Default-medium)` | no | `easy` / `medium` / `hard`. |
-| `required_plan(Default-free)` | no | `free` / `pro` / `elite`. |
-| `is_active(Default-TRUE)` | no | `TRUE` / `FALSE`. |
-| `exam_year` | no | Blank OK for bank MCQs. |
-| `paper_name` | no | e.g. `Paper I`. Blank skips the appearance. |
-| `exam_type(Default-university)` | no | `university` / `internal`. |
-| `textbook_key` | no | Must match `Textbooks.sheet_key`. |
-| `page` | no | Integer page citation. |
-| `section_heading` | no | |
-
-### `LessonResources` → `lesson_resources` (optional)
-
-`subject_name`, `topic_name`, `lesson_name` must match a Questions lesson
-(sync derives the internal `L-…` id). Then `title`, `url` (`https`),
-`source_label`, `display_order(Default-1)`, `is_free(Default-TRUE)`. Do not
-link copyrighted textbook PDFs.
-
-## What you can leave blank
-
-Sync already invents subjects, topics, lessons, exam papers, appearances, and
-textbook refs from the wide Questions row. Extra blanks it now fills:
-
-| Sheet cell | If blank, sync writes |
-|---|---|
-| Universities `slug` | *(column removed)* `lower(code)` |
-| Questions `kind(Default-MCQ)` | **Not applied.** Blank kind: `pyq_theory` if no MCQ options; else `mcq` |
-| Questions `difficulty(Default-medium)` | `medium` (always written, so a leftover `easy` in the DB is overwritten) |
-| Questions `required_plan(Default-free)` | `free` |
-| Questions `is_active(Default-TRUE)` | `TRUE` |
-| Questions `topic_name` | no topic row; `questions.topic_id` stays null |
-| Questions `lesson_name` | no lesson row; `questions.lesson_id` stays null |
-| Questions `exam_type(Default-university)` | `university` |
-| LessonResources `display_order(Default-1)` | 1, then 2, … per lesson |
-| LessonResources `is_free(Default-TRUE)` | `TRUE` |
-
-**Still type these** — they are content, not metadata: `code` / `name` /
-`state` on Universities; college names; textbook `sheet_key` + title (join
-key for `textbook_key`); question `external_id`, `subject_name`, stem, MCQ
-options, paper year + paper name, page citations. `topic_name` / `lesson_name`
-can wait until the chapter is known. LessonResources still need
-subject/topic/lesson names plus title and https URL.
-
-**Not worth dropping yet:** `state` is unused in the app UI today but NOT
-NULL in Postgres. `phase_code` tags a new subject to an MBBS year (cannot
-guess a new subject). `external_id` must be stable when the same stem
-repeats on another paper.
-
-## Editor rules (short)
-
-1. Fill **Universities → Colleges → Textbooks → Questions**. Optional:
-   LessonResources. Phases is optional (already seeded in Supabase).
-2. Never invent UUIDs. Repeat `external_id` when the same stem appeared in
-   another paper or has another textbook page.
-3. Booleans: `TRUE` / `FALSE` (Google Sheets checkboxes are fine). Blank
-   `is_active` means TRUE.
-4. Enums: `easy` / `medium` / `hard`, `free` / `pro` / `elite`, `mcq` /
-   `pyq_theory` (case-insensitive). Blank difficulty is `medium`, blank plan
-   is `free`. Uppercase A–D for MCQ answers.
-5. Empty optional cells stay blank; do not write `null` or `N/A`.
-6. Theory PYQs do **not** need options or `kind`. MCQ rows still need options.
-   Sample answers are optional — a stem + paper columns is enough to ship.
-7. Bank MCQs can leave `exam_year` / `paper_name` blank.
-
-## Phase 2.2 — Sync
-
-Install and run instructions: [`apps_script/README.md`](apps_script/README.md).
-Paste `WideSheet.gs` into the bound project along with the other `.gs` files.
-
-## Validation checklist (you, not the agent)
-
-- [ ] Sheet has the editor tabs listed above (names match).
-- [ ] Questions header includes `university_code` and `subject_name` (wide).
-- [ ] Sample rows include at least one `pyq_theory` (no options) and one `mcq`.
-- [ ] A theory row missing `correct_option` still validates; an MCQ row missing
-      options fails.
-- [ ] Two rows can share `external_id` with different papers.
-- [ ] A content person can fill a new PYQ without knowing Postgres.
+Apply migrations through
+`supabase/migrations/20260915200000_content_admin_seed_and_cleanup.sql`
+before the first sync.

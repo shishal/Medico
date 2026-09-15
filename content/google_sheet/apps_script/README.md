@@ -1,102 +1,44 @@
 # Phase 2.2 — Apps Script sync
 
-Bound this project to your Google Sheet (from Phase 2.1). A **Medico** menu
-offers **Sync to App** (validate + upsert), **Reset Database** (delete
-sheet-synced catalog), and **Check configuration**.
+Bound this project to a Sheet that has a single `Questions` tab. The **Medico**
+menu previews one transactional import and requires typing `APPLY` before writes.
 
 ## Prerequisites
 
-1. Phase 2.1 sheet tabs exist with the headers in `../tabs/`.
-2. Apply these migrations on your Supabase project (SQL editor or CLI):
-   - `supabase/migrations/20260820133000_phase2_2_sheet_upsert_keys.sql` — `questions.external_id`, `topics (subject_id, name)` unique
-   - `supabase/migrations/20260829240000_tests_sheet_key_upsert.sql` — `tests.sheet_key` unique (PostgREST cannot upsert on the Phase 4B partial unique index on `title`)
-3. Supabase **Project URL** and **service_role** key (Settings → API). Treat service_role like a root password.
+1. Import `../tabs/Questions.csv` as tab `Questions`.
+2. Apply migrations through
+   `supabase/migrations/20260915200000_content_admin_seed_and_cleanup.sql`
+   (subject → year map, universities/colleges seed, orphan cleanup, sync wiring).
+3. Script properties: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
 
-## Install into the Sheet
+## Install
 
-1. Open the Google Sheet → **Extensions → Apps Script**.
-2. Delete any default `Code.gs` stub content.
-3. Create files matching this folder and paste each file’s contents:
-   - `Code.gs`
-   - `SheetReader.gs`
-   - `Validate.gs`
-   - `WideSheet.gs`
-   - `UgCatalog.gs`
-   - `SupabaseClient.gs`
-   - `Sync.gs`
-4. (Optional) Project Settings → update timezone; `appsscript.json` uses `Asia/Kolkata`.
-5. **Project Settings → Script properties** (or older UI: File → Project properties → Script properties) add:
+Paste these files into Apps Script:
 
-   | Property | Value |
-   |---|---|
-   | `SUPABASE_URL` | `https://YOUR_PROJECT.supabase.co` |
-   | `SUPABASE_SERVICE_ROLE_KEY` | service_role secret |
-
-6. Save → reload the Sheet → confirm the **Medico** menu appears.
-7. **Medico → Check configuration** (should say OK without showing the key).
+- `Code.gs`
+- `SheetReader.gs`
+- `SupabaseClient.gs`
+- `Sync.gs`
 
 ## What Sync does
 
-1. Reads editor tabs: `Universities`, `Colleges`, `Phases`, `Textbooks`,
-   `Questions` (wide), optional `LessonResources`. **Do not recreate**
-   `Subjects` / `Topics` / `Lessons` — those are inferred from `subject_name`,
-   `topic_name`, and `lesson_name` on Questions. If Questions still has the
-   old headers (`topic_name` without `university_code` + `subject_name`) *and*
-   a Subjects tab exists, the legacy path runs instead.
-2. Validates **all** rows (collects every error — does not stop at the first).
-   Theory rows skip options; MCQ rows still require them. Sample answers over
-   ~400 words are a warning, not a reject.
-3. If any error: popup lists them with **tab + row number**; **writes nothing**.
-4. If clean: infers subjects/topics/lessons/papers/appearances from the wide
-   row and upserts normalized tables. `Tests` / `TestQuestions` are skipped
-   when those tabs are empty or missing (catalog tests are retired; Practice
-   still creates `tests` rows from the app).
+1. Reads `Questions` rows.
+2. Calls `sync_content_csv(..., false)` for validation + counts.
+3. Asks you to type `APPLY`.
+4. Calls `sync_content_csv(..., true)` in one DB transaction.
 
-### Reset Database
+Subjects get MBBS year from `subject_phase_defaults` (not from the CSV).
+Unknown subject names fail validation.
 
-**Medico → Reset Database** asks for confirmation, then deletes sheet-synced
-catalog rows (questions, papers, subjects, topics, lessons, universities,
-colleges, textbooks, and dependent bookmarks/answers). It does **not** delete
-auth users or `mbbs_phases`. Profiles keep the account but university/college
-are cleared. Run **Sync to App** afterwards to reload from this sheet.
+## Validation
 
-### Validation (includes Phase 2.2 required checks)
-
-- `kind` ∈ mcq / pyq_theory. Blank kind: if all four options and `correct_option` are empty → `pyq_theory`, otherwise `mcq`. The header `kind(Default-MCQ)` is a label only — it is not written on blank cells.
-- Blank `difficulty` → `medium` (always sent on upsert). Blank `required_plan` → `free`. Blank `is_active` → TRUE. Blank `exam_type` → `university`.
-- MCQ: `correct_option` ∈ A/B/C/D and all four options non-empty
-- Theory: options not required; paper columns (`exam_year` + `paper_name`) create the appearance
-- resource `url` must start with `https://`
-- `subject_name` is required on the wide Questions tab. `topic_name` / `lesson_name` are optional tags (blank is fine; they create catalog rows only when filled)
-- plus header presence, enums, and `university_code` matching the Universities tab
-
-### Upsert keys (re-run safe)
-
-| Table | Conflict target |
-|---|---|
-| subjects | `name` |
-| topics | `subject_id,name` |
-| questions | `external_id` |
-| question_sample_answers | `question_id` |
-| universities | `code` (`slug` is `lower(code)`, not a sheet column) |
-| colleges | `university_id,name` |
-| lessons | `topic_id,name` |
-| lesson_resources | `lesson_id,url` |
-| textbooks | `sheet_key` |
-| exam_papers | `external_id` |
-| question_appearances | `question_id,exam_paper_id` |
-| question_textbook_refs | `question_id,textbook_id,page` |
-| question_resources | `question_id,url` |
-| tests | `sheet_key` (set from the sheet `title`; not a sheet column) |
-| test_questions | delete-by-test then insert (so removals/reorder apply) |
-
-## Your validation
-
-1. Sync once with sample rows → confirm rows appear in Supabase Table Editor.
-2. Sync again unchanged → same row counts, no duplicates.
-3. Set one `correct_option` to `E` → Sync → popup error, **no** Supabase changes for that run → fix and sync again.
+- Required: `subject_name`, `question_text`
+- MCQ: options A–D + correct option
+- Theory: leave options blank
+- `exam_year` + `paper_name` together; `textbook_title` + `page` together;
+  `resource_title` + `resource_url` together
+- Resource URL must be `https://`
 
 ## Security
 
-- Never put service_role in the Flutter app, git-tracked `.env` committed to the repo, or cell formulas.
-- Script Properties stay in the Apps Script project; restrict who can edit the Sheet / script.
+Never put the service_role key in the Flutter app or git.

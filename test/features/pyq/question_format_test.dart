@@ -13,7 +13,7 @@ void main() {
     );
   });
 
-  test('theory marks map to Essay / Short note / VSA', () {
+  test('theory marks map to Essay / Short note / VSA / Unclassified', () {
     expect(
       QuestionFormat.fromKindAndMarks(kind: 'pyq_theory', marks: 10),
       QuestionFormat.essay,
@@ -36,7 +36,7 @@ void main() {
     );
     expect(
       QuestionFormat.fromKindAndMarks(kind: 'pyq_theory', marks: null),
-      QuestionFormat.essay,
+      QuestionFormat.unclassified,
     );
   });
 }

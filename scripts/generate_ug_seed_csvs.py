@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Fill content/google_sheet/tabs/*.csv with a denormalized KUHS seed.
+"""LEGACY seed generator — do not use for the current CMS.
 
-Editor tabs: Universities, Colleges, Textbooks, Questions (wide),
-LessonResources, Phases. Hierarchy (subjects/topics/lessons/papers) is
-inferred by Apps Script on sync. Re-run any time; output is deterministic.
+The live content pipeline is one lean Questions.csv plus admin seeds under
+content/admin/ and supabase/migrations/20260915200000_*.sql. This script still
+emits multi-tab CSVs for historical reference only.
 
 Usage (from repo root):
   python3 scripts/generate_ug_seed_csvs.py

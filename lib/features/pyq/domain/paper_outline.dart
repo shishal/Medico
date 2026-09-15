@@ -7,18 +7,21 @@ import '../../practice/domain/practice_enums.dart';
 enum PaperOutlineTab {
   longAnswer,
   shortNotes,
-  mcq;
+  mcq,
+  other;
 
   String get label => switch (this) {
     PaperOutlineTab.longAnswer => 'LAQ',
     PaperOutlineTab.shortNotes => 'Short notes',
     PaperOutlineTab.mcq => 'MCQ',
+    PaperOutlineTab.other => 'Other',
   };
 
   String emptyMessage(int year) => switch (this) {
     PaperOutlineTab.longAnswer => 'No long answers in $year.',
     PaperOutlineTab.shortNotes => 'No short notes in $year.',
     PaperOutlineTab.mcq => 'No MCQs in $year.',
+    PaperOutlineTab.other => 'No unclassified questions in $year.',
   };
 }
 
@@ -29,6 +32,7 @@ bool matchesOutlineTab(PyqTeaser teaser, PaperOutlineTab tab) {
       teaser.format == QuestionFormat.shortNote ||
           teaser.format == QuestionFormat.vsa,
     PaperOutlineTab.mcq => teaser.format == QuestionFormat.mcq,
+    PaperOutlineTab.other => teaser.format == QuestionFormat.unclassified,
   };
 }
 
@@ -65,9 +69,11 @@ int defaultPaperOutlineTabIndex({
   required List<PyqTeaser> longAnswer,
   required List<PyqTeaser> shortNotes,
   required List<PyqTeaser> mcq,
+  required List<PyqTeaser> other,
 }) {
   if (longAnswer.isNotEmpty) return 0;
   if (shortNotes.isNotEmpty) return 1;
   if (mcq.isNotEmpty) return 2;
+  if (other.isNotEmpty) return 3;
   return 0;
 }

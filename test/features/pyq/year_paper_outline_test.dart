@@ -16,7 +16,7 @@ PyqTeaser _teaser({
   required String id,
   required String text,
   String kind = 'pyq_theory',
-  num marks = 10,
+  num? marks = 10,
   List<String> papers = const ['Paper I'],
   List<int> years = const [2024],
 }) {
@@ -52,6 +52,7 @@ void main() {
       _teaser(id: 'short', text: 'Short note', marks: 5),
       _teaser(id: 'vsa', text: 'Very short', marks: 2),
       _teaser(id: 'mcq', text: 'MCQ stem', kind: 'mcq', marks: 1),
+      _teaser(id: 'other', text: 'Marks not entered', marks: null),
       _teaser(id: 'other-year', text: '2023 essay', years: const [2023]),
     ];
 
@@ -75,6 +76,13 @@ void main() {
       tab: PaperOutlineTab.mcq,
     );
     expect(mcq.single.id, 'mcq');
+
+    final other = teasersForOutlineTab(
+      teasers: teasers,
+      year: 2024,
+      tab: PaperOutlineTab.other,
+    );
+    expect(other.single.id, 'other');
   });
 
   test('defaultPaperOutlineTabIndex skips empty long-answer tab', () {
@@ -83,6 +91,7 @@ void main() {
         longAnswer: const [],
         shortNotes: [_teaser(id: 's', text: 'note', marks: 5)],
         mcq: const [],
+        other: const [],
       ),
       1,
     );
@@ -91,6 +100,7 @@ void main() {
         longAnswer: [_teaser(id: 'e', text: 'essay')],
         shortNotes: const [],
         mcq: const [],
+        other: const [],
       ),
       0,
     );

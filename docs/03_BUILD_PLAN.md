@@ -39,12 +39,19 @@ Mini / Subject / Mock / Grand list IA is retired.
 ## UG-C — Content pipeline
 
 **UG-C.1 — Sheet tabs**
-- Description: Universities, Colleges, Textbooks, a wide Questions tab (placement + stem + paper + textbook + sample answer), optional LessonResources. Subjects/Topics/Lessons/ExamPapers/Appearances/TextbookRefs are inferred by sync. Tests/TestQuestions are retired.
+- Description: One lean Questions CSV/tab. Subject + stem are required;
+  topic/lesson/paper/marks/textbook/page/resources are optional, and MCQ
+  options/key are conditionally required. MBBS year comes from
+  `subject_phase_defaults` in Postgres. Universities/colleges are admin
+  seeds (`content/admin/` + migration), not routine sync tabs.
 - Validation: fill the sample CSV rows, run Apps Script validation against a missing `correct_option` on a theory row — it must pass. An MCQ row missing options must fail.
 
 **UG-C.2 — Sync script**
-- Description: Upsert in dependency order; sample answers go to `question_sample_answers` (not a column on `questions`). Resource URLs must be https.
-- Validation: sync twice with unchanged data — no duplicate lessons or appearances.
+- Description: Apps Script and Python call one service-role-only transactional
+  RPC to preview/apply the complete Questions CSV snapshot. Sample answers go
+  to `question_sample_answers`; resource URLs must be https.
+- Validation: sync twice unchanged with no duplicates; removed managed rows
+  preview destructive counts and require confirmation before deletion.
 
 ---
 

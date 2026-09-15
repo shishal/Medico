@@ -11,7 +11,7 @@ import '../../domain/pyq_models.dart';
 import '../providers/pyq_providers.dart';
 import '../widgets/pyq_teaser_card.dart';
 
-/// One exam year: pinned LAQ / Short notes / MCQ tabs.
+/// One exam year: pinned LAQ / Short notes / MCQ / Other tabs.
 class YearPaperOutlineScreen extends ConsumerWidget {
   const YearPaperOutlineScreen({
     super.key,
@@ -50,6 +50,7 @@ class YearPaperOutlineScreen extends ConsumerWidget {
             longAnswer: forTab(PaperOutlineTab.longAnswer),
             shortNotes: forTab(PaperOutlineTab.shortNotes),
             mcq: forTab(PaperOutlineTab.mcq),
+            other: forTab(PaperOutlineTab.other),
           );
         },
       ),
@@ -63,12 +64,14 @@ class _OutlineBody extends StatefulWidget {
     required this.longAnswer,
     required this.shortNotes,
     required this.mcq,
+    required this.other,
   });
 
   final int year;
   final List<PyqTeaser> longAnswer;
   final List<PyqTeaser> shortNotes;
   final List<PyqTeaser> mcq;
+  final List<PyqTeaser> other;
 
   @override
   State<_OutlineBody> createState() => _OutlineBodyState();
@@ -88,6 +91,7 @@ class _OutlineBodyState extends State<_OutlineBody>
         longAnswer: widget.longAnswer,
         shortNotes: widget.shortNotes,
         mcq: widget.mcq,
+        other: widget.other,
       ),
     );
   }
@@ -102,6 +106,7 @@ class _OutlineBodyState extends State<_OutlineBody>
     PaperOutlineTab.longAnswer => widget.longAnswer,
     PaperOutlineTab.shortNotes => widget.shortNotes,
     PaperOutlineTab.mcq => widget.mcq,
+    PaperOutlineTab.other => widget.other,
   };
 
   @override

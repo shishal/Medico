@@ -15,14 +15,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CSV = ROOT / "content" / "google_sheet" / "tabs" / "Questions.csv"
+# Preferred editor column order for Questions.csv (extras may follow).
+LEAN_TEMPLATE_COLUMNS = (
+    "subject_name",
+    "question_text",
+    "sample_answer_text",
+    "explanation_text",
+    "university_code",
+    "exam_year",
+    "paper_name",
+    "topic_name",
+    "lesson_name",
+)
 ALLOWED_COLUMNS = {
-    "subject_name", "question_text", "option_a", "option_b", "option_c",
-    "option_d", "correct_option", "kind", "topic_name", "lesson_name",
-    "marks", "university_code", "exam_year", "paper_name", "exam_type",
-    "textbook_title", "textbook_authors", "textbook_edition", "page",
-    "section_heading", "explanation_text", "sample_answer_text", "difficulty",
-    "required_plan", "is_active", "resource_title", "resource_url",
-    "resource_source_label", "resource_is_free",
+    *LEAN_TEMPLATE_COLUMNS,
+    "option_a", "option_b", "option_c", "option_d", "correct_option", "kind",
+    "marks", "exam_type", "textbook_title", "textbook_authors", "textbook_edition",
+    "page", "section_heading", "difficulty", "required_plan", "is_active",
+    "resource_title", "resource_url", "resource_source_label", "resource_is_free",
 }
 
 

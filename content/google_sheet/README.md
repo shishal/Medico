@@ -17,19 +17,21 @@ and are seeded by migration, not by content sync.
 
 ## Lean `Questions` columns
 
+Editor-facing order (first nine, then MCQ/optional extras):
+
 | Column | Required | Notes |
 |---|---|---|
 | `subject_name` | yes | Must exist in `subject_phase_defaults` (e.g. Anatomy → year1). |
 | `question_text` | yes | Stem. |
-| `option_a` … `option_d` | if MCQ | Blank on theory. Any option/key cell ⇒ MCQ. |
-| `correct_option` | if MCQ | `A` / `B` / `C` / `D`. |
+| `sample_answer_text` | no | DA (Pro-gated table). |
+| `explanation_text` | no | EX. |
+| `university_code` + `exam_year` + `paper_name` | no | Fill all three or none. Code must exist in `universities` (e.g. KUHS). |
 | `topic_name` | no | Syllabus tag; created on sync. |
 | `lesson_name` | no | Needs `topic_name` if filled. |
+| `option_a` … `option_d` | if MCQ | Blank on theory. Any option/key cell ⇒ MCQ. |
+| `correct_option` | if MCQ | `A` / `B` / `C` / `D`. |
 | `marks` | no | Theory format: ≥10 essay, 4–9 short, ≤3 VSA. |
-| `university_code` + `exam_year` + `paper_name` | no | Fill all three or none. Code must exist in `universities` (e.g. KUHS). |
 | `textbook_title` + `page` | no | Fill both or neither. |
-| `explanation_text` | no | EX. |
-| `sample_answer_text` | no | DA (Pro-gated table). |
 | `resource_title` + `resource_url` | no | Fill both or neither; `https` only. |
 
 Optional advanced columns (allowed by sync, omitted from the lean template):

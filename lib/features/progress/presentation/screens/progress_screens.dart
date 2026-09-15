@@ -108,12 +108,12 @@ class ProgressScreen extends ConsumerWidget {
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                subjectTileCaption(
-                                  showLessonProgress: true,
-                                  learntLessons: p.subjects[i].learntLessons,
-                                  totalLessons: p.subjects[i].totalLessons,
-                                  totalPyqs: p.subjects[i].totalPyqs,
-                                ),
+                                p.subjects[i].totalLessons > 0
+                                    ? '${p.subjects[i].learntLessons} of ${p.subjects[i].totalLessons} lessons learnt'
+                                    : subjectTileCaption(
+                                        showLessonProgress: true,
+                                        totalPyqs: p.subjects[i].totalPyqs,
+                                      ),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],

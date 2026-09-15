@@ -2,36 +2,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medico/features/catalog/presentation/widgets/subject_tile.dart';
 
 void main() {
-  test('subjectTileCaption prefers lesson progress when chapters exist', () {
+  test('subjectTileCaption shows PYQ count even when chapters exist', () {
     expect(
       subjectTileCaption(
         showLessonProgress: true,
-        learntLessons: 1,
-        totalLessons: 4,
         totalPyqs: 12,
       ),
-      '1 of 4 lessons learnt',
+      '12 PYQs',
     );
   });
 
-  test('subjectTileCaption shows PYQ count when there are no lessons', () {
+  test('subjectTileCaption singularizes a single PYQ', () {
     expect(
       subjectTileCaption(
         showLessonProgress: true,
-        learntLessons: 0,
-        totalLessons: 0,
         totalPyqs: 1,
       ),
       '1 PYQ',
-    );
-    expect(
-      subjectTileCaption(
-        showLessonProgress: true,
-        learntLessons: 0,
-        totalLessons: 0,
-        totalPyqs: 3,
-      ),
-      '3 PYQs',
     );
   });
 
@@ -39,9 +26,17 @@ void main() {
     expect(
       subjectTileCaption(
         showLessonProgress: false,
-        learntLessons: 0,
-        totalLessons: 4,
         totalPyqs: 12,
+      ),
+      'No PYQs yet',
+    );
+  });
+
+  test('subjectTileCaption is empty copy when the subject has no PYQs', () {
+    expect(
+      subjectTileCaption(
+        showLessonProgress: true,
+        totalPyqs: 0,
       ),
       'No PYQs yet',
     );

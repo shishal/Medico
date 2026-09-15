@@ -82,12 +82,9 @@ class SubjectSticker extends StatelessWidget {
   Widget build(BuildContext context) {
     final comic = ComicColors.of(context);
     final accent = StickerFills.subjectAccent(subject.name);
-    // Display fraction from server learnt/total — not a client-computed score.
-    // Skip it when this university has no papers; those totals are another bank.
-    final total = showLessonProgress ? (coverage?.totalLessons ?? 0) : 0;
-    final learnt = showLessonProgress ? (coverage?.learntLessons ?? 0) : 0;
+    // PYQ count comes from get_study_progress — not a client-computed score.
+    // Hide it when this university has no papers; those totals are another bank.
     final pyqs = showLessonProgress ? (coverage?.totalPyqs ?? 0) : 0;
-    final progress = total == 0 ? 0.0 : learnt / total;
 
     return ComicCard(
       key: ValueKey('subject-tile-${subject.id}'),
@@ -116,12 +113,13 @@ class SubjectSticker extends StatelessWidget {
               ),
               const Spacer(),
               CoverageRing(
-                progress: progress,
+                // Count badge, not lesson-completion fill.
+                progress: 0,
                 size: 36,
                 strokeWidth: 4,
                 color: accent,
                 child: Text(
-                  total == 0 ? '—' : '$learnt',
+                  showLessonProgress ? '$pyqs' : '—',
                   style: Theme.of(context).textTheme.labelSmall
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
@@ -139,8 +137,6 @@ class SubjectSticker extends StatelessWidget {
           Text(
             subjectTileCaption(
               showLessonProgress: showLessonProgress,
-              learntLessons: learnt,
-              totalLessons: total,
               totalPyqs: pyqs,
             ),
             maxLines: 1,
@@ -153,18 +149,12 @@ class SubjectSticker extends StatelessWidget {
   }
 }
 
-/// Home sticker subtitle. Lesson progress stays on the ring when chapters
-/// exist; untagged PYQs still get a count so the card is not empty.
+/// Home sticker subtitle: this university's PYQ count for the subject.
 String subjectTileCaption({
   required bool showLessonProgress,
-  required int learntLessons,
-  required int totalLessons,
   int totalPyqs = 0,
 }) {
   if (!showLessonProgress) return 'No PYQs yet';
-  if (totalLessons > 0) {
-    return '$learntLessons of $totalLessons lessons learnt';
-  }
   if (totalPyqs == 1) return '1 PYQ';
   if (totalPyqs > 1) return '$totalPyqs PYQs';
   return 'No PYQs yet';

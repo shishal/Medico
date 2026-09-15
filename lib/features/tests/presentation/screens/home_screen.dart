@@ -35,8 +35,7 @@ class HomeScreen extends ConsumerWidget {
             const HomeCoverageBanner(),
             const ComicSectionTitle(
               title: 'Subjects',
-              subtitle:
-                  'Tap a subject for previous-year papers. The ring is lessons marked learnt — not a PYQ count.',
+              subtitle: 'Tap a subject for previous-year papers.',
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 280),

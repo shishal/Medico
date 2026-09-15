@@ -129,7 +129,15 @@ void main() {
                 streak: 2,
                 days7: [],
                 days30: [],
-                subjects: [],
+                subjects: [
+                  SubjectCoverage(
+                    id: 'anat',
+                    name: 'Anatomy',
+                    learntLessons: 0,
+                    totalLessons: 1,
+                    totalPyqs: 12,
+                  ),
+                ],
               ),
             ),
             inProgressAttemptsProvider.overrideWith(_NoAttempts.new),
@@ -160,6 +168,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 800));
 
       expect(find.text('Anatomy'), findsOneWidget);
+      expect(find.text('12 PYQs'), findsOneWidget);
+      expect(find.textContaining('lessons learnt'), findsNothing);
       expect(find.text('Pathology'), findsNothing);
       expect(find.text('Your year'), findsNothing);
       expect(find.text('Practice'), findsOneWidget);

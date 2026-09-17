@@ -39,13 +39,19 @@ Optional advanced columns (allowed by sync, omitted from the lean template):
 `section_heading`, `difficulty`, `required_plan`, `is_active`,
 `resource_source_label`, `resource_is_free`.
 
+`difficulty` is revision priority, not an easy/medium/hard scale: `must`,
+`should` or `could`. Leave it blank unless the question really is a must-know
+or a nice-to-have — blank imports as `should`, and the app only shows a chip
+for `must` and `could`, so a sheet full of `should` looks the same as an
+untagged one.
+
 ## Defaults
 
 | Blank cell | Sync uses |
 |---|---|
 | kind | theory if no MCQ cells; else MCQ |
 | exam_type | university |
-| difficulty | medium |
+| difficulty | should |
 | required_plan | free |
 | is_active | TRUE |
 | resource_is_free | TRUE |

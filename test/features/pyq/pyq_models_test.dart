@@ -20,18 +20,21 @@ void main() {
     expect(teaser.kind, 'pyq_theory');
     expect(teaser.isHighYield, isTrue);
     expect(teaser.format.label, 'Essay');
-    expect(teaser.difficulty.label, 'Should');
+    // A blank difficulty cell imports as `should`, which carries no signal.
+    expect(teaser.priority.label, 'Should');
+    expect(teaser.priority.isNoteworthy, isFalse);
   });
 
-  test('PyqTeaser maps hard difficulty to Must', () {
+  test('PyqTeaser reads an explicit must priority', () {
     final teaser = PyqTeaser.fromJson({
       PyqTeaserColumns.id: 'q-must',
       PyqTeaserColumns.questionText: 'Name the cranial nerves.',
       PyqTeaserColumns.requiredPlan: 'free',
       PyqTeaserColumns.appearanceCount: 1,
-      PyqTeaserColumns.difficulty: 'hard',
+      PyqTeaserColumns.difficulty: 'must',
     });
-    expect(teaser.difficulty.label, 'Must');
+    expect(teaser.priority.label, 'Must');
+    expect(teaser.priority.isNoteworthy, isTrue);
   });
 
   test('PyqTeaser reads kind for MCQ and is not high-yield at 1×', () {

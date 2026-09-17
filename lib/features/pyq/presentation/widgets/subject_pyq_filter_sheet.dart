@@ -54,97 +54,104 @@ class SubjectPyqFilterSheet extends ConsumerWidget {
             Spacing.lg,
             Spacing.lg,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Filters', style: Theme.of(context).textTheme.titleLarge),
-              if (paperNames.isNotEmpty) ...[
-                const SizedBox(height: Spacing.md),
-                Text('Paper', style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: Spacing.sm),
-                Wrap(
-                  spacing: Spacing.sm,
-                  runSpacing: Spacing.sm,
-                  children: [
-                    FilterChip(
-                      label: const Text('All papers'),
-                      selected: filter.paperName == null,
-                      onSelected: (_) => notifier.setPaperName(null),
-                    ),
-                    for (final name in paperNames)
+          // Scrollable because a subject like Anatomy has enough chapters to
+          // push the chip wraps past the sheet height.
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Filters', style: Theme.of(context).textTheme.titleLarge),
+                if (paperNames.isNotEmpty) ...[
+                  const SizedBox(height: Spacing.md),
+                  Text('Paper', style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: Spacing.sm),
+                  Wrap(
+                    spacing: Spacing.sm,
+                    runSpacing: Spacing.sm,
+                    children: [
                       FilterChip(
-                        label: Text(name),
-                        selected: filter.paperName == name,
-                        onSelected: (_) => notifier.setPaperName(name),
+                        label: const Text('All papers'),
+                        selected: filter.paperName == null,
+                        onSelected: (_) => notifier.setPaperName(null),
                       ),
-                  ],
-                ),
-              ],
-              if (chapters.isNotEmpty) ...[
-                const SizedBox(height: Spacing.md),
-                Text('Chapters', style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: Spacing.sm),
-                Wrap(
-                  spacing: Spacing.sm,
-                  runSpacing: Spacing.sm,
-                  children: [
-                    FilterChip(
-                      label: const Text('All chapters'),
-                      selected: filter.topicId == null,
-                      onSelected: (_) => notifier.setTopicId(null),
-                    ),
-                    for (final chapter in chapters)
+                      for (final name in paperNames)
+                        FilterChip(
+                          label: Text(name),
+                          selected: filter.paperName == name,
+                          onSelected: (_) => notifier.setPaperName(name),
+                        ),
+                    ],
+                  ),
+                ],
+                if (chapters.isNotEmpty) ...[
+                  const SizedBox(height: Spacing.md),
+                  Text(
+                    'Chapters',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: Spacing.sm),
+                  Wrap(
+                    spacing: Spacing.sm,
+                    runSpacing: Spacing.sm,
+                    children: [
                       FilterChip(
-                        label: Text(chapter.name),
-                        selected: filter.topicId == chapter.id,
-                        onSelected: (_) => notifier.setTopicId(chapter.id),
+                        label: const Text('All chapters'),
+                        selected: filter.topicId == null,
+                        onSelected: (_) => notifier.setTopicId(null),
                       ),
-                  ],
+                      for (final chapter in chapters)
+                        FilterChip(
+                          label: Text(chapter.name),
+                          selected: filter.topicId == chapter.id,
+                          onSelected: (_) => notifier.setTopicId(chapter.id),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: Spacing.md),
+                Text(
+                  'Revision priority',
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
-              ],
-              const SizedBox(height: Spacing.md),
-              Text(
-                'Must / Should / Could',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              if (filter.priorities.isEmpty) ...[
                 const SizedBox(height: Spacing.xs),
                 Text(
-                  'None chosen — all questions',
+                  filter.priorities.isEmpty
+                      ? 'None chosen — all questions. Untagged questions count as Should.'
+                      : 'Untagged questions count as Should.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ],
-              const SizedBox(height: Spacing.sm),
-              Wrap(
-                spacing: Spacing.sm,
-                runSpacing: Spacing.sm,
-                children: [
-                  for (final priority in QuestionDifficulty.filterOrder)
-                    FilterChip(
-                      label: Text(priority.label),
-                      selected: filter.priorities.contains(priority),
-                      onSelected: (_) => notifier.togglePriority(priority),
+                const SizedBox(height: Spacing.sm),
+                Wrap(
+                  spacing: Spacing.sm,
+                  runSpacing: Spacing.sm,
+                  children: [
+                    for (final priority in QuestionPriority.values)
+                      FilterChip(
+                        label: Text(priority.label),
+                        selected: filter.priorities.contains(priority),
+                        onSelected: (_) => notifier.togglePriority(priority),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: Spacing.lg),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: filter.isActive ? notifier.clear : null,
+                      child: const Text('Clear all'),
                     ),
-                ],
-              ),
-              const SizedBox(height: Spacing.lg),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: filter.isActive ? notifier.clear : null,
-                    child: const Text('Clear all'),
-                  ),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Done'),
-                  ),
-                ],
-              ),
-            ],
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Done'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

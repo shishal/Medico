@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/markdown_copy.dart';
 import '../../domain/player_session_state.dart';
-import 'player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 
 /// Shown only when [PlayerSessionState.revealsFeedback] is true (Tutor Mode).
 class TutorFeedbackPanel extends StatelessWidget {

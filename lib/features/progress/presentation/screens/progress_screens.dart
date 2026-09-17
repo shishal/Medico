@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/date_format.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
@@ -45,7 +46,10 @@ class ProgressScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      '$events30 events in the last 30 days',
+                      // "events" is our analytics word, not a student's.
+                      events30 == 1
+                          ? '1 study session in the last 30 days'
+                          : '$events30 study sessions in the last 30 days',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -61,10 +65,11 @@ class ProgressScreen extends ConsumerWidget {
                 spacing: Spacing.sm,
                 runSpacing: Spacing.sm,
                 children: [
+                  // Was `substring(5)`, i.e. a bare "08-29".
                   for (final d in p.days7)
                     Chip(
                       label: Text(
-                        '${d.date.length >= 10 ? d.date.substring(5) : d.date} · ${d.count}',
+                        '${DateFormats.weekdayAndDay(d.date)} · ${d.count}',
                       ),
                     ),
                 ],

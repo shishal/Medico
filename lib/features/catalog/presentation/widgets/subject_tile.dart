@@ -5,8 +5,8 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_card.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_med_glyph.dart';
-import '../../../../core/widgets/coverage_ring.dart';
 import '../../../../core/widgets/staggered_fade.dart';
 import '../../domain/catalog_models.dart';
 import '../../domain/subject_visual.dart';
@@ -28,8 +28,11 @@ class SubjectStickerGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     if (subjects.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.all(Spacing.lg),
-        child: Text('No subjects for this year yet.'),
+        padding: EdgeInsets.symmetric(vertical: Spacing.xl),
+        child: AsyncEmptyView(
+          icon: Icons.school_outlined,
+          message: 'No subjects for this MBBS year yet.',
+        ),
       );
     }
 
@@ -112,18 +115,25 @@ class SubjectSticker extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              CoverageRing(
-                // Count badge, not lesson-completion fill.
-                progress: 0,
-                size: 36,
-                strokeWidth: 4,
-                color: accent,
-                child: Text(
-                  showLessonProgress ? '$pyqs' : '—',
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(fontWeight: FontWeight.w700),
+              // A CoverageRing at progress: 0 drew an empty track that read as
+              // "0% done", and the number was then repeated in the caption
+              // below. One pill, stated once.
+              if (showLessonProgress && pyqs > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.sm,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '$pyqs',
+                    style: Theme.of(context).textTheme.labelMedium
+                        ?.copyWith(color: accent, fontWeight: FontWeight.w800),
+                  ),
                 ),
-              ),
             ],
           ),
           const Spacer(),
@@ -141,7 +151,9 @@ class SubjectSticker extends StatelessWidget {
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

@@ -178,7 +178,7 @@ def exercise_sync(conn) -> list[str]:
             """
             insert into public.questions
               (external_id, kind, question_text, difficulty, required_plan, is_active)
-            values (%s, 'pyq_theory', 'Non CSV control', 'medium', 'free', true)
+            values (%s, 'pyq_theory', 'Non CSV control', 'should', 'free', true)
             """,
             (marker,),
         )

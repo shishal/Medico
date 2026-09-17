@@ -110,3 +110,50 @@ final class BookmarksListProvider
 }
 
 String _$bookmarksListHash() => r'40311f49469854dd8d175f3974d9d17238c10956';
+
+/// Bookmarked lessons, shown as a second section under the questions.
+
+@ProviderFor(lessonBookmarksList)
+final lessonBookmarksListProvider = LessonBookmarksListProvider._();
+
+/// Bookmarked lessons, shown as a second section under the questions.
+
+final class LessonBookmarksListProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<BookmarkedLesson>>,
+          List<BookmarkedLesson>,
+          FutureOr<List<BookmarkedLesson>>
+        >
+    with
+        $FutureModifier<List<BookmarkedLesson>>,
+        $FutureProvider<List<BookmarkedLesson>> {
+  /// Bookmarked lessons, shown as a second section under the questions.
+  LessonBookmarksListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'lessonBookmarksListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$lessonBookmarksListHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<BookmarkedLesson>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<BookmarkedLesson>> create(Ref ref) {
+    return lessonBookmarksList(ref);
+  }
+}
+
+String _$lessonBookmarksListHash() =>
+    r'0a8b7ac3478963d09dd9d8e78dc31fc55a8f1305';

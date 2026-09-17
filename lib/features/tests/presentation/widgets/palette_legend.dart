@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
-import 'player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 
 /// Explains palette colors. Exam Mode matches the NEET convention in the
 /// test-engine spec; Tutor Mode matches the practice spec.

@@ -37,12 +37,14 @@ class ProgressRepository {
         RpcFunctions.searchCatalog,
         params: {SearchCatalogParams.query: query},
       );
-      if (raw is! Map) return const Success(SearchHits(subjects: [], lessons: [], questions: []));
+      if (raw is! Map) {
+        return const Success(
+          SearchHits(subjects: [], lessons: [], questions: []),
+        );
+      }
       return Success(SearchHits.fromJson(Map<String, dynamic>.from(raw)));
     } catch (e) {
-      return Failure(
-        UserFacingError.from(e, fallback: 'Search failed.'),
-      );
+      return Failure(UserFacingError.from(e, fallback: 'Search failed.'));
     }
   }
 }

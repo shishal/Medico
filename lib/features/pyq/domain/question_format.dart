@@ -6,6 +6,9 @@ enum QuestionFormat {
   shortNote,
   vsa,
   mcq,
+
+  /// Theory question with no `marks` in the sheet, so we cannot tell essay
+  /// from short note. Matches the "Other" tab on the paper outline.
   unclassified;
 
   String get label => switch (this) {
@@ -13,7 +16,8 @@ enum QuestionFormat {
     QuestionFormat.shortNote => 'Short note',
     QuestionFormat.vsa => 'VSA',
     QuestionFormat.mcq => 'MCQ',
-    QuestionFormat.unclassified => 'Unclassified',
+    // "Unclassified" described our tagging, not the question.
+    QuestionFormat.unclassified => 'Other',
   };
 
   static QuestionFormat fromKindAndMarks({required String kind, num? marks}) {

@@ -113,7 +113,10 @@ copy a competitor mascot or pixel-identical layouts.
   cards. Light mode is clean white/gray cards with the same orange CTAs —
   not warm comic paper `#FBF4E6`.
 - **Theme modes:** System (follow the phone) / Light / Dark. Persist the
-  choice. **Dark is the app default** until the student picks something else.
+  choice. **Light is the app default** until the student picks something else
+  — this matches docs/00_PRODUCT.md, build-plan task 10.1 and the code. The
+  splash is deliberately dark in both polarities; see
+  `flutter_native_splash.yaml`.
 - **Type scale**: use Material 3's built-in `TextTheme` roles (`headlineSmall`,
   `titleMedium`, `bodyLarge`, etc.) rather than ad-hoc `TextStyle(fontSize: 16)`.
 - **Urgent actions** (timer running low, submit test) use the same orange

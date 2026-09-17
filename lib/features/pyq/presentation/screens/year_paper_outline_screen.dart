@@ -120,6 +120,8 @@ class _OutlineBodyState extends State<_OutlineBody>
           tabAlignment: TabAlignment.start,
           tabs: [
             for (final tab in PaperOutlineTab.values)
+              // No separator between label and count: four tabs already only
+              // just fit a 360dp screen, and ' · ' pushed MCQ off-screen.
               Tab(text: '${tab.label} ${_listFor(tab).length}'),
           ],
         ),
@@ -155,9 +157,9 @@ class _OutlineQuestionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (teasers.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.all(Spacing.md),
-        children: [Text(tab.emptyMessage(year))],
+      return AsyncEmptyView(
+        icon: Icons.description_outlined,
+        message: tab.emptyMessage(year),
       );
     }
     return ListView.builder(

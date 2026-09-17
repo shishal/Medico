@@ -31,7 +31,7 @@ class SubjectPyqScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(title),
         actions: [
-          TextButton(
+          TextButton.icon(
             onPressed: () => async.whenOrNull(
               data: (feed) => showSubjectPyqFilterSheet(
                 context: context,
@@ -40,7 +40,12 @@ class SubjectPyqScreen extends ConsumerWidget {
                 chapters: feed.chapters,
               ),
             ),
-            child: Text(filter.isActive ? 'Filters · on' : 'Filters'),
+            icon: Icon(
+              filter.isActive
+                  ? Icons.filter_alt_rounded
+                  : Icons.filter_alt_outlined,
+            ),
+            label: const Text('Filters'),
           ),
         ],
       ),
@@ -51,69 +56,149 @@ class SubjectPyqScreen extends ConsumerWidget {
           onAction: () => ref.invalidate(subjectPyqsProvider(subjectId)),
         ),
         data: (feed) {
-          final years = yearsWithMatchingPyqs(
+          final years = yearSummariesWithMatchingPyqs(
             teasers: feed.teasers,
             paperName: filter.paperName,
             topicId: filter.topicId,
             priorities: filter.priorities,
           );
-          return ListView(
-            padding: const EdgeInsets.all(Spacing.md),
-            children: [
-              Text(
-                'Previous year questions',
-                style: Theme.of(context).textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w800),
+          final activeSummary = filter.isActive
+              ? [
+                  if (filter.paperName != null) filter.paperName!,
+                  if (filter.topicId != null)
+                    feed.chapters
+                        .where((c) => c.id == filter.topicId)
+                        .map((c) => c.name)
+                        .firstOrNull,
+                  if (filter.priorities.isNotEmpty)
+                    QuestionPriority.values
+                        .where(filter.priorities.contains)
+                        .map((p) => p.label)
+                        .join(', '),
+                ].whereType<String>().join(' · ')
+              : null;
+
+          if (years.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: () async =>
+                  ref.invalidate(subjectPyqsProvider(subjectId)),
+              child: ListView(
+                // A scrollable is required for pull-to-refresh to have
+                // somewhere to hang, even when the list itself is empty.
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.6,
+                    child: filter.isActive
+                        ? AsyncEmptyView(
+                            icon: Icons.filter_alt_off_outlined,
+                            message: 'No years match these filters.',
+                            actionLabel: 'Clear filters',
+                            onAction: ref
+                                .read(
+                                  subjectPyqFiltersProvider(subjectId).notifier,
+                                )
+                                .clear,
+                          )
+                        : AsyncEmptyView(
+                            icon: Icons.history_edu_outlined,
+                            message:
+                                'No previous year papers for $title yet.\n'
+                                'They arrive as your university is tagged.',
+                          ),
+                  ),
+                ],
               ),
-              const SizedBox(height: Spacing.xs),
-              Text(
-                'Pick a year to see that sitting. A university paper mixes chapters.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              if (filter.isActive) ...[
-                const SizedBox(height: Spacing.sm),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async =>
+                ref.invalidate(subjectPyqsProvider(subjectId)),
+            child: ListView(
+              padding: const EdgeInsets.all(Spacing.md),
+              children: [
                 Text(
-                  [
-                    if (filter.paperName != null) filter.paperName!,
-                    if (filter.topicId != null)
-                      feed.chapters
-                          .where((c) => c.id == filter.topicId)
-                          .map((c) => c.name)
-                          .firstOrNull,
-                    if (filter.priorities.isNotEmpty)
-                      QuestionDifficulty.filterOrder
-                          .where(filter.priorities.contains)
-                          .map((p) => p.label)
-                          .join(', '),
-                  ].whereType<String>().join(' · '),
-                  style: Theme.of(context).textTheme.labelLarge,
+                  'Previous year questions',
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w800),
                 ),
-              ],
-              const SizedBox(height: Spacing.md),
-              if (years.isEmpty)
+                const SizedBox(height: Spacing.xs),
                 Text(
-                  filter.isActive
-                      ? 'No years match these filters.'
-                      : 'No previous year papers yet.',
-                )
-              else
+                  'Pick a year to see that sitting. A university paper mixes chapters.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                if (activeSummary != null && activeSummary.isNotEmpty) ...[
+                  const SizedBox(height: Spacing.sm),
+                  Text(
+                    activeSummary,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                ],
+                const SizedBox(height: Spacing.md),
                 for (final year in years)
                   Padding(
                     padding: const EdgeInsets.only(bottom: Spacing.sm),
-                    child: ComicCard(
+                    child: _YearCard(
+                      summary: year,
                       onTap: () => context.push(
-                        AppRoutes.subjectYearPath(subjectId, year, title),
-                      ),
-                      child: Text(
-                        '$year',
-                        style: Theme.of(context).textTheme.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w800),
+                        AppRoutes.subjectYearPath(subjectId, year.year, title),
                       ),
                     ),
                   ),
-            ],
+              ],
+            ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// A year row that says what opening it leads to, rather than just the number.
+class _YearCard extends StatelessWidget {
+  const _YearCard({required this.summary, required this.onTap});
+
+  final SubjectYearSummary summary;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final count = summary.questionCount;
+    final caption = [
+      count == 1 ? '1 question' : '$count questions',
+      if (summary.paperNames.isNotEmpty) summary.paperNames.join(' · '),
+    ].join(' · ');
+
+    return ComicCard(
+      onTap: onTap,
+      semanticLabel: '${summary.year}, $caption',
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${summary.year}',
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: Spacing.xs),
+                Text(
+                  caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodySmall?.copyWith(color: muted),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right_rounded, color: muted),
+        ],
       ),
     );
   }

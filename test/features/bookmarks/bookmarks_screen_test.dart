@@ -72,7 +72,7 @@ void main() {
   testWidgets('empty state explains how to bookmark', (tester) async {
     await _pumpScreen(tester, items: const []);
 
-    expect(find.textContaining('No question bookmarks yet'), findsOneWidget);
+    expect(find.textContaining('Nothing saved yet'), findsOneWidget);
     expect(find.textContaining('Practice'), findsNothing);
   });
 
@@ -98,7 +98,9 @@ void main() {
     expect(find.text('Which organelle produces ATP?'), findsOneWidget);
     expect(find.text('Anatomy · Cell Biology'), findsOneWidget);
     expect(find.text('What is the first heart sound?'), findsOneWidget);
-    expect(find.text('Practice · upcoming'), findsOneWidget);
+    expect(find.text('Questions · 2'), findsOneWidget);
+    // The dead "Practice · upcoming" button is gone.
+    expect(find.textContaining('upcoming'), findsNothing);
   });
 
   testWidgets('plan-locked bookmark fails gracefully', (tester) async {
@@ -113,7 +115,6 @@ void main() {
     expect(find.text('Unavailable on your plan'), findsOneWidget);
     expect(find.text('Upgrade to see this question.'), findsOneWidget);
     expect(find.text('Visible stem'), findsOneWidget);
-    expect(find.text('Practice · upcoming'), findsOneWidget);
   });
 
   testWidgets('unbookmark hides the row immediately', (tester) async {
@@ -128,7 +129,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Which organelle produces ATP?'), findsNothing);
-    expect(find.textContaining('No question bookmarks yet'), findsOneWidget);
+    expect(find.textContaining('Nothing saved yet'), findsOneWidget);
   });
 
   testWidgets('error state shows offline copy and Retry', (tester) async {

@@ -7,6 +7,8 @@ import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_card.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/comic_select_sheet.dart';
@@ -135,6 +137,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
+            const SizedBox(height: Spacing.sm),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              // TweenAnimationBuilder animates from whatever it last showed to
+              // the new `end`, so the bar slides forward as steps advance.
+              // `begin` only applies to the very first build.
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: (_step + 1) / _stepCount),
+                duration: const Duration(milliseconds: 240),
+                curve: Curves.easeOut,
+                builder: (context, value, _) =>
+                    LinearProgressIndicator(value: value, minHeight: 6),
+              ),
+            ),
             const SizedBox(height: Spacing.lg),
             if (_step == 0) const ComicCard(child: ThemeModeSelector()),
             if (_step == 1)
@@ -164,7 +180,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   );
                 },
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('$e'),
+                error: (e, _) =>
+                    InlineErrorMessage(message: UserFacingError.display(e)),
               ),
             ],
             if (_step == 3) ...[
@@ -192,7 +209,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   );
                 },
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('$e'),
+                error: (e, _) =>
+                    InlineErrorMessage(message: UserFacingError.display(e)),
               ),
             ],
             if (_step == 4) ...[
@@ -216,7 +234,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   );
                 },
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('$e'),
+                error: (e, _) =>
+                    InlineErrorMessage(message: UserFacingError.display(e)),
               ),
               const SizedBox(height: Spacing.md),
               colleges.when(
@@ -231,7 +250,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   );
                 },
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('$e'),
+                error: (e, _) =>
+                    InlineErrorMessage(message: UserFacingError.display(e)),
               ),
               const SizedBox(height: Spacing.md),
               ComicSelectField<int>(
@@ -279,7 +299,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_step == _stepCount - 1 ? 'Continue' : 'Next'),
+                        : Text(
+                            _step == _stepCount - 1 ? 'Start studying' : 'Next',
+                          ),
                   ),
                 ),
               ],

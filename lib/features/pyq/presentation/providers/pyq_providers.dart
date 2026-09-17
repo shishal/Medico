@@ -26,6 +26,20 @@ Future<PyqLessonFeed> lessonPyqs(Ref ref, String lessonId) async {
   };
 }
 
+/// "More on this topic" links for one lesson. This used to be an initState
+/// fetch into local widget state, so it never refreshed and a failure showed
+/// as an empty section.
+@riverpod
+Future<List<ResourceLink>> lessonResources(Ref ref, String lessonId) async {
+  final result = await ref
+      .watch(pyqRepositoryProvider)
+      .fetchLessonResources(lessonId);
+  return switch (result) {
+    Success(:final value) => value,
+    Failure(:final message) => throw Exception(message),
+  };
+}
+
 /// Kept alive so leaving the subject and coming back does not re-show
 /// the loading spinner while the feed is fetched again.
 @Riverpod(keepAlive: true)
@@ -65,7 +79,7 @@ class SubjectPyqFilters extends _$SubjectPyqFilters {
     );
   }
 
-  void togglePriority(QuestionDifficulty value) {
+  void togglePriority(QuestionPriority value) {
     final next = {...state.priorities};
     if (!next.add(value)) next.remove(value);
     state = SubjectPyqFilter(

@@ -22,7 +22,7 @@ PyqTeaser _teaser({
   List<int> years = const [2024],
   String kind = 'pyq_theory',
   num marks = 10,
-  QuestionDifficulty difficulty = QuestionDifficulty.medium,
+  QuestionPriority priority = QuestionPriority.should,
 }) {
   return PyqTeaser(
     id: id,
@@ -32,7 +32,7 @@ PyqTeaser _teaser({
     requiredPlan: PlanTier.free,
     appearanceCount: years.length,
     kind: kind,
-    difficulty: difficulty,
+    priority: priority,
     appearanceYears: years,
     paperNames: papers,
     topicName: topicName,
@@ -101,15 +101,34 @@ void main() {
     },
   );
 
+  test('yearSummariesWithMatchingPyqs counts each sitting newest first', () {
+    final summaries = yearSummariesWithMatchingPyqs(teasers: _feed().teasers);
+
+    expect(summaries.map((s) => s.year), [2024, 2023]);
+    expect(summaries.first.questionCount, 1);
+    expect(summaries.first.paperNames, ['Paper II']);
+    expect(summaries.last.paperNames, ['Paper I']);
+  });
+
+  test('yearSummariesWithMatchingPyqs respects the active filters', () {
+    final summaries = yearSummariesWithMatchingPyqs(
+      teasers: _feed().teasers,
+      paperName: 'Paper I',
+    );
+
+    expect(summaries.map((s) => s.year), [2023]);
+    expect(summaries.single.questionCount, 1);
+  });
+
   test('filterSubjectPyqs keeps only Must when that priority is chosen', () {
     final teasers = [
-      _teaser(id: 'must', text: 'Must', difficulty: QuestionDifficulty.hard),
-      _teaser(id: 'could', text: 'Could', difficulty: QuestionDifficulty.easy),
+      _teaser(id: 'must', text: 'Must', priority: QuestionPriority.must),
+      _teaser(id: 'could', text: 'Could', priority: QuestionPriority.could),
     ];
     expect(
       filterSubjectPyqs(
         teasers: teasers,
-        priorities: {QuestionDifficulty.hard},
+        priorities: {QuestionPriority.must},
       ).single.id,
       'must',
     );
@@ -278,9 +297,11 @@ void main() {
 
     expect(find.text('2024'), findsOneWidget);
     expect(find.text('2023'), findsNothing);
-    expect(find.text('Filters · on'), findsOneWidget);
+    // Active filters are named above the year list and the icon fills in.
+    expect(find.text('Paper II'), findsOneWidget);
+    expect(find.byIcon(Icons.filter_alt_rounded), findsOneWidget);
 
-    await tester.tap(find.text('Filters · on'));
+    await tester.tap(find.text('Filters'));
     await tester.pumpAndSettle();
     expect(find.text('Chapters'), findsOneWidget);
     await tester.tap(find.text('Clear all'));

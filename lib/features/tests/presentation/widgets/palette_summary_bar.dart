@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/spacing.dart';
 import '../../domain/palette_cell.dart';
-import 'player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 
 /// Compact counts + a button that opens the full question palette.
 class PaletteSummaryBar extends StatelessWidget {

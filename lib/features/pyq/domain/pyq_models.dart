@@ -13,7 +13,7 @@ class PyqTeaser {
     required this.requiredPlan,
     required this.appearanceCount,
     this.kind = 'pyq_theory',
-    this.difficulty = QuestionDifficulty.medium,
+    this.priority = QuestionPriority.should,
     this.textbookLine,
     this.appearanceYears = const [],
     this.paperNames = const [],
@@ -29,7 +29,7 @@ class PyqTeaser {
   final PlanTier requiredPlan;
   final int appearanceCount;
   final String kind;
-  final QuestionDifficulty difficulty;
+  final QuestionPriority priority;
   final String? textbookLine;
   final List<int> appearanceYears;
 
@@ -55,10 +55,10 @@ class PyqTeaser {
       ),
       appearanceCount: _asInt(json[PyqTeaserColumns.appearanceCount]),
       kind: json[PyqTeaserColumns.kind] as String? ?? 'pyq_theory',
-      difficulty: QuestionDifficulty.fromString(
+      priority: QuestionPriority.fromString(
         json[PyqTeaserColumns.difficulty] as String? ??
             json[QuestionColumns.difficulty] as String? ??
-            QuestionDifficulty.medium.dbValue,
+            QuestionPriority.should.dbValue,
       ),
     );
   }
@@ -71,7 +71,7 @@ class PyqTeaser {
     String? topicName,
     String? lessonName,
     String? topicId,
-    QuestionDifficulty? difficulty,
+    QuestionPriority? priority,
   }) {
     return PyqTeaser(
       id: id,
@@ -82,7 +82,7 @@ class PyqTeaser {
       requiredPlan: requiredPlan,
       appearanceCount: appearanceCount ?? this.appearanceCount,
       kind: kind,
-      difficulty: difficulty ?? this.difficulty,
+      priority: priority ?? this.priority,
       textbookLine: textbookLine ?? this.textbookLine,
       appearanceYears: appearanceYears ?? this.appearanceYears,
       paperNames: paperNames ?? this.paperNames,

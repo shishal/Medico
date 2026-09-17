@@ -1,8 +1,12 @@
 # Regenerated from assets/branding/ via:
 #   dart run flutter_native_splash:create
 #
-# Color matches AppTheme.splashCanvas so the native launch screen and the
-# Flutter SplashScreen don't flash white → charcoal.
+# Color matches AppTheme.splashCanvas in both polarities on purpose: the
+# splash is a dark brand moment and splash_logo.png is drawn for a dark
+# backdrop, so a light variant would need a second asset. The app itself
+# defaults to Light (docs/00_PRODUCT.md), so expect charcoal → paper on the
+# handoff; keeping native and Flutter splash identical means there is only
+# ever one such transition instead of two.
 flutter_native_splash:
   color: "#121212"
   color_dark: "#121212"

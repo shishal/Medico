@@ -4,7 +4,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/markdown_copy.dart';
 import '../../../tests/domain/question_option.dart';
 import '../../../tests/presentation/widgets/option_list.dart';
-import '../../../tests/presentation/widgets/player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 import '../../domain/attempt_review.dart';
 
 /// Options in review: tap does nothing; colors come from [ReviewItem.visualFor].

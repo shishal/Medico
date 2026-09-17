@@ -28,45 +28,52 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: Spacing.xl),
-          children: [
-            const HomeHeroBanner(),
-            const HomeCoverageBanner(),
-            const ComicSectionTitle(
-              title: 'Subjects',
-              subtitle: 'Tap a subject for previous-year papers.',
-            ),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 280),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              child: subjects.when(
-                data: (items) => SubjectStickerGrid(
-                  key: ValueKey(items.map((s) => s.id).join(',')),
-                  subjects: items,
-                  coverage: coverage,
-                  showLessonProgress: hasUniversityPapers,
-                ),
-                loading: () => const Padding(
-                  key: ValueKey('subjects-loading'),
-                  padding: EdgeInsets.all(Spacing.lg),
-                  child: LinearProgressIndicator(),
-                ),
-                error: (e, _) => Padding(
-                  key: const ValueKey('subjects-error'),
-                  padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
-                  child: InlineErrorMessage(
-                    message: UserFacingError.display(e),
-                    onRetry: () => ref.invalidate(phaseSubjectsProvider),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(phaseSubjectsProvider);
+            ref.invalidate(studyProgressProvider);
+            ref.invalidate(universityCoverageProvider);
+          },
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: Spacing.xl),
+            children: [
+              const HomeHeroBanner(),
+              const HomeCoverageBanner(),
+              const ComicSectionTitle(
+                title: 'Subjects',
+                subtitle: 'Tap a subject for previous-year papers.',
+              ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 280),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                child: subjects.when(
+                  data: (items) => SubjectStickerGrid(
+                    key: ValueKey(items.map((s) => s.id).join(',')),
+                    subjects: items,
+                    coverage: coverage,
+                    showLessonProgress: hasUniversityPapers,
+                  ),
+                  loading: () => const Padding(
+                    key: ValueKey('subjects-loading'),
+                    padding: EdgeInsets.all(Spacing.lg),
+                    child: LinearProgressIndicator(),
+                  ),
+                  error: (e, _) => Padding(
+                    key: const ValueKey('subjects-error'),
+                    padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
+                    child: InlineErrorMessage(
+                      message: UserFacingError.display(e),
+                      onRetry: () => ref.invalidate(phaseSubjectsProvider),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const HomeResumeBanner(),
-            const ComicSectionTitle(title: 'Saved'),
-            const HomeQuickActions(),
-          ],
+              const HomeResumeBanner(),
+              const ComicSectionTitle(title: 'More'),
+              const HomeQuickActions(),
+            ],
+          ),
         ),
       ),
     );

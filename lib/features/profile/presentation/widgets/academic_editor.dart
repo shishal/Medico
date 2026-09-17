@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
+import '../../../../core/utils/user_facing_error.dart';
+import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_select_sheet.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
@@ -39,10 +41,23 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
     super.dispose();
   }
 
+  /// The Save button stays enabled but these two are required, so say which
+  /// one is missing instead of swallowing the tap.
+  String? get _blocker {
+    if (_universityId == null) return 'Pick your university first.';
+    if (_phaseId == null) return 'Pick your MBBS year first.';
+    return null;
+  }
+
   Future<void> _save() async {
-    final universityId = _universityId;
-    final phaseId = _phaseId;
-    if (universityId == null || phaseId == null) return;
+    final blocker = _blocker;
+    if (blocker != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(blocker)));
+      return;
+    }
+    final universityId = _universityId!;
+    final phaseId = _phaseId!;
     setState(() => _saving = true);
     final result = await ref
         .read(profileRepositoryProvider)
@@ -140,7 +155,8 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
             );
           },
           loading: () => const LinearProgressIndicator(),
-          error: (e, _) => Text('$e'),
+          error: (e, _) =>
+              InlineErrorMessage(message: UserFacingError.display(e)),
         ),
         const SizedBox(height: Spacing.md),
         phases.when(
@@ -151,7 +167,8 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
             padding: EdgeInsets.zero,
           ),
           loading: () => const LinearProgressIndicator(),
-          error: (e, _) => Text('$e'),
+          error: (e, _) =>
+              InlineErrorMessage(message: UserFacingError.display(e)),
         ),
         const SizedBox(height: Spacing.md),
         colleges.when(
@@ -166,7 +183,8 @@ class _AcademicEditorState extends ConsumerState<AcademicEditor> {
             );
           },
           loading: () => const LinearProgressIndicator(),
-          error: (e, _) => Text('$e'),
+          error: (e, _) =>
+              InlineErrorMessage(message: UserFacingError.display(e)),
         ),
         const SizedBox(height: Spacing.md),
         ComicSelectField<int>(

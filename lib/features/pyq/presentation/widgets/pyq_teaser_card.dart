@@ -56,7 +56,7 @@ class PyqTeaserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final comic = ComicColors.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final years = teaser.appearanceYears.map((y) => '$y').join(' · ');
+    final years = teaser.appearanceYears.map((y) => '$y').join(', ');
 
     return ComicCard(
       onTap: onTap,
@@ -70,29 +70,16 @@ class PyqTeaserCard extends StatelessWidget {
                   spacing: Spacing.sm,
                   runSpacing: Spacing.xs,
                   children: [
-                    Chip(
-                      label: Text(teaser.format.label),
-                      visualDensity: VisualDensity.compact,
-                    ),
+                    if (teaser.format != QuestionFormat.unclassified)
+                      _MetaChip(label: teaser.format.label),
                     if (teaser.marks != null)
-                      Chip(
-                        label: Text('${teaser.marks} marks'),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    Chip(
-                      label: Text(teaser.difficulty.label),
-                      visualDensity: VisualDensity.compact,
-                    ),
+                      _MetaChip(label: '${teaser.marks} marks'),
+                    // `should` is what a blank CSV cell imports as, so a chip
+                    // there would sit on every card and mean nothing.
+                    if (teaser.priority.isNoteworthy)
+                      _MetaChip(label: teaser.priority.label),
                     if (teaser.isHighYield)
-                      Chip(
-                        label: const Text('High yield'),
-                        visualDensity: VisualDensity.compact,
-                        backgroundColor: scheme.primary.withValues(alpha: 0.18),
-                        labelStyle: TextStyle(
-                          color: scheme.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                      _MetaChip(label: 'High yield', color: scheme.primary),
                   ],
                 ),
               ),
@@ -102,16 +89,20 @@ class PyqTeaserCard extends StatelessWidget {
           const SizedBox(height: Spacing.sm),
           Text(
             teaser.questionText,
+            // The reader shows the full stem; a 10-mark essay would otherwise
+            // fill the screen and make the paper outline unscannable.
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          if (years.isNotEmpty || teaser.appearanceCount > 0) ...[
+          if (years.isNotEmpty || teaser.paperNames.isNotEmpty) ...[
             const SizedBox(height: Spacing.sm),
             Text(
               [
                 if (teaser.paperNames.isNotEmpty) teaser.paperNames.join(' · '),
                 if (years.isNotEmpty) years,
-                if (teaser.appearanceCount > 0)
-                  '${teaser.appearanceCount}× in papers',
+                if (teaser.appearanceCount > 1)
+                  'asked ${teaser.appearanceCount}×',
               ].join(' · '),
               style: Theme.of(context).textTheme.bodySmall
                   ?.copyWith(color: comic.ink.withValues(alpha: 0.7)),
@@ -133,10 +124,43 @@ class PyqTeaserCard extends StatelessWidget {
             const SizedBox(height: Spacing.sm),
             Text(
               teaser.textbookLine!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Compact metadata pill. Lighter than a stock [Chip] so three of them on one
+/// card stay readable; [color] tints it for the one fact worth emphasising.
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.label, this.color});
+
+  final String label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final tint = color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 3),
+      decoration: BoxDecoration(
+        color: tint == null
+            ? scheme.surfaceContainerHighest
+            : tint.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: tint ?? scheme.onSurfaceVariant,
+          fontWeight: tint == null ? FontWeight.w600 : FontWeight.w700,
+        ),
       ),
     );
   }

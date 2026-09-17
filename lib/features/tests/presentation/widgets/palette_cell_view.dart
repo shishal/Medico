@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/palette_cell.dart';
-import 'player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 
 /// One numbered palette cell. Visuals come from [PaletteCell] so Exam vs
 /// Tutor rules stay out of this widget.

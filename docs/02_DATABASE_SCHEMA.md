@@ -8,7 +8,9 @@ Run these in the Supabase SQL editor in order. Each block is idempotent-ish (use
 create type plan_tier as enum ('free', 'pro', 'elite');
 create type test_type as enum ('mini', 'subject', 'mock', 'grand');
 create type attempt_status as enum ('in_progress', 'submitted', 'abandoned');
-create type question_difficulty as enum ('easy', 'medium', 'hard');
+-- Revision priority (MoSCoW), not a difficulty scale. The type name is
+-- historical; `20260916120000_review_fixes.sql` renamed the values.
+create type question_difficulty as enum ('could', 'should', 'must');
 ```
 
 ## 2. Core tables
@@ -52,7 +54,7 @@ create table questions (
   explanation_text text,
   explanation_video_url text,
   image_url text,
-  difficulty question_difficulty not null default 'medium',
+  difficulty question_difficulty not null default 'should',
   source text,                    -- e.g. 'PYQ 2024', 'Custom'
   required_plan plan_tier not null default 'free',
   is_active boolean not null default true,
@@ -228,9 +230,15 @@ grant execute on function get_attempt_results(uuid) to authenticated;
 create policy "own profile select" on profiles for select using (auth.uid() = id);
 create policy "own profile update" on profiles for update using (auth.uid() = id);
 
--- subjects/topics: readable by any authenticated user (not plan-gated at this level)
+-- subjects/topics/lessons: readable by any authenticated user, NOT plan-gated,
+-- even though subjects and lessons carry a required_plan. This is deliberate:
+-- the catalog reads these tables directly and renders Pro rows with a padlock
+-- that routes to the upgrade screen, so gating the names would delete the
+-- upgrade prompt. Paid content (stems, MCQ keys, explanations, sample answers)
+-- is gated by the `questions` policy and question_sample_answers RLS.
 create policy "subjects readable" on subjects for select using (auth.role() = 'authenticated');
 create policy "topics readable" on topics for select using (auth.role() = 'authenticated');
+create policy "lessons readable" on lessons for select using (auth.role() = 'authenticated');
 
 -- questions: only visible if the user's current plan meets the question's required plan
 create policy "questions plan-gated select" on questions for select using (
@@ -331,7 +339,9 @@ $$;
 
 ### 6.2 Results summary (Phase 6.2)
 
-The results screen reads stored `total_score` / counts / `percentile` — it does not re-score. Subject-wise correct/incorrect/unattempted uses the same classification as §5 of the test-engine spec, grouped by `questions → topics → subjects`. Time spent is wall-clock `submitted_at - started_at`.
+The results screen reads stored `total_score` / counts / `percentile` — it does not re-score. Subject-wise correct/incorrect/unattempted uses the same classification as §5 of the test-engine spec. Time spent is wall-clock `submitted_at - started_at`.
+
+Subject resolution walks `questions.topic_id → topics.subject_id`, falling back to the lesson's topic and then to the question's newest exam paper. `topic_id` became nullable in the UG pivot, so the original inner join to `topics` silently dropped untagged questions from the breakdown while they still counted in the stored totals. The fallbacks are **scalar subqueries, not joins**, so each question contributes exactly one row and the per-subject counts still sum to the stored attempt totals.
 
 `get_attempt_results` is `security definer` so a student can still open their own submitted results if their plan later drops below a question's `required_plan` (a client-side join through `questions` would be blocked by that RLS policy).
 
@@ -583,7 +593,10 @@ language plpgsql security definer
 set search_path = public as $$
 -- reject unknown plan / amount / currency (catalog: pro 149900/180d, elite 299900/365d)
 -- insert payments; on unique payment id, return {applied:false, duplicate:true}
--- else set profiles.plan, plan_started_at, plan_expires_at = now() + duration
+-- else set profiles.plan, plan_started_at,
+--   plan_expires_at = greatest(now(), coalesce(plan_expires_at, now())) + duration
+--   (stacks onto time the student already paid for; renewing early used to
+--    reset the expiry and throw the remainder away)
 $$;
 ```
 
@@ -671,12 +684,25 @@ RLS `plan_rank(current_plan()) >= plan_rank('pro')`.
 Also: `question_appearances` (frequency = count), `question_textbook_refs`
 (citation only — never PDF bytes).
 
+Indexes on the PYQ read path (added in
+`20260916120000_review_fixes.sql`) — every subject load filters `exam_papers`
+by university + subject and then walks appearances in both directions:
+
+```sql
+create index idx_exam_papers_university on exam_papers(university_id);
+create index idx_exam_papers_subject on exam_papers(subject_id);
+create index idx_question_appearances_paper on question_appearances(exam_paper_id);
+create index idx_questions_lesson on questions(lesson_id) where lesson_id is not null;
+-- the (question_id, exam_paper_id) primary key already covers the other direction
+```
+
 View `pyq_teasers` (security_invoker = true so questions RLS still applies):
 stem, marks, kind, difficulty, lesson_id, required_plan, appearance_count —
-no sample answer, no MCQ keys. The app shows difficulty as Must / Should /
-Could (`hard` / `medium` / `easy`). Includes both `pyq_theory` and `mcq`
-rows. University filter is applied in the client/RPC via appearances →
-exam_papers.
+no sample answer, no MCQ keys. `difficulty` holds `must` / `should` / `could`
+and is optional on import (blank ⇒ `should`); the app renders a chip only for
+`must` and `could`, since `should` is just the default. Includes both
+`pyq_theory` and `mcq` rows. University filter is applied in the client/RPC
+via appearances → exam_papers.
 
 `universities.slug` is `lower(code)` from sheet sync (not a sheet column).
 `is_fallback` is retired — drop with

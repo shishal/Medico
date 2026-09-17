@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/utils/open_external_link.dart';
 import '../../../../core/theme/comic_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
@@ -18,6 +19,7 @@ import '../../../security/domain/capture_event.dart';
 import '../../../security/presentation/widgets/content_capture_guard.dart';
 import '../../data/pyq_repository.dart';
 import '../../domain/pyq_models.dart';
+import '../../domain/question_format.dart';
 import '../providers/preferred_textbook_provider.dart';
 import '../providers/pyq_providers.dart';
 
@@ -84,9 +86,7 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
       context.push(AppRoutes.upgradePath(PlanTier.pro));
       return;
     }
-    final uri = Uri.tryParse(link.url);
-    if (uri == null) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await openExternalLink(context, link.url);
   }
 
   @override
@@ -96,6 +96,13 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
     final years = d.appearances
         .map((a) => '${a.year} ${a.paperName}')
         .join(' · ');
+    final meta = [
+      if (d.teaser.format != QuestionFormat.unclassified) d.teaser.format.label,
+      if (d.teaser.marks != null) '${d.teaser.marks} marks',
+      // Skip `should`, which is only what a blank CSV cell imports as.
+      if (d.teaser.priority.isNoteworthy) d.teaser.priority.label,
+      if (d.teaser.appearanceCount > 1) 'asked ${d.teaser.appearanceCount}×',
+    ].join(' · ');
 
     return Scaffold(
       appBar: AppBar(
@@ -105,18 +112,22 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
       body: ListView(
         padding: const EdgeInsets.all(Spacing.lg),
         children: [
+          // DA first: it is the panel that opens by default, so the selected
+          // control should be the leading one.
           Row(
             children: [
               _PanelButton(
-                label: 'EX',
-                selected: _panel == _ReaderPanel.explanation,
-                onPressed: () => _toggle(_ReaderPanel.explanation),
+                label: 'DA',
+                tooltip: 'Direct answer',
+                selected: _panel == _ReaderPanel.directAnswer,
+                onPressed: () => _toggle(_ReaderPanel.directAnswer),
               ),
               const SizedBox(width: Spacing.sm),
               _PanelButton(
-                label: 'DA',
-                selected: _panel == _ReaderPanel.directAnswer,
-                onPressed: () => _toggle(_ReaderPanel.directAnswer),
+                label: 'EX',
+                tooltip: 'Explanation, textbook pages and links',
+                selected: _panel == _ReaderPanel.explanation,
+                onPressed: () => _toggle(_ReaderPanel.explanation),
               ),
             ],
           ),
@@ -129,14 +140,10 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${d.teaser.format.label}'
-                  '${d.teaser.marks != null ? ' · ${d.teaser.marks} marks' : ''}'
-                  ' · ${d.teaser.difficulty.label}'
-                  '${d.teaser.appearanceCount > 0 ? ' · ${d.teaser.appearanceCount}×' : ''}',
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-                const SizedBox(height: Spacing.sm),
+                if (meta.isNotEmpty) ...[
+                  Text(meta, style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(height: Spacing.sm),
+                ],
                 Text(
                   d.teaser.questionText,
                   style: Theme.of(context).textTheme.titleMedium,
@@ -194,19 +201,26 @@ class _PyqBodyState extends ConsumerState<_PyqBody> {
 class _PanelButton extends StatelessWidget {
   const _PanelButton({
     required this.label,
+    required this.tooltip,
     required this.selected,
     required this.onPressed,
   });
 
   final String label;
+
+  /// DA / EX are opaque on their own; long-press or hover spells them out.
+  final String tooltip;
   final bool selected;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return selected
-        ? FilledButton(onPressed: onPressed, child: Text(label))
-        : OutlinedButton(onPressed: onPressed, child: Text(label));
+    return Tooltip(
+      message: tooltip,
+      child: selected
+          ? FilledButton(onPressed: onPressed, child: Text(label))
+          : OutlinedButton(onPressed: onPressed, child: Text(label)),
+    );
   }
 }
 
@@ -214,6 +228,22 @@ class _DirectAnswerPanel extends StatelessWidget {
   const _DirectAnswerPanel({required this.detail});
 
   final PyqDetail detail;
+
+  /// Just the letter, in the same green + check mark as the highlighted option
+  /// above. Spelling the option text out here would print it twice on one
+  /// screen, since opening this panel also reveals the key in the option list.
+  Widget _answerLine(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.check_circle, size: 20, color: PlayerColors.correct),
+        const SizedBox(width: Spacing.sm),
+        Text(
+          'Answer: ${detail.correctOption}',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +253,7 @@ class _DirectAnswerPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (hasKey) ...[
-            ComicCard(child: Text('Correct option: ${detail.correctOption}')),
+            ComicCard(child: _answerLine(context)),
             const SizedBox(height: Spacing.sm),
           ],
           ComicCard(
@@ -245,9 +275,9 @@ class _DirectAnswerPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (hasKey) Text('Correct option: ${detail.correctOption}'),
+          if (hasKey) _answerLine(context),
           if (detail.sampleAnswer != null) ...[
-            if (hasKey) const SizedBox(height: Spacing.sm),
+            if (hasKey) const Divider(height: Spacing.lg),
             MarkdownCopy(data: detail.sampleAnswer!),
           ],
         ],
@@ -315,15 +345,18 @@ class _ExplanationPanel extends ConsumerWidget {
             ),
           ],
           for (final c in citations)
-            ComicCard(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Spacing.sm,
-                vertical: Spacing.xs,
-              ),
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.menu_book_outlined),
-                title: Text(c.label),
+            Padding(
+              padding: const EdgeInsets.only(top: Spacing.sm),
+              child: ComicCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.sm,
+                  vertical: Spacing.xs,
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.menu_book_outlined),
+                  title: Text(c.label),
+                ),
               ),
             ),
         ],
@@ -378,19 +411,55 @@ class _McqOptions extends StatelessWidget {
       children: [
         for (final entry in options.entries)
           if (entry.value != null && entry.value!.trim().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: Spacing.sm),
-              child: ComicCard(
-                color: revealed && entry.key == detail.correctOption
-                    ? Color.alphaBlend(
-                        Colors.green.withValues(alpha: 0.18),
-                        ComicColors.of(context).sticker,
-                      )
-                    : null,
-                child: Text('${entry.key}. ${entry.value}'),
-              ),
+            _McqOptionRow(
+              letter: entry.key,
+              text: entry.value!,
+              isCorrect: revealed && entry.key == detail.correctOption,
             ),
       ],
+    );
+  }
+}
+
+class _McqOptionRow extends StatelessWidget {
+  const _McqOptionRow({
+    required this.letter,
+    required this.text,
+    required this.isCorrect,
+  });
+
+  final String letter;
+  final String text;
+  final bool isCorrect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Spacing.sm),
+      child: ComicCard(
+        color: isCorrect
+            ? Color.alphaBlend(
+                PlayerColors.correct.withValues(alpha: 0.18),
+                ComicColors.of(context).sticker,
+              )
+            : null,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: Text('$letter. $text')),
+            // Colour alone fails for red-green colour blindness, so the key
+            // also carries a glyph.
+            if (isCorrect) ...[
+              const SizedBox(width: Spacing.sm),
+              const Icon(
+                Icons.check_circle,
+                size: 20,
+                color: PlayerColors.correct,
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

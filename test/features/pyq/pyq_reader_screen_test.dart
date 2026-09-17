@@ -170,7 +170,10 @@ void main() {
     );
 
     expect(find.text('A. Mitochondria'), findsOneWidget);
-    expect(find.text('Correct option: A'), findsOneWidget);
+    expect(find.text('Answer: A'), findsOneWidget);
+    // The key is marked on the option itself too, so colour is not the only
+    // cue for a red-green colour-blind student.
+    expect(find.byIcon(Icons.check_circle), findsNWidgets(2));
     expect(find.text('Mitochondria make ATP.'), findsOneWidget);
     expect(find.text('Oxidative phosphorylation.'), findsNothing);
   });

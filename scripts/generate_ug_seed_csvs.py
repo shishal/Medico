@@ -384,7 +384,7 @@ LOCKED_PYQ_ROWS = [
         "explanation_text": "",
         "explanation_video_url": "",
         "image_url": "",
-        "difficulty": "medium",
+        "difficulty": "should",
         "source": "KUHS PYQ",
         "required_plan": "free",
         "is_active": "TRUE",
@@ -421,7 +421,7 @@ LOCKED_PYQ_ROWS = [
         "explanation_text": "",
         "explanation_video_url": "",
         "image_url": "",
-        "difficulty": "easy",
+        "difficulty": "could",
         "source": "KUHS PYQ",
         "required_plan": "free",
         "is_active": "TRUE",
@@ -826,7 +826,7 @@ def mcq_bank_for(topic: str, lesson_name: str) -> list[tuple]:
             "It is tested only in NEET-PG, never in university papers",
             "B",
             f"{lesson_name} is a standard KUHS theory and viva topic; learn relations and one clinical note.",
-            "easy",
+            "could",
         ),
         (
             f"A student is asked a 5-mark short note on {lesson_name.lower()}. The best structure is:",
@@ -836,7 +836,7 @@ def mcq_bank_for(topic: str, lesson_name: str) -> list[tuple]:
             "List drug trade names only",
             "B",
             "Examiners mark headings they can tick: definition, classification or steps, applied aspect.",
-            "easy",
+            "could",
         ),
     ]
 
@@ -854,7 +854,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "Medial cord and ulnar nerve",
             "B",
             "Erb point is on the upper trunk (C5–C6), six nerves meet here; traction causes waiter's-tip posture.",
-            "medium",
+            "should",
         ),
         (
             "The long thoracic nerve arises from which roots?",
@@ -864,7 +864,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "T1, T2",
             "A",
             "Long thoracic (C5–C7) supplies serratus anterior; injury causes winged scapula.",
-            "easy",
+            "could",
         ),
     ],
     "Upper Limb Anatomy::Humerus fractures": [
@@ -876,7 +876,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "Musculocutaneous",
             "B",
             "Ulnar nerve lies behind the medial epicondyle (funny bone); supracondylar fractures more often injure the median/anterior interosseous or brachial artery.",
-            "easy",
+            "could",
         ),
         (
             "Holstein–Lewis fracture is a fracture of the:",
@@ -886,7 +886,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "Clavicle middle third",
             "B",
             "A spiral fracture of the distal humeral shaft can entrap the radial nerve as it pierces the lateral intermuscular septum.",
-            "hard",
+            "must",
         ),
     ],
     "Head and Neck Anatomy::Larynx": [
@@ -898,7 +898,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "Glossopharyngeal nerve",
             "B",
             "Cricothyroid is the only intrinsic laryngeal muscle supplied by the external laryngeal nerve (superior laryngeal); others are recurrent laryngeal.",
-            "easy",
+            "could",
         ),
         (
             "The rima glottidis is widest during:",
@@ -908,7 +908,7 @@ EXTRA_MCQS: dict[str, list[tuple]] = {
             "Swallowing with cords adducted only",
             "B",
             "Posterior cricoarytenoids abduct the cords; rima is widest in deep inspiration.",
-            "medium",
+            "should",
         ),
     ],
 }
@@ -1606,7 +1606,7 @@ def question_combo_key(row: dict) -> tuple[str, ...]:
     """One sheet row per subject/topic/kind/difficulty/plan/year/paper/exam type."""
     kind = (row.get("kind(Default-MCQ)") or row.get("kind") or "").strip()
     difficulty = (
-        row.get("difficulty(Default-medium)") or row.get("difficulty") or ""
+        row.get("difficulty(Default-should)") or row.get("difficulty") or ""
     ).strip()
     plan = (
         row.get("required_plan(Default-free)") or row.get("required_plan") or ""
@@ -1647,15 +1647,15 @@ def keep_year1(rows: list[dict]) -> list[dict]:
     ]
 
 
-def keep_medium_difficulty(rows: list[dict]) -> list[dict]:
-    """Seed content is medium difficulty only until other bands are filled in."""
+def keep_should_priority(rows: list[dict]) -> list[dict]:
+    """Seed rows all carry the default `should` priority (MoSCoW)."""
     return [
         row
         for row in rows
         if (
-            row.get("difficulty(Default-medium)") or row.get("difficulty") or ""
+            row.get("difficulty(Default-should)") or row.get("difficulty") or ""
         ).strip().lower()
-        == "medium"
+        == "should"
     ]
 
 
@@ -1750,7 +1750,7 @@ def build() -> None:
             # PYQ — keep the two already in the sheet.
             locked_pyq = LOCKED_PYQS.get(lid)
             marks = 10 if lesson_index == 0 else 5
-            difficulty = "medium" if marks == 10 else "easy"
+            difficulty = "should" if marks == 10 else "could"
             if locked_pyq:
                 qid = locked_pyq
             else:
@@ -2046,7 +2046,7 @@ def build() -> None:
         "correct_option",
         "explanation_text",
         "sample_answer_text",
-        "difficulty(Default-medium)",
+        "difficulty(Default-should)",
         "required_plan(Default-free)",
         "is_active(Default-TRUE)",
         "exam_year",
@@ -2088,7 +2088,7 @@ def build() -> None:
                         "correct_option": q.get("correct_option") or "",
                         "explanation_text": q.get("explanation_text") or "",
                         "sample_answer_text": q.get("sample_answer_text") or "",
-                        "difficulty(Default-medium)": q.get("difficulty") or "medium",
+                        "difficulty(Default-should)": q.get("difficulty") or "should",
                         "required_plan(Default-free)": q.get("required_plan") or "free",
                         "is_active(Default-TRUE)": q.get("is_active") or "TRUE",
                         "exam_year": (paper or {}).get("exam_year") or "",
@@ -2101,7 +2101,7 @@ def build() -> None:
                 )
         seen_q.add(ext)
     wide_rows = keep_first_topic(
-        keep_medium_difficulty(keep_year1(keep_first_combo(wide_rows)))
+        keep_should_priority(keep_year1(keep_first_combo(wide_rows)))
     )
     write_csv("Questions.csv", wide_fields, wide_rows)
 

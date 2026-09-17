@@ -1,34 +1,35 @@
-/// Postgres `question_difficulty` enum (`easy` / `medium` / `hard`).
+/// Revision priority (MoSCoW) — how hard a student should chase a question.
 ///
-/// The app shows **Must / Should / Could** (MoSCoW). Mapping:
-/// hard → Must, medium → Should, easy → Could.
-enum QuestionDifficulty {
-  easy,
-  medium,
-  hard;
+/// Matches the Postgres `question_difficulty` enum, whose values are now
+/// `must` / `should` / `could`. The column kept its old name; there is no
+/// easy/medium/hard scale anywhere. Optional on import: a blank cell in the
+/// Questions CSV lands on [should], so treat that as "unremarkable", not as a
+/// deliberate tag.
+enum QuestionPriority {
+  // Declared in the order students scan a paper, so `values` is the UI order.
+  must,
+  should,
+  could;
 
-  /// Must first, then Should, then Could — how students scan a paper.
-  static const filterOrder = [
-    QuestionDifficulty.hard,
-    QuestionDifficulty.medium,
-    QuestionDifficulty.easy,
-  ];
-
-  static QuestionDifficulty fromString(String value) {
+  static QuestionPriority fromString(String value) {
     return switch (value.toLowerCase().trim()) {
-      'easy' || 'could' => QuestionDifficulty.easy,
-      'hard' || 'must' => QuestionDifficulty.hard,
-      _ => QuestionDifficulty.medium,
+      'could' => QuestionPriority.could,
+      'must' => QuestionPriority.must,
+      _ => QuestionPriority.should,
     };
   }
 
   String get dbValue => name;
 
   String get label => switch (this) {
-    QuestionDifficulty.easy => 'Could',
-    QuestionDifficulty.medium => 'Should',
-    QuestionDifficulty.hard => 'Must',
+    QuestionPriority.could => 'Could',
+    QuestionPriority.should => 'Should',
+    QuestionPriority.must => 'Must',
   };
+
+  /// [should] is the import default, so it carries no signal worth a chip.
+  /// Must and Could are deliberate tags and are worth showing.
+  bool get isNoteworthy => this != QuestionPriority.should;
 }
 
 /// `create_practice_session` `p_source_filter` values.

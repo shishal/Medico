@@ -21,7 +21,7 @@ enum PaperOutlineTab {
     PaperOutlineTab.longAnswer => 'No long answers in $year.',
     PaperOutlineTab.shortNotes => 'No short notes in $year.',
     PaperOutlineTab.mcq => 'No MCQs in $year.',
-    PaperOutlineTab.other => 'No unclassified questions in $year.',
+    PaperOutlineTab.other => 'No other questions in $year.',
   };
 }
 
@@ -43,7 +43,7 @@ List<PyqTeaser> teasersForOutlineTab({
   required PaperOutlineTab tab,
   String? paperName,
   String? topicId,
-  Set<QuestionDifficulty> priorities = const {},
+  Set<QuestionPriority> priorities = const {},
 }) {
   final filtered = filterSubjectPyqs(
     teasers: teasers,

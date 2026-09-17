@@ -43,7 +43,7 @@ WHAT YOU CAN DO
 • Browse Mini, Subject, Mock, and Grand tests. Grand tests follow the real NEET-PG shape: five timed sections.
 • Start a test only after you have seen duration, marking scheme, and (for sectional papers) the section-lock warning.
 • Sit the paper with a question palette, mark-for-review, and a timer that auto-submits at zero.
-• Practice on your own filters: subject, topic, difficulty, tutor mode (see the answer now) or exam mode (see everything at the end).
+• Practice on your own filters: subject, topic, revision priority, tutor mode (see the answer now) or exam mode (see everything at the end).
 • Open results for score, accuracy, percentile, and a subject-wise breakdown.
 • Bookmark questions from review and come back to them later.
 

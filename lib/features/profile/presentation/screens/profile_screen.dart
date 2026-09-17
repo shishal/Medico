@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:url_launcher/url_launcher.dart';
-
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/support.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/date_format.dart';
+import '../../../../core/utils/open_external_link.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
@@ -68,169 +68,170 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(Spacing.lg),
-        children: [
-          const Center(
-            child: ComicMascot(
-              asset: BrandAssets.mascotAvatar,
-              size: 96,
-              bounce: false,
-            ),
-          ),
-          const SizedBox(height: Spacing.md),
-          Text(
-            (name == null || name.isEmpty) ? 'Medico student' : name,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          profileAsync.when(
-            data: (profile) {
-              if (profile == null) return const SizedBox.shrink();
-              final unis = ref.watch(universitiesProvider).value ?? const [];
-              final phases = ref.watch(mbbsPhasesProvider).value ?? const [];
-              String? uniCode;
-              String? yearName;
-              for (final u in unis) {
-                if (u.id == profile.universityId) uniCode = u.code;
-              }
-              for (final p in phases) {
-                if (p.id == profile.mbbsPhaseId) yearName = p.name;
-              }
-              final bits = [
-                ?uniCode,
-                ?yearName,
-                if (profile.batchYear != null) '${profile.batchYear} batch',
-              ];
-              if (bits.isEmpty) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(top: Spacing.xs),
-                child: Text(
-                  bits.join(' · '),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-          const SizedBox(height: Spacing.sm),
-          planAsync.when(
-            data: (plan) => Text(
-              plan == null ? 'Plan: —' : 'Current plan: ${plan.label}',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            loading: () => const Align(
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(userProfileProvider.notifier).refresh(),
+        child: ListView(
+          padding: const EdgeInsets.all(Spacing.lg),
+          children: [
+            const Center(
+              child: ComicMascot(
+                asset: BrandAssets.mascotAvatar,
+                size: 96,
+                bounce: false,
               ),
             ),
-            error: (error, _) => InlineErrorMessage(
-              message: UserFacingError.display(error),
-              onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
+            const SizedBox(height: Spacing.md),
+            Text(
+              (name == null || name.isEmpty) ? 'Medico student' : name,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          profileAsync.when(
-            data: (profile) {
-              if (profile == null) return const SizedBox.shrink();
-              final expires = profile.planExpiresAt;
-              return Text(
-                expires == null
-                    ? 'No plan expiry set'
-                    : 'Stored plan: ${profile.plan.label} · expires ${expires.toLocal()}',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+            profileAsync.when(
+              data: (profile) {
+                if (profile == null) return const SizedBox.shrink();
+                final unis = ref.watch(universitiesProvider).value ?? const [];
+                final phases = ref.watch(mbbsPhasesProvider).value ?? const [];
+                String? uniCode;
+                String? yearName;
+                for (final u in unis) {
+                  if (u.id == profile.universityId) uniCode = u.code;
+                }
+                for (final p in phases) {
+                  if (p.id == profile.mbbsPhaseId) yearName = p.name;
+                }
+                final bits = [
+                  ?uniCode,
+                  ?yearName,
+                  if (profile.batchYear != null) '${profile.batchYear} batch',
+                ];
+                if (bits.isEmpty) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(top: Spacing.xs),
+                  child: Text(
+                    bits.join(' · '),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: Spacing.sm),
+            // One plan line. This used to be "Current plan: Pro" followed by
+            // "Stored plan: Pro · expires 2026-09-20 14:33:00.000".
+            planAsync.when(
+              data: (plan) {
+                if (plan == null) return const SizedBox.shrink();
+                final expires = profileAsync.value?.planExpiresAt;
+                return Column(
+                  children: [
+                    Text(
+                      plan.label,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    if (expires != null) ...[
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        DateFormats.planExpiry(expires),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
+              loading: () => const Center(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-          const SizedBox(height: Spacing.lg),
-          profileAsync.when(
-            data: (profile) {
-              if (profile == null) return const SizedBox.shrink();
-              return ComicCard(child: AcademicEditor(profile: profile));
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (_, _) => const SizedBox.shrink(),
-          ),
-          const SizedBox(height: Spacing.lg),
-          ComicCard(
-            color: Color.alphaBlend(
-              StickerFills.mint.withValues(alpha: 0.4),
-              comic.sticker,
+              ),
+              error: (error, _) => InlineErrorMessage(
+                message: UserFacingError.display(error),
+                onRetry: () => ref.read(userProfileProvider.notifier).refresh(),
+              ),
             ),
-            onTap: () => launchUrl(
-              Uri.parse(SupportLinks.whatsAppUrl),
-              mode: LaunchMode.externalApplication,
+            const SizedBox(height: Spacing.lg),
+            profileAsync.when(
+              data: (profile) {
+                if (profile == null) return const SizedBox.shrink();
+                return ComicCard(child: AcademicEditor(profile: profile));
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (_, _) => const SizedBox.shrink(),
             ),
-            child: const Row(
-              children: [
-                Icon(Icons.chat_outlined),
-                SizedBox(width: Spacing.md),
-                Expanded(child: Text('WhatsApp community')),
-                Icon(Icons.chevron_right_rounded),
-              ],
+            const SizedBox(height: Spacing.lg),
+            ComicCard(
+              color: Color.alphaBlend(
+                StickerFills.mint.withValues(alpha: 0.4),
+                comic.sticker,
+              ),
+              onTap: () => openExternalLink(context, SupportLinks.whatsAppUrl),
+              child: const Row(
+                children: [
+                  Icon(Icons.chat_outlined),
+                  SizedBox(width: Spacing.md),
+                  Expanded(child: Text('WhatsApp community')),
+                  Icon(Icons.chevron_right_rounded),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          ComicCard(
-            color: Color.alphaBlend(
-              ComicColors.of(context).accentPurple.withValues(alpha: 0.18),
-              comic.sticker,
+            const SizedBox(height: Spacing.sm),
+            ComicCard(
+              color: Color.alphaBlend(
+                ComicColors.of(context).accentPurple.withValues(alpha: 0.18),
+                comic.sticker,
+              ),
+              onTap: () => openExternalLink(context, SupportLinks.telegramUrl),
+              child: const Row(
+                children: [
+                  Icon(Icons.campaign_outlined),
+                  SizedBox(width: Spacing.md),
+                  Expanded(child: Text('Telegram channel')),
+                  Icon(Icons.chevron_right_rounded),
+                ],
+              ),
             ),
-            onTap: () => launchUrl(
-              Uri.parse(SupportLinks.telegramUrl),
-              mode: LaunchMode.externalApplication,
+            const SizedBox(height: Spacing.sm),
+            ComicCard(
+              color: Color.alphaBlend(
+                StickerFills.peach.withValues(alpha: 0.4),
+                comic.sticker,
+              ),
+              // push, not go: otherwise Plans replaces the stack and its back
+              // button falls through to Home instead of returning here.
+              onTap: () => context.push(AppRoutes.upgrade),
+              child: const Row(
+                children: [
+                  Icon(Icons.workspace_premium_outlined),
+                  SizedBox(width: Spacing.md),
+                  Expanded(child: Text('Compare plans')),
+                  Icon(Icons.chevron_right_rounded),
+                ],
+              ),
             ),
-            child: const Row(
-              children: [
-                Icon(Icons.campaign_outlined),
-                SizedBox(width: Spacing.md),
-                Expanded(child: Text('Telegram channel')),
-                Icon(Icons.chevron_right_rounded),
-              ],
+            const SizedBox(height: Spacing.sm),
+            const ComicCard(child: ThemeModeSelector()),
+            const SizedBox(height: Spacing.md),
+            TextButton(
+              onPressed: _isSigningOut ? null : _signOut,
+              child: _isSigningOut
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Sign out'),
             ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          ComicCard(
-            color: Color.alphaBlend(
-              StickerFills.peach.withValues(alpha: 0.4),
-              comic.sticker,
-            ),
-            onTap: () => context.go(AppRoutes.upgrade),
-            child: const Row(
-              children: [
-                Icon(Icons.workspace_premium_outlined),
-                SizedBox(width: Spacing.md),
-                Expanded(child: Text('Compare plans')),
-                Icon(Icons.chevron_right_rounded),
-              ],
-            ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          const ComicCard(child: ThemeModeSelector()),
-          const SizedBox(height: Spacing.md),
-          TextButton(
-            onPressed: _isSigningOut ? null : _signOut,
-            child: _isSigningOut
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Sign out'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

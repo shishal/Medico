@@ -15,7 +15,7 @@ A form the student fills in before starting a session, which calls `create_pract
 |---|---|---|
 | Subjects/Topics | Multi-select, topics filtered by chosen subjects | Required to pick at least one; default to "all" if none chosen |
 | Tags | Multi-select (`#PYQ`, `#HighYield`, `#RecentUpdate`, `#OneLiner`, `#ClinicalVignette`, etc.) | **Disabled/hidden** if the user's plan's `allow_tag_filter` is false — don't just grey it out silently, show a small "Upgrade to filter by tags" hint so free users understand what they're missing |
-| Difficulty | Hidden in Practice (Practice is Upcoming). PYQ lists show **Must / Should / Could** (`hard` / `medium` / `easy` in the database). |
+| Priority | Hidden in Practice (Practice is Upcoming). PYQ lists show **Must / Should / Could** — the `questions.difficulty` column now stores those words. It is optional and blank imports as `should`, so the UI shows a chip only for `must` and `could`. |
 | Question source | Single-select: **Unattempted**, **Previously Incorrect**, **Bookmarked**, **All** | This is the single most-used filter in every competitor app researched — give it visual priority in the UI, don't bury it |
 | Question count | Slider or stepper | Cap it live in the UI to the plan's `max_practice_session_questions` as the user drags it — don't let them select 80 and then get silently clamped to 50 server-side without explanation; show the cap and why |
 | Feedback timing | Two-option toggle: **Tutor Mode** (see answer + explanation right after each question) vs **Exam Mode** (see everything at the end) | Label these using the same terminology students already know from other QBanks — don't invent new names for a well-established concept |

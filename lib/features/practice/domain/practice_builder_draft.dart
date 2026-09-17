@@ -30,7 +30,7 @@ class PracticeBuilderDraft {
   final Set<String> selectedSubjectIds;
   final Set<String> selectedTopicIds;
   final Set<String> selectedTagIds;
-  final Set<QuestionDifficulty> selectedDifficulties;
+  final Set<QuestionPriority> selectedDifficulties;
   final QuestionSourceFilter sourceFilter;
   final int questionCount;
   final FeedbackTiming feedbackTiming;
@@ -141,8 +141,8 @@ class PracticeBuilderDraft {
   List<String>? get resolvedTagIds =>
       selectedTagIds.isEmpty ? null : selectedTagIds.toList();
 
-  /// Always null — difficulty is hidden in the app and must not filter sessions.
-  List<QuestionDifficulty>? get resolvedDifficulties => null;
+  /// Always null — priority is not a practice-session filter in the app.
+  List<QuestionPriority>? get resolvedDifficulties => null;
 
   /// Minutes to send: null turns the timer off on the server.
   int? get resolvedTimerMinutes =>
@@ -228,7 +228,7 @@ class PracticeBuilderDraft {
     Set<String>? selectedSubjectIds,
     Set<String>? selectedTopicIds,
     Set<String>? selectedTagIds,
-    Set<QuestionDifficulty>? selectedDifficulties,
+    Set<QuestionPriority>? selectedDifficulties,
     QuestionSourceFilter? sourceFilter,
     int? questionCount,
     FeedbackTiming? feedbackTiming,

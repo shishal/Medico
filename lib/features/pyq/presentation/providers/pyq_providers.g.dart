@@ -84,6 +84,102 @@ final class LessonPyqsFamily extends $Family
   String toString() => r'lessonPyqsProvider';
 }
 
+/// "More on this topic" links for one lesson. This used to be an initState
+/// fetch into local widget state, so it never refreshed and a failure showed
+/// as an empty section.
+
+@ProviderFor(lessonResources)
+final lessonResourcesProvider = LessonResourcesFamily._();
+
+/// "More on this topic" links for one lesson. This used to be an initState
+/// fetch into local widget state, so it never refreshed and a failure showed
+/// as an empty section.
+
+final class LessonResourcesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ResourceLink>>,
+          List<ResourceLink>,
+          FutureOr<List<ResourceLink>>
+        >
+    with
+        $FutureModifier<List<ResourceLink>>,
+        $FutureProvider<List<ResourceLink>> {
+  /// "More on this topic" links for one lesson. This used to be an initState
+  /// fetch into local widget state, so it never refreshed and a failure showed
+  /// as an empty section.
+  LessonResourcesProvider._({
+    required LessonResourcesFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'lessonResourcesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$lessonResourcesHash();
+
+  @override
+  String toString() {
+    return r'lessonResourcesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ResourceLink>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ResourceLink>> create(Ref ref) {
+    final argument = this.argument as String;
+    return lessonResources(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LessonResourcesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$lessonResourcesHash() => r'91ffb3352836ab3f770e78c37f01745689e746ae';
+
+/// "More on this topic" links for one lesson. This used to be an initState
+/// fetch into local widget state, so it never refreshed and a failure showed
+/// as an empty section.
+
+final class LessonResourcesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ResourceLink>>, String> {
+  LessonResourcesFamily._()
+    : super(
+        retry: null,
+        name: r'lessonResourcesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// "More on this topic" links for one lesson. This used to be an initState
+  /// fetch into local widget state, so it never refreshed and a failure showed
+  /// as an empty section.
+
+  LessonResourcesProvider call(String lessonId) =>
+      LessonResourcesProvider._(argument: lessonId, from: this);
+
+  @override
+  String toString() => r'lessonResourcesProvider';
+}
+
 /// Kept alive so leaving the subject and coming back does not re-show
 /// the loading spinner while the feed is fetched again.
 
@@ -226,7 +322,7 @@ final class SubjectPyqFiltersProvider
   }
 }
 
-String _$subjectPyqFiltersHash() => r'e5ddea503b809eb924de758c4aec23b4cfe6a4e9';
+String _$subjectPyqFiltersHash() => r'e7dd7423b8392987db4e8257f642c68ba5890132';
 
 /// Chapter / paper filters for one subject's year list and paper outline.
 

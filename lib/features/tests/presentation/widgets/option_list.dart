@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../domain/player_session_state.dart';
 import '../../domain/question_option.dart';
-import 'player_colors.dart';
+import '../../../../core/theme/player_colors.dart';
 
 class OptionList extends StatelessWidget {
   const OptionList({super.key, required this.session, required this.onSelect});

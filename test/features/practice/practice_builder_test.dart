@@ -228,7 +228,7 @@ void main() {
 
     test('never applies stored difficulty to a new session', () {
       const draft = PracticeBuilderDraft(
-        selectedDifficulties: {QuestionDifficulty.hard},
+        selectedDifficulties: {QuestionPriority.must},
       );
       expect(draft.hasContentFilters, isFalse);
       expect(draft.resolvedDifficulties, isNull);

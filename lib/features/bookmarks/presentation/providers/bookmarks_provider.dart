@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/utils/result.dart';
 import '../../../auth/presentation/providers/auth_session_provider.dart';
 import '../../data/bookmarks_repository.dart';
+import '../../domain/bookmarked_lesson.dart';
 import '../../domain/bookmarked_question.dart';
 
 part 'bookmarks_provider.g.dart';
@@ -72,6 +73,19 @@ Future<List<BookmarkedQuestion>> bookmarksList(Ref ref) async {
   if (!isSignedIn) return const [];
 
   final result = await ref.read(bookmarksRepositoryProvider).fetchAll();
+  return switch (result) {
+    Success(:final value) => value,
+    Failure(:final message) => throw Exception(message),
+  };
+}
+
+/// Bookmarked lessons, shown as a second section under the questions.
+@riverpod
+Future<List<BookmarkedLesson>> lessonBookmarksList(Ref ref) async {
+  final isSignedIn = ref.watch(authSessionProvider);
+  if (!isSignedIn) return const [];
+
+  final result = await ref.read(bookmarksRepositoryProvider).fetchLessons();
   return switch (result) {
     Success(:final value) => value,
     Failure(:final message) => throw Exception(message),

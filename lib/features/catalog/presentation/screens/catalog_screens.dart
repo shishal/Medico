@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/open_external_link.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/user_facing_error.dart';
 import '../../../../core/widgets/async_status_views.dart';
@@ -12,12 +12,12 @@ import '../../../../core/widgets/comic_card.dart';
 import '../../../bookmarks/presentation/widgets/lesson_bookmark_icon_button.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
-import '../../../pyq/data/pyq_repository.dart';
 import '../../../pyq/domain/pyq_models.dart';
 import '../../../pyq/domain/question_format.dart';
 import '../../../pyq/presentation/providers/pyq_providers.dart';
 import '../../../pyq/presentation/widgets/pyq_teaser_card.dart';
 import '../../data/catalog_repository.dart';
+import '../../domain/catalog_models.dart';
 import '../providers/catalog_providers.dart';
 import '../widgets/catalog_row_card.dart';
 
@@ -136,30 +136,40 @@ class LessonScreen extends ConsumerStatefulWidget {
 }
 
 class _LessonScreenState extends ConsumerState<LessonScreen> {
-  List<ResourceLink> _resources = const [];
   bool _recordedOpen = false;
+  bool _redirectedToUpgrade = false;
   QuestionFormat? _formatFilter;
 
   @override
   void initState() {
     super.initState();
-    Future<void>.microtask(_loadExtras);
+    Future<void>.microtask(_recordOpen);
   }
 
-  Future<void> _loadExtras() async {
-    final resources = await ref
-        .read(pyqRepositoryProvider)
-        .fetchLessonResources(widget.lessonId);
-    if (!mounted) return;
-    if (resources case Success(:final value)) {
-      setState(() => _resources = value);
-    }
-    if (!_recordedOpen) {
-      _recordedOpen = true;
-      await ref
-          .read(catalogRepositoryProvider)
-          .recordOpenedLesson(widget.lessonId);
-    }
+  Future<void> _recordOpen() async {
+    if (_recordedOpen) return;
+    _recordedOpen = true;
+    await ref
+        .read(catalogRepositoryProvider)
+        .recordOpenedLesson(widget.lessonId);
+  }
+
+  /// Sends a student to the upgrade screen if this lesson is above their plan.
+  ///
+  /// Two things this has to get right. It must fire at most once — the old
+  /// version ran on every rebuild and queued a fresh redirect each time. And
+  /// it must wait for a *known* plan: treating "still loading" as Free would
+  /// eject a paying student from a lesson they own.
+  void _gateOnPlan(CatalogLesson? lesson, PlanTier? plan) {
+    if (_redirectedToUpgrade || lesson == null || plan == null) return;
+    if (plan.covers(lesson.requiredPlan)) return;
+
+    _redirectedToUpgrade = true;
+    // Navigation cannot run while this widget is still building.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.pushReplacement(AppRoutes.upgradePath(lesson.requiredPlan));
+    });
   }
 
   Future<void> _openLink(ResourceLink link, PlanTier plan) async {
@@ -168,23 +178,21 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       context.push(AppRoutes.upgradePath(PlanTier.pro));
       return;
     }
-    final uri = Uri.tryParse(link.url);
-    if (uri == null) return;
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await openExternalLink(context, link.url);
   }
 
   @override
   Widget build(BuildContext context) {
     final pyqs = ref.watch(lessonPyqsProvider(widget.lessonId));
-    final lessonAsync = ref.watch(lessonDetailProvider(widget.lessonId));
-    final plan = ref.watch(currentPlanProvider).value ?? PlanTier.free;
-    final lesson = lessonAsync.value;
-    if (lesson != null && !plan.covers(lesson.requiredPlan)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        context.go(AppRoutes.upgradePath(lesson.requiredPlan));
-      });
-    }
+    final resources =
+        ref.watch(lessonResourcesProvider(widget.lessonId)).value ??
+        const <ResourceLink>[];
+    final knownPlan = ref.watch(currentPlanProvider).value;
+    final plan = knownPlan ?? PlanTier.free;
+    _gateOnPlan(
+      ref.watch(lessonDetailProvider(widget.lessonId)).value,
+      knownPlan,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -205,11 +213,10 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
           return ListView(
             padding: const EdgeInsets.all(Spacing.md),
             children: [
-              const FilledButton(
-                onPressed: null,
-                child: Text('Practice · upcoming'),
-              ),
-              const SizedBox(height: Spacing.md),
+              // A permanently disabled "Practice · upcoming" button used to
+              // sit here, above the real actions. Practice mode gets its own
+              // tab when it ships; a dead control in the best spot on the
+              // screen is worse than no control.
               FilledButton.tonal(
                 onPressed: () async {
                   final result = await ref
@@ -225,13 +232,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                 },
                 child: const Text('Mark lesson learnt'),
               ),
-              if (_resources.isNotEmpty) ...[
+              if (resources.isNotEmpty) ...[
                 const SizedBox(height: Spacing.lg),
                 Text(
                   'More on this topic',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                for (final link in _resources)
+                for (final link in resources)
                   Padding(
                     padding: const EdgeInsets.only(top: Spacing.sm),
                     child: ComicCard(
@@ -265,7 +272,19 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
               ),
               const SizedBox(height: Spacing.sm),
               if (items.isEmpty)
-                const Text('No PYQs tagged to this lesson yet.')
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: Spacing.xl),
+                  child: AsyncEmptyView(
+                    icon: Icons.description_outlined,
+                    message: _formatFilter == null
+                        ? 'No PYQs tagged to this lesson yet.'
+                        : 'No ${_formatFilter!.label} questions in this lesson.',
+                    actionLabel: _formatFilter == null ? null : 'Show all',
+                    onAction: _formatFilter == null
+                        ? null
+                        : () => setState(() => _formatFilter = null),
+                  ),
+                )
               else
                 for (var i = 0; i < items.length; i++)
                   Padding(

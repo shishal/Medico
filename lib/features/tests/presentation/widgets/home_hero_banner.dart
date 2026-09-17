@@ -9,6 +9,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
+import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../../progress/presentation/providers/ug_home_providers.dart';
@@ -52,54 +53,52 @@ class HomeHeroBanner extends ConsumerWidget {
         children: [
           const ComicMascot(
             asset: BrandAssets.mascotWave,
-            size: 64,
+            size: 56,
             heroTag: BrandAssets.mascotHeroTag,
             bounce: false,
             circleBackdrop: true,
           ),
           const SizedBox(width: Spacing.md),
+          // The plan pill sits on the subtitle line rather than beside the
+          // search button: on a 360dp screen the old single row left the
+          // greeting about 116dp and both lines wrapped.
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   hello,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
-                  subtitleParts.isEmpty
-                      ? 'Pick a subject to start.'
-                      : subtitleParts.join(' · '),
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    if (plan != null) ...[
+                      _PlanPill(plan: plan),
+                      const SizedBox(width: Spacing.sm),
+                    ],
+                    Expanded(
+                      child: Text(
+                        subtitleParts.isEmpty
+                            ? 'Pick a subject to start.'
+                            : subtitleParts.join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          if (plan != null)
-            Padding(
-              padding: const EdgeInsets.only(right: Spacing.sm),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.sm,
-                  vertical: Spacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: ComicColors.of(context).proGold.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  plan.label,
-                  style: textTheme.labelLarge?.copyWith(
-                    color: ComicColors.of(context).proGold,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
+          const SizedBox(width: Spacing.sm),
           IconButton.filledTonal(
             tooltip: 'Search',
             onPressed: () => context.push(AppRoutes.search),
@@ -116,6 +115,37 @@ class HomeHeroBanner extends ConsumerWidget {
   }
 }
 
+/// Display-only plan badge. Gold is reserved for paid tiers (see
+/// docs/01_PROJECT_FOUNDATION.md) — a free account used to wear a gold chip.
+class _PlanPill extends StatelessWidget {
+  const _PlanPill({required this.plan});
+
+  final PlanTier plan;
+
+  @override
+  Widget build(BuildContext context) {
+    final comic = ComicColors.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final paid = plan != PlanTier.free;
+    final fg = paid ? comic.proGold : scheme.onSurfaceVariant;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm, vertical: 2),
+      decoration: BoxDecoration(
+        color: paid
+            ? comic.proGold.withValues(alpha: 0.2)
+            : scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        plan.label,
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(color: fg, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
+
 /// Quiet catalog size under the greeting.
 class HomeCoverageBanner extends ConsumerWidget {
   const HomeCoverageBanner({super.key});
@@ -128,7 +158,11 @@ class HomeCoverageBanner extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
       data: (c) {
         final scheme = Theme.of(context).colorScheme;
-        final line = '${c.pyqCount} PYQs · ${c.paperCount} papers';
+        // v1 content is KUHS, so the other universities really do have zero.
+        // "0 PYQs · 0 papers" reads as broken; say what is actually going on.
+        final line = c.paperCount == 0
+            ? 'No papers tagged for your university yet — KUHS is live first.'
+            : '${c.pyqCount} PYQs · ${c.paperCount} papers';
         return Padding(
           padding: const EdgeInsets.fromLTRB(
             Spacing.lg,

@@ -5,6 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 /// Renders stored markdown (sample answers, explanations) using the
 /// surrounding theme. Plain text still looks like a normal paragraph.
 ///
+/// Selection/copy is off on purpose — DA, EX, tutor feedback, and review
+/// answers are paid content. Links still open via [onTapLink].
+///
 /// Use this instead of [Text] inside a [ListView] — [MarkdownBody] does
 /// not scroll on its own (`Markdown` would fight the parent scroll view).
 class MarkdownCopy extends StatelessWidget {
@@ -33,7 +36,7 @@ class MarkdownCopy extends StatelessWidget {
 
     return MarkdownBody(
       data: data,
-      selectable: true,
+      selectable: false,
       styleSheet: sheet,
       onTapLink: (text, href, title) {
         if (href == null || href.isEmpty) return;

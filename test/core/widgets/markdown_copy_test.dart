@@ -27,4 +27,15 @@ void main() {
     expect(find.textContaining('four', findRichText: true), findsOneWidget);
     expect(find.textContaining('Give', findRichText: true), findsOneWidget);
   });
+
+  testWidgets('answer markdown is not selectable for copy', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: MarkdownCopy(data: 'Sample answer body.')),
+      ),
+    );
+
+    // selectable: false uses plain Text/RichText, not SelectableText.
+    expect(find.byType(SelectableText), findsNothing);
+  });
 }

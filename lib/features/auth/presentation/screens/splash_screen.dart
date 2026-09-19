@@ -6,9 +6,11 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/result.dart';
 import '../../../../core/widgets/brand_mark.dart';
 import '../../../../core/widgets/brand_pulse_loader.dart';
 import '../../../../core/widgets/comic_mascot.dart';
+import '../../data/auth_repository.dart';
 import '../providers/auth_session_provider.dart';
 
 /// Brief branded splash; navigates to login or home based on auth session.
@@ -63,7 +65,39 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future<void>.delayed(const Duration(milliseconds: 1300));
     if (!mounted) return;
 
-    final isAuthenticated = ref.read(authSessionProvider);
+    var isAuthenticated = ref.read(authSessionProvider);
+    if (isAuthenticated) {
+      final repo = ref.read(authRepositoryProvider);
+      final claim = await repo.claimActiveDevice();
+      if (!mounted) return;
+
+      if (claim case Success(:final value)) {
+        ref.read(deviceSessionNoticeProvider.notifier).setFromClaim(value);
+      }
+
+      final assertResult = await repo.assertActiveDevice();
+      if (!mounted) return;
+
+      final stillActive = switch (assertResult) {
+        Success(:final value) => value,
+        Failure() => true, // don't lock out on a transient RPC failure
+      };
+
+      if (!stillActive) {
+        await ref
+            .read(authSessionProvider.notifier)
+            .signOutBecauseOtherDevice();
+        if (!mounted) return;
+        context.go(
+          AppRoutes.loginWithReason(AppRoutes.loginReasonOtherDevice),
+        );
+        return;
+      }
+
+      isAuthenticated = ref.read(authSessionProvider);
+    }
+
+    if (!mounted) return;
     context.go(isAuthenticated ? AppRoutes.home : AppRoutes.login);
   }
 

@@ -10,6 +10,8 @@ import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
+import '../../domain/device_session.dart';
+import '../providers/auth_session_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -26,6 +28,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
   String? _errorMessage;
+  String? _infoMessage;
+  var _consumedQueryReason = false;
 
   @override
   void dispose() {
@@ -34,8 +38,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_consumedQueryReason) return;
+    _consumedQueryReason = true;
+
+    String? reason;
+    // Login is usually under GoRouter; widget tests may mount it alone.
+    try {
+      reason = GoRouterState.of(context).uri.queryParameters['reason'];
+    } on Object {
+      reason = null;
+    }
+
+    final fromQuery = switch (reason) {
+      AppRoutes.loginReasonOtherDevice =>
+        DeviceSessionMessages.signedInElsewhere,
+      AppRoutes.loginReasonPlanSuspended =>
+        DeviceSessionMessages.planSuspended,
+      _ => null,
+    };
+
+    final fromNotice = ref.read(deviceSessionNoticeProvider);
+    if (fromNotice != null) {
+      ref.read(deviceSessionNoticeProvider.notifier).clear();
+    }
+
+    final message = fromQuery ?? fromNotice;
+    if (message != null) {
+      _infoMessage = message;
+    }
+  }
+
   Future<void> _submit() async {
-    setState(() => _errorMessage = null);
+    setState(() {
+      _errorMessage = null;
+      _infoMessage = null;
+    });
 
     if (!_formKey.currentState!.validate()) {
       return;
@@ -55,7 +95,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = false);
 
     switch (result) {
-      case Success():
+      case Success(:final value):
+        ref.read(deviceSessionNoticeProvider.notifier).setFromClaim(value);
+        if (value.justSuspended) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(DeviceSessionMessages.planSuspended)),
+          );
+        }
         context.go(AppRoutes.home);
       case Failure(:final message):
         setState(() => _errorMessage = message);
@@ -96,6 +142,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: Spacing.xl),
+                if (_infoMessage != null) ...[
+                  Text(
+                    _infoMessage!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                ],
                 if (_errorMessage != null) ...[
                   Text(
                     _errorMessage!,

@@ -1,6 +1,7 @@
 /// Supabase table and column name constants — no magic strings in queries.
 abstract final class Tables {
   static const profiles = 'profiles';
+  static const deviceClaims = 'device_claims';
   static const subjects = 'subjects';
   static const topics = 'topics';
   static const tests = 'tests';
@@ -41,12 +42,23 @@ abstract final class ProfileColumns {
   static const plan = 'plan';
   static const planStartedAt = 'plan_started_at';
   static const planExpiresAt = 'plan_expires_at';
+  static const planSuspendedAt = 'plan_suspended_at';
+  static const planSuspendReason = 'plan_suspend_reason';
+  static const activeDeviceId = 'active_device_id';
+  static const activeDeviceClaimedAt = 'active_device_claimed_at';
   static const createdAt = 'created_at';
   static const universityId = 'university_id';
   static const collegeId = 'college_id';
   static const batchYear = 'batch_year';
   static const mbbsPhaseId = 'mbbs_phase_id';
   static const onboardingCompletedAt = 'onboarding_completed_at';
+}
+
+abstract final class DeviceClaimColumns {
+  static const userId = 'user_id';
+  static const deviceId = 'device_id';
+  static const firstSeenAt = 'first_seen_at';
+  static const lastSeenAt = 'last_seen_at';
 }
 
 abstract final class TestColumns {
@@ -205,6 +217,8 @@ abstract final class AttemptAnswerColumns {
 /// Postgres RPC function names (see `docs/02_DATABASE_SCHEMA.md`).
 abstract final class RpcFunctions {
   static const currentPlan = 'current_plan';
+  static const claimActiveDevice = 'claim_active_device';
+  static const assertActiveDevice = 'assert_active_device';
   static const createPracticeSession = 'create_practice_session';
   static const serverNow = 'server_now';
   static const submitAttempt = 'submit_attempt';
@@ -214,6 +228,20 @@ abstract final class RpcFunctions {
   static const recordStudyEvent = 'record_study_event';
   static const getStudyProgress = 'get_study_progress';
   static const searchCatalog = 'search_catalog';
+}
+
+/// Named parameters for [RpcFunctions.claimActiveDevice] /
+/// [RpcFunctions.assertActiveDevice].
+abstract final class DeviceSessionParams {
+  static const deviceId = 'p_device_id';
+}
+
+/// Keys in the jsonb returned by [RpcFunctions.claimActiveDevice].
+abstract final class ClaimActiveDeviceJson {
+  static const ok = 'ok';
+  static const suspended = 'suspended';
+  static const justSuspended = 'just_suspended';
+  static const distinctDeviceCount = 'distinct_device_count';
 }
 
 /// Named parameters for [RpcFunctions.currentPlan].

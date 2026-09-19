@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/supabase/supabase_provider.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
@@ -11,6 +10,7 @@ import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
+import '../providers/auth_session_provider.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -60,11 +60,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _isLoading = false);
 
     switch (result) {
-      case Success():
-        // If email confirmation is off, Supabase returns a session immediately.
-        final hasSession =
-            ref.read(supabaseClientProvider).auth.currentSession != null;
-        if (hasSession) {
+      case Success(:final value):
+        // Null value = email confirmation required (no session yet).
+        if (value != null) {
+          ref.read(deviceSessionNoticeProvider.notifier).setFromClaim(value);
           context.go(AppRoutes.home);
         } else {
           setState(

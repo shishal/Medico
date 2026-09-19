@@ -10,6 +10,8 @@ class UserProfile {
     required this.plan,
     this.planStartedAt,
     this.planExpiresAt,
+    this.planSuspendedAt,
+    this.planSuspendReason,
     required this.createdAt,
     this.universityId,
     this.collegeId,
@@ -26,6 +28,10 @@ class UserProfile {
   final PlanTier plan;
   final DateTime? planStartedAt;
   final DateTime? planExpiresAt;
+
+  /// When set, [effectivePlan] is free until support clears suspension.
+  final DateTime? planSuspendedAt;
+  final String? planSuspendReason;
   final DateTime createdAt;
   final String? universityId;
   final String? collegeId;
@@ -35,12 +41,14 @@ class UserProfile {
 
   bool get needsOnboarding => onboardingCompletedAt == null;
 
+  bool get isPlanSuspended => planSuspendedAt != null;
+
   /// Effective plan for UI (lock icons, upgrade prompts).
   ///
-  /// Mirrors Postgres `current_plan()`: if [planExpiresAt] is in the past,
-  /// treat the user as free. RLS still enforces access server-side; this is
-  /// only for display decisions so screens don't re-implement expiry logic.
+  /// Mirrors Postgres `current_plan()`: suspended or expired → free. RLS still
+  /// enforces access server-side; this is only for display decisions.
   PlanTier get effectivePlan {
+    if (isPlanSuspended) return PlanTier.free;
     final expiresAt = planExpiresAt;
     if (expiresAt != null && expiresAt.isBefore(DateTime.now())) {
       return PlanTier.free;
@@ -56,6 +64,8 @@ class UserProfile {
       plan: PlanTier.fromString(json[ProfileColumns.plan] as String),
       planStartedAt: _parseDate(json[ProfileColumns.planStartedAt]),
       planExpiresAt: _parseDate(json[ProfileColumns.planExpiresAt]),
+      planSuspendedAt: _parseDate(json[ProfileColumns.planSuspendedAt]),
+      planSuspendReason: json[ProfileColumns.planSuspendReason] as String?,
       createdAt: _parseDate(json[ProfileColumns.createdAt]) ?? DateTime.now(),
       universityId: json[ProfileColumns.universityId] as String?,
       collegeId: json[ProfileColumns.collegeId] as String?,

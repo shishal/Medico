@@ -17,6 +17,7 @@ import '../../../../core/widgets/comic_mascot.dart';
 import '../../../../core/widgets/theme_mode_selector.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
 import '../../../auth/data/auth_repository.dart';
+import '../../../auth/domain/device_session.dart';
 import '../providers/current_plan_provider.dart';
 import '../providers/user_profile_provider.dart';
 import '../widgets/academic_editor.dart';
@@ -124,16 +125,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             planAsync.when(
               data: (plan) {
                 if (plan == null) return const SizedBox.shrink();
-                final expires = profileAsync.value?.planExpiresAt;
+                final profile = profileAsync.value;
+                final expires = profile?.planExpiresAt;
+                final suspended = profile?.isPlanSuspended ?? false;
                 return Column(
                   children: [
                     Text(
-                      plan.label,
+                      suspended ? 'Free (paused)' : plan.label,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.titleMedium
                           ?.copyWith(fontWeight: FontWeight.w700),
                     ),
-                    if (expires != null) ...[
+                    if (suspended) ...[
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        DeviceSessionMessages.planSuspended,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ] else if (expires != null) ...[
                       const SizedBox(height: Spacing.xs),
                       Text(
                         DateFormats.planExpiry(expires),

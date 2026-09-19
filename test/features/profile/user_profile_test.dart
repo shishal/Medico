@@ -38,6 +38,19 @@ void main() {
     expect(p.effectivePlan, PlanTier.pro);
   });
 
+  test('effectivePlan is free when plan is suspended', () {
+    final p = UserProfile(
+      id: 'user-1',
+      plan: PlanTier.pro,
+      planExpiresAt: DateTime.now().add(const Duration(days: 30)),
+      planSuspendedAt: DateTime.now(),
+      planSuspendReason: 'multi_device',
+      createdAt: DateTime.utc(2026, 1, 1),
+    );
+    expect(p.isPlanSuspended, isTrue);
+    expect(p.effectivePlan, PlanTier.free);
+  });
+
   test('needsOnboarding is true until onboarding_completed_at is set', () {
     final incomplete = profile(plan: PlanTier.free);
     expect(incomplete.needsOnboarding, isTrue);

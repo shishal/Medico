@@ -23,6 +23,12 @@ create table profiles (
   plan plan_tier not null default 'free',
   plan_started_at timestamptz,
   plan_expires_at timestamptz,
+  -- Single-device login + multi-device suspension (migration
+  -- `20260919140000_single_device_login.sql`). Students cannot UPDATE these.
+  active_device_id text,
+  active_device_claimed_at timestamptz,
+  plan_suspended_at timestamptz,
+  plan_suspend_reason text,
   created_at timestamptz not null default now()
 );
 
@@ -165,10 +171,12 @@ language sql immutable as $$
   select case p when 'free' then 0 when 'pro' then 1 when 'elite' then 2 end;
 $$;
 
--- Returns the user's *effective* plan, falling back to 'free' if their paid plan expired
+-- Returns the user's *effective* plan, falling back to 'free' if their paid
+-- plan expired OR if plan_suspended_at is set (multi-device sharing).
 create function current_plan(p_user_id uuid) returns plan_tier
 language sql stable as $$
   select case
+    when plan_suspended_at is not null then 'free'::plan_tier
     when plan_expires_at is not null and plan_expires_at < now() then 'free'::plan_tier
     else plan
   end
@@ -181,7 +189,7 @@ create function server_now() returns timestamptz
 language sql stable as $$ select now(); $$;
 ```
 
-**Validation for this step**: after running, manually set a test profile's `plan_expires_at` to yesterday and confirm `select current_plan('<that-user-id>')` returns `'free'` even though the `plan` column still says `'pro'`. This is the exact bug class that causes "I cancelled and I'm still being charged/still have access" support tickets — test it now, not after launch.
+**Validation for this step**: after running, manually set a test profile's `plan_expires_at` to yesterday and confirm `select current_plan('<that-user-id>')` returns `'free'` even though the `plan` column still says `'pro'`. Also set `plan_suspended_at = now()` with a future `plan_expires_at` and confirm `current_plan` is `'free'`. This is the exact bug class that causes "I cancelled and I'm still being charged/still have access" support tickets — test it now, not after launch.
 
 ## 5. Row-Level Security
 
@@ -753,7 +761,58 @@ tables above. Editors do not invent UUIDs. See `content/google_sheet/README.md`.
 `profiles` gains `university_id`, `college_id`, `batch_year`, `mbbs_phase_id`,
 `onboarding_completed_at`. `handle_new_user` inserts `plan = 'pro'` with
 `plan_expires_at = now() + 4 days`. Authenticated GRANT update is limited to
-name/phone/academic fields — never `plan` / `plan_expires_at`.
+name/phone/academic fields — never `plan` / `plan_expires_at` /
+`plan_suspended_at` / `active_device_id`.
+
+### 9.3b Single-device login + 3rd-device plan suspension
+
+Migration: `supabase/migrations/20260919140000_single_device_login.sql`.
+
+**Policy:** one active install at a time (new claim kicks the old Auth
+session). Lifetime unique `device_id`s are stored in `device_claims`. The
+**3rd distinct** install sets `plan_suspended_at` / `plan_suspend_reason =
+'multi_device'`. `current_plan()` then returns `free` until support clears
+suspension. `plan` / `plan_expires_at` are left intact so unsuspend restores
+paid access if still unexpired.
+
+```sql
+create table device_claims (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  device_id text not null,
+  first_seen_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  primary key (user_id, device_id)
+);
+-- No authenticated write policies — only claim_active_device() touches rows.
+
+-- claim_active_device(p_device_id text) → jsonb { ok, suspended, just_suspended, distinct_device_count }
+-- assert_active_device(p_device_id text) → boolean
+```
+
+**Support unsuspend** (SQL editor / service role only — no Flutter UI):
+
+```sql
+-- Restore plan access (and optionally drop stale installs so the student
+-- can use a new phone without immediately re-hitting the cap).
+update public.profiles
+set plan_suspended_at = null,
+    plan_suspend_reason = null
+where id = '<user-uuid>';
+
+-- Optional: keep only the current active install in history
+delete from public.device_claims
+where user_id = '<user-uuid>'
+  and device_id is distinct from (
+    select active_device_id from public.profiles where id = '<user-uuid>'
+  );
+```
+
+**Validation**
+
+- Device A then B → A kicked on resume/assert; `device_claims` count = 2; plan still paid
+- Device C (3rd unique) → `plan_suspended_at` set; `current_plan` = `free`
+- Clear `plan_suspended_at` → Pro returns if `plan_expires_at` is still future
+- Authenticated role cannot `UPDATE` `active_device_id` / `plan_suspended_at`
 
 ### 9.4 Progress
 
@@ -773,6 +832,8 @@ Google Sheet / CSV tab.
 | `search_catalog(p_query)` | subjects, lessons, PYQ teasers |
 | `create_practice_session(..., p_lesson_ids uuid[] default null)` | MCQ-only + optional lesson filter |
 | `mark_lesson_learnt(p_lesson_id)` / `mark_question_learnt(p_question_id)` | progress + study_event |
+| `claim_active_device(p_device_id)` | jsonb — sole active device + maybe suspend on 3rd install |
+| `assert_active_device(p_device_id)` | boolean — this install still owns the account |
 
 Lesson resources: visible if `is_free` OR the user's plan covers the parent
 lesson's `required_plan`.

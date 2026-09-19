@@ -25,6 +25,13 @@ abstract final class AppRoutes {
   static const profile = '/profile';
   static const upgrade = '/upgrade';
 
+  /// Login with a one-shot reason banner (e.g. kicked by another device).
+  static String loginWithReason(String reason) =>
+      Uri(path: login, queryParameters: {'reason': reason}).toString();
+
+  static const loginReasonOtherDevice = 'other_device';
+  static const loginReasonPlanSuspended = 'plan_suspended';
+
   static String subjectPath(String id, String title) =>
       Uri(path: '/subjects/$id', queryParameters: {'title': title}).toString();
 

@@ -58,6 +58,9 @@ checkout/config.js
 # Script tooling (local venvs for one-off DB validators)
 scripts/.venv/
 
+# Local DB dumps (contain user data — never commit)
+backups/
+
 # Supabase local dev artifacts
 supabase/.branches
 supabase/.temp

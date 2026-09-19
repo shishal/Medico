@@ -38,4 +38,27 @@ void main() {
     // selectable: false uses plain Text/RichText, not SelectableText.
     expect(find.byType(SelectableText), findsNothing);
   });
+
+  testWidgets('zoomable answer can enlarge text via A+', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ZoomableMarkdownCopy(data: 'Long sample answer.'),
+        ),
+      ),
+    );
+
+    final before = tester.widget<RichText>(
+      find.text('Long sample answer.', findRichText: true),
+    );
+    final beforePx = before.textScaler.scale(14);
+
+    await tester.tap(find.byIcon(Icons.text_increase));
+    await tester.pump();
+
+    final after = tester.widget<RichText>(
+      find.text('Long sample answer.', findRichText: true),
+    );
+    expect(after.textScaler.scale(14), greaterThan(beforePx));
+  });
 }

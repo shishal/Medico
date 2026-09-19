@@ -278,7 +278,7 @@ class _DirectAnswerPanel extends StatelessWidget {
           if (hasKey) _answerLine(context),
           if (detail.sampleAnswer != null) ...[
             if (hasKey) const Divider(height: Spacing.lg),
-            MarkdownCopy(data: detail.sampleAnswer!),
+            ZoomableMarkdownCopy(data: detail.sampleAnswer!),
           ],
         ],
       ),
@@ -317,7 +317,8 @@ class _ExplanationPanel extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (hasExplanation) ComicCard(child: MarkdownCopy(data: explanation)),
+        if (hasExplanation)
+          ComicCard(child: ZoomableMarkdownCopy(data: explanation)),
         if (citations.isNotEmpty) ...[
           const SizedBox(height: Spacing.lg),
           Text('Textbook pages', style: Theme.of(context).textTheme.titleSmall),

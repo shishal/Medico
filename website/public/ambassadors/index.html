@@ -6,50 +6,97 @@
     <title>Campus ambassadors | Medico</title>
     <meta
       name="description"
-      content="Help Medico grow KUHS college coverage. One ambassador per college per year. Email support@medico.shishal.com."
+      content="Help Medico grow college coverage. One ambassador per college per year. Email support@medico.shishal.com."
     />
     <link rel="canonical" href="https://medico.shishal.com/ambassadors/" />
+    <meta name="theme-color" content="#F25C2D" />
     <link rel="icon" href="/img/icon-512.png" type="image/png" />
-    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/css/site.css" />
   </head>
   <body>
+    <a class="skip" href="#main">Skip to content</a>
     <header class="nav">
       <div class="wrap nav-inner">
-        <a class="brand" href="/">Medico</a>
-        <nav class="nav-links">
-          <a href="/kuhs/">KUHS</a>
+        <a class="brand" href="/">
+          <img src="/img/icon-512.png" width="32" height="32" alt="" />
+          Medico
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="nav-links"
+        >
+          Menu
+        </button>
+        <nav id="nav-links" class="nav-links">
           <a href="/ambassadors/">Ambassadors</a>
+          <a href="/#plans">Plans</a>
+          <a class="nav-cta" href="/">Home</a>
         </nav>
       </div>
     </header>
-    <main id="main" class="wrap" style="padding: 48px 0 80px">
-      <p class="eyebrow">Campus program</p>
-      <h1>Become a Medico ambassador</h1>
-      <p class="lede">
-        College internals and university papers need someone on campus who can
-        share dates and question lists (without breaking college rules). We
-        pick generally one student per college per academic year.
-      </p>
-      <h2>What you do</h2>
-      <ul>
-        <li>Be the point of contact for your college batch.</li>
-        <li>Help classmates start the 4-day trial.</li>
-        <li>Share internal / university dates and papers we can add.</li>
-      </ul>
-      <h2>What you get</h2>
-      <ul>
-        <li>Pro access for your ambassador term.</li>
-        <li>Direct line to the product team.</li>
-      </ul>
-      <p>
-        There is no CRM in the app yet — apply by emailing
-        <a href="mailto:support@medico.shishal.com">support@medico.shishal.com</a>
-        with your college, year, and KUHS register number.
-      </p>
+
+    <main id="main">
+      <div class="wrap page-hero">
+        <p class="eyebrow">Campus program</p>
+        <h1>Become a Medico ambassador</h1>
+        <p class="lede">
+          University papers and college internals need someone on campus who
+          can share dates and question lists without breaking college rules. We
+          generally pick one student per college per academic year.
+        </p>
+      </div>
+
+      <div class="wrap" style="padding-bottom: 80px">
+        <h2>What you do</h2>
+        <ul>
+          <li>Be the point of contact for your college batch.</li>
+          <li>Help classmates start the 4-day Pro trial.</li>
+          <li>Share internal / university dates and papers we can add.</li>
+        </ul>
+
+        <h2>What you get</h2>
+        <ul>
+          <li>Pro access for your ambassador term.</li>
+          <li>Direct line to the product team.</li>
+        </ul>
+
+        <p class="muted">
+          There is no in-app CRM yet — apply by emailing
+          <a href="mailto:support@medico.shishal.com"
+            >support@medico.shishal.com</a
+          >
+          with your college, MBBS year, and university register number.
+        </p>
+
+        <div class="btn-row">
+          <a
+            class="btn btn-primary"
+            href="mailto:support@medico.shishal.com?subject=Medico%20ambassador"
+            >Apply by email</a
+          >
+          <a class="btn btn-ghost" href="/">Back to Medico</a>
+        </div>
+      </div>
     </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <p>
+          <a href="/">Home</a> ·
+          <a href="/privacy/">Privacy</a> ·
+          <a href="mailto:support@medico.shishal.com">Support</a>
+        </p>
+        <p class="foot-copy">© <span id="y">2026</span> Shishal. Medico.</p>
+      </div>
+    </footer>
+    <script src="/js/site.js"></script>
   </body>
 </html>

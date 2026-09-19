@@ -3,6 +3,10 @@
 Static marketing + Play Store legal pages. Served by nginx in Docker on your
 machine; Cloudflare sits in front.
 
+Positioning: **MBBS university-exam companion** (generic — no named
+university on the public site), not NEET-PG mocks. Theme follows the Flutter
+chrome (coral `#F25C2D`, charcoal, indigo accent).
+
 Nothing in this folder talks to Supabase or Razorpay yet. Checkout is a
 placeholder at `/checkout/` so you can drop the existing `checkout/` app
 there later without changing the hostname.

@@ -9,6 +9,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
+import '../../../notifications/presentation/providers/notifications_provider.dart';
 import '../../../profile/domain/plan_tier.dart';
 import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
@@ -99,6 +100,7 @@ class HomeHeroBanner extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: Spacing.sm),
+          const _NotificationsBellButton(),
           IconButton.filledTonal(
             tooltip: 'Search',
             onPressed: () => context.push(AppRoutes.search),
@@ -112,6 +114,26 @@ class HomeHeroBanner extends ConsumerWidget {
   static String _firstName(String full) {
     final space = full.indexOf(' ');
     return space <= 0 ? full : full.substring(0, space);
+  }
+}
+
+class _NotificationsBellButton extends ConsumerWidget {
+  const _NotificationsBellButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadAnnouncementCountProvider);
+    final icon = IconButton.filledTonal(
+      tooltip: 'Notifications',
+      onPressed: () => context.push(AppRoutes.notifications),
+      icon: const Icon(Icons.notifications_outlined),
+    );
+    if (unread <= 0) return icon;
+
+    return Badge(
+      label: Text(unread > 9 ? '9+' : '$unread'),
+      child: icon,
+    );
   }
 }
 

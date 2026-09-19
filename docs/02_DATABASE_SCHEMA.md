@@ -776,3 +776,59 @@ Google Sheet / CSV tab.
 
 Lesson resources: visible if `is_free` OR the user's plan covers the parent
 lesson's `required_plan`.
+
+---
+
+## 11. In-app announcements (inbox, no OS push)
+
+Broadcast messages (new app version, offer, payment reminder, etc.) published
+via **Supabase Table Editor**. Students see them in the app inbox when they
+open the app — there is no FCM / lock-screen push in this step.
+
+Migration: `supabase/migrations/20260919120000_announcements_inbox.sql`.
+
+```sql
+create table announcements (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  body text not null,
+  category text not null default 'general'
+    check (category in ('general', 'version', 'offer', 'payment')),
+  deep_link text,                 -- optional app path, e.g. /upgrade
+  is_active boolean not null default true,
+  published_at timestamptz not null default now(),
+  expires_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table announcement_reads (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  announcement_id uuid not null references announcements(id) on delete cascade,
+  read_at timestamptz not null default now(),
+  primary key (user_id, announcement_id)
+);
+
+alter table announcements enable row level security;
+alter table announcement_reads enable row level security;
+
+create policy "active announcements select" on announcements
+  for select to authenticated
+  using (is_active and (expires_at is null or expires_at > now()));
+
+create policy "own announcement reads select" on announcement_reads
+  for select to authenticated using (auth.uid() = user_id);
+create policy "own announcement reads insert" on announcement_reads
+  for insert to authenticated with check (auth.uid() = user_id);
+
+grant select on table announcements to authenticated;
+grant select, insert on table announcement_reads to authenticated;
+-- no INSERT/UPDATE/DELETE on announcements for authenticated — Table Editor / service_role only
+```
+
+**Ops (Table Editor):**
+
+1. Draft: insert with `is_active = false` (hidden from the app).
+2. Publish: set `is_active = true` (optional `expires_at`).
+3. Next Home open / refresh shows the row as unread until the student opens or dismisses it.
+
+See also `docs/11_ANNOUNCEMENTS_OPS.md`.

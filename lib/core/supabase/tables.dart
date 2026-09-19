@@ -30,6 +30,8 @@ abstract final class Tables {
   static const questionProgress = 'question_progress';
   static const lessonBookmarks = 'lesson_bookmarks';
   static const studyEvents = 'study_events';
+  static const announcements = 'announcements';
+  static const announcementReads = 'announcement_reads';
 }
 
 abstract final class ProfileColumns {
@@ -382,4 +384,25 @@ abstract final class MarkLearntParams {
 
 abstract final class SearchCatalogParams {
   static const query = 'p_query';
+}
+
+abstract final class AnnouncementColumns {
+  static const id = 'id';
+  static const title = 'title';
+  static const body = 'body';
+  static const category = 'category';
+  static const deepLink = 'deep_link';
+  static const isActive = 'is_active';
+  static const publishedAt = 'published_at';
+  static const expiresAt = 'expires_at';
+  static const createdAt = 'created_at';
+
+  /// PostgREST embed alias: `reads:announcement_reads(read_at)`.
+  static const readsEmbed = 'reads';
+}
+
+abstract final class AnnouncementReadColumns {
+  static const userId = 'user_id';
+  static const announcementId = 'announcement_id';
+  static const readAt = 'read_at';
 }

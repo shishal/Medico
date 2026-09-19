@@ -19,6 +19,7 @@ import '../../features/pyq/presentation/screens/pyq_reader_screen.dart';
 import '../../features/pyq/presentation/screens/subject_pyq_screen.dart';
 import '../../features/pyq/presentation/screens/year_paper_outline_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_inbox_screen.dart';
 import '../../features/results/presentation/screens/results_screen.dart';
 import '../../features/results/presentation/screens/solution_review_screen.dart';
 import '../../features/tests/presentation/screens/home_screen.dart';
@@ -218,6 +219,10 @@ GoRouter goRouter(Ref ref) {
       comicGoRoute(
         path: AppRoutes.bookmarks,
         builder: (context, state) => const BookmarksScreen(),
+      ),
+      comicGoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsInboxScreen(),
       ),
       comicGoRoute(
         path: AppRoutes.upgrade,

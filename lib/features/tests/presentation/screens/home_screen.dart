@@ -7,6 +7,8 @@ import '../../../../core/widgets/async_status_views.dart';
 import '../../../../core/widgets/comic_section_title.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
 import '../../../catalog/presentation/widgets/subject_tile.dart';
+import '../../../notifications/presentation/providers/notifications_provider.dart';
+import '../../../notifications/presentation/widgets/home_unread_announcement_banner.dart';
 import '../../../progress/presentation/providers/ug_home_providers.dart';
 import '../providers/pending_submit_sync_provider.dart';
 import '../widgets/home_hero_banner.dart';
@@ -33,11 +35,13 @@ class HomeScreen extends ConsumerWidget {
             ref.invalidate(phaseSubjectsProvider);
             ref.invalidate(studyProgressProvider);
             ref.invalidate(universityCoverageProvider);
+            ref.invalidate(announcementsProvider);
           },
           child: ListView(
             padding: const EdgeInsets.only(bottom: Spacing.xl),
             children: [
               const HomeHeroBanner(),
+              const HomeUnreadAnnouncementBanner(),
               const HomeCoverageBanner(),
               const ComicSectionTitle(
                 title: 'Subjects',

@@ -21,6 +21,7 @@ abstract final class AppRoutes {
   static const results = '/results/:attemptId';
   static const solutionReview = '/results/:attemptId/review';
   static const bookmarks = '/bookmarks';
+  static const notifications = '/notifications';
   static const profile = '/profile';
   static const upgrade = '/upgrade';
 

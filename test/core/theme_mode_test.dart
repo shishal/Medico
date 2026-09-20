@@ -9,13 +9,13 @@ import 'package:medico/core/theme/theme_mode_provider.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('dark canvas is charcoal, not teal paper', () {
-    expect(ComicColors.dark.paper, const Color(0xFF121212));
-    expect(AppTheme.splashCanvas, const Color(0xFF121212));
-    expect(AppTheme.seedColor, const Color(0xFFF25C2D));
-    expect(ComicColors.dark.sticker, const Color(0xFF252528));
-    expect(ComicColors.dark.stickerLift, const Color(0xFF2E2E33));
-    expect(ComicColors.dark.accentPurple, const Color(0xFF8B7CFF));
+  test('dark canvas is near-black, not teal paper', () {
+    expect(ComicColors.dark.paper, const Color(0xFF0A0A0A));
+    expect(AppTheme.splashCanvas, const Color(0xFF000000));
+    expect(AppTheme.seedColor, const Color(0xFF008FD6));
+    expect(ComicColors.dark.sticker, const Color(0xFF161A1F));
+    expect(ComicColors.dark.stickerLift, const Color(0xFF1E2430));
+    expect(ComicColors.dark.accentPurple, const Color(0xFF5B8DEF));
   });
 
   test('light canvas is clean gray, not comic paper', () {

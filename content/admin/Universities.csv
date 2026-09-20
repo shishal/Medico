@@ -1,9 +1,104 @@
-code,name,state
-KUHS,Kerala University of Health Sciences,Kerala
-RGUHS,Rajiv Gandhi University of Health Sciences,Karnataka
-NTRUHS,Dr. NTR University of Health Sciences,Andhra Pradesh
-KNRUHS,Kaloji Narayana Rao University of Health Sciences,Telangana
-TNMGRMU,Tamil Nadu Dr. M.G.R. Medical University,Tamil Nadu
-WBUHS,West Bengal University of Health Sciences,West Bengal
-RUHS,Rajasthan University of Health Sciences,Rajasthan
-MUHS,Maharashtra University of Health Sciences,Maharashtra
+code,name,state,slug
+NTRUHS,"Dr. NTR University of Health Sciences, Vijayawada",Andhra Pradesh,ntruhs
+GITAM,"GITAM (Deemed to be University), Visakhapatnam",Andhra Pradesh,gitam
+SVIMS,"Sri Venkateswara Institute of Medical Sciences (SVIMS), Tirupati",Andhra Pradesh,svims
+RGU,"Rajiv Gandhi University, Doimukh",Arunachal Pradesh,rgu
+SSUHS,"Srimanta Sankaradeva University of Health Sciences, Guwahati",Assam,ssuhs
+BUHS,"Bihar University of Health Sciences, Patna",Bihar,buhs
+CGHSAU,"Pt. Deendayal Upadhyay Memorial Health Sciences and Ayush University of Chhattisgarh, Raipur",Chhattisgarh,cghsau
+GGSIPU,Guru Gobind Singh Indraprastha University,Delhi,ggsipu
+Jamia Hamdard,Jamia Hamdard (Deemed University),Delhi,jamia-hamdard
+DU,University of Delhi,Delhi,du
+GU-goa,Goa University,Goa,gu-goa
+BU,"Bhaikaka University, Karamsad",Gujarat,bu
+BKNMU,"Bhakta Kavi Narsinh Mehta University, Junagadh",Gujarat,bknmu
+DDU,"Dharmsinh Desai University, Nadiad",Gujarat,ddu
+GU-gujarat,"Gujarat University, Ahmedabad",Gujarat,gu-gujarat
+HNGU,"Hemchandracharya North Gujarat University, Patan",Gujarat,hngu
+KSKVKU,"KSKV Kachchh University, Bhuj",Gujarat,kskvku
+MKBU,Maharaja Krishnakumarsinhji Bhavnagar University,Gujarat,mkbu
+MSU Baroda,Maharaja Sayajirao University of Baroda,Gujarat,msu-baroda
+PU,"Parul University, Vadodara",Gujarat,pu
+SPU,"Sankalchand Patel University, Visnagar",Gujarat,spu
+SU-gujarat,"Saurashtra University, Rajkot",Gujarat,su-gujarat
+SGGU,"Shri Govind Guru University, Godhra",Gujarat,sggu
+SVDU,"Sumandeep Vidyapeeth (Deemed University), Vadodara",Gujarat,svdu
+VNSGU,"Veer Narmad South Gujarat University, Surat",Gujarat,vnsgu
+AVV-haryana,Amrita Vishwa Vidyapeetham (Deemed University),Haryana,avv-haryana
+MMDU,"Maharishi Markandeshwar (Deemed to be University), Mullana",Haryana,mmdu
+MMU,"Maharishi Markandeshwar University, Sadopur",Haryana,mmu
+UHS Rohtak,"Pandit Bhagwat Dayal Sharma University of Health Sciences, Rohtak",Haryana,uhs-rohtak
+SGTU,"SGT University, Gurugram",Haryana,sgtu
+AMRU,"Atal Medical and Research University, Mandi",Himachal Pradesh,amru
+BBMKU,"Binod Bihari Mahto Koyalanchal University, Dhanbad",Jharkhand,bbmku
+KU,"Kolhan University, Chaibasa",Jharkhand,ku
+MAHE-jharkhand,Manipal Academy of Higher Education (Deemed University),Jharkhand,mahe-jharkhand
+NPU,"Nilamber-Pitamber University, Medininagar",Jharkhand,npu
+NC,Not confirmed,Jharkhand,nc
+RCU,"Ramchandra Chandravansi University, Palamu",Jharkhand,rcu
+RU,Ranchi University,Jharkhand,ru
+SKMU,"Sido Kanhu Murmu University, Dumka",Jharkhand,skmu
+ACU,Adichunchanagiri University (Deemed University),Karnataka,acu
+BLDE,"BLDE (Deemed to be University), Vijayapura",Karnataka,blde
+JSSAHER,JSS Academy of Higher Education and Research (Deemed University),Karnataka,jssaher
+KAHER,KLE Academy of Higher Education and Research (Deemed University),Karnataka,kaher
+KBNU,Khaja Bandanawaz University,Karnataka,kbnu
+MAHE-karnataka,Manipal Academy of Higher Education (Deemed University),Karnataka,mahe-karnataka
+Nitte,Nitte (Deemed to be University),Karnataka,nitte
+RGUHS,"Rajiv Gandhi University of Health Sciences, Bangalore",Karnataka,rguhs
+SDUAHER,Sri Devaraj Urs Academy of Higher Education & Research (Deemed University),Karnataka,sduaher
+SSAHE,Sri Siddhartha Academy of Higher Education (Deemed University),Karnataka,ssahe
+Yenepoya,Yenepoya (Deemed to be University),Karnataka,yenepoya
+AVV-kerala,Amrita Vishwa Vidyapeetham (Deemed University),Kerala,avv-kerala
+KUHS,"Kerala University of Health Sciences, Thrissur",Kerala,kuhs
+MPMSU,"Madhya Pradesh Medical Science University, Jabalpur",Madhya Pradesh,mpmsu
+BVDU,Bharati Vidyapeeth (Deemed to be University),Maharashtra,bvdu
+DMIMS,Datta Meghe Institute of Medical Sciences (Deemed University),Maharashtra,dmims
+DPU,Dr. D.Y. Patil Vidyapeeth (Deemed University),Maharashtra,dpu
+KVV,Krishna Vishwa Vidyapeeth (Deemed University),Maharashtra,kvv
+MGMIHS,MGM Institute of Health Sciences (Deemed University),Maharashtra,mgmihs
+MUHS,"Maharashtra University of Health Sciences, Nashik",Maharashtra,muhs
+MGIMS,"Mahatma Gandhi Institute of Medical Sciences (Deemed University), Sevagram",Maharashtra,mgims
+PIMS-DU,Pravara Institute of Medical Sciences (Deemed University),Maharashtra,pims-du
+SIU,Symbiosis International (Deemed University),Maharashtra,siu
+MU,"Manipur University, Canchipur, Imphal",Manipur,mu
+NEHU,"North Eastern Hill University, Shillong",Meghalaya,nehu
+USTM,University of Science and Technology Meghalaya,Meghalaya,ustm
+MZU,Mizoram University,Mizoram,mzu
+NU,Nagaland University,Nagaland,nu
+KIIT,"Kalinga Institute of Industrial Technology (KIIT), Bhubaneswar",Odisha,kiit
+OUHS,"Odisha University of Health Sciences, Bhubaneswar",Odisha,ouhs
+SOA,"Siksha 'O' Anusandhan (Deemed to be University), Bhubaneswar",Odisha,soa
+AU,"Adesh University, Bathinda",Punjab,au
+BFUHS,"Baba Farid University of Health Sciences, Faridkot",Punjab,bfuhs
+SGRDUHS,"Sri Guru Ram Das University of Health Sciences, Amritsar",Punjab,sgrduhs
+GUU,"Geetanjali University, Udaipur",Rajasthan,guu
+JNU,Jaipur National University,Rajasthan,jnu
+MGUMST,"Mahatma Gandhi University of Medical Sciences & Technology, Jaipur",Rajasthan,mgumst
+NIMSU,"NIMS University, Jaipur",Rajasthan,nimsu
+PMU,"Pacific Medical University, Udaipur",Rajasthan,pmu
+RUHS,"Rajasthan University of Health Sciences, Jaipur",Rajasthan,ruhs
+SMU,Sikkim Manipal University,Sikkim,smu
+SU-sikkim,Sikkim University,Sikkim,su-sikkim
+BIHER,Bharath Institute of Higher Education and Research (Deemed University),Tamil Nadu,biher
+CARE,Chettinad Academy of Research and Education (Deemed University),Tamil Nadu,care
+MGRERI,Dr. M.G.R. Educational and Research Institute (Deemed University),Tamil Nadu,mgreri
+MAHER,Meenakshi Academy of Higher Education and Research (Deemed University),Tamil Nadu,maher
+SRMIST,SRM Institute of Science and Technology (Deemed University),Tamil Nadu,srmist
+SIMATS,Saveetha Institute of Medical and Technical Sciences (Deemed University),Tamil Nadu,simats
+SBV,"Sri Balaji Vidyapeeth (Deemed University), Pondicherry",Tamil Nadu,sbv
+SRIHER,Sri Ramachandra Institute of Higher Education & Research (Deemed University),Tamil Nadu,sriher
+TNMGRMU,"The Tamil Nadu Dr. M.G.R. Medical University, Chennai",Tamil Nadu,tnmgrmu
+VISTAS,"VELS Institute of Science, Technology & Advanced Studies (Deemed University)",Tamil Nadu,vistas
+VMRF,Vinayaka Mission's Research Foundation (Deemed University),Tamil Nadu,vmrf
+KNRUHS,"Kaloji Narayana Rao University of Health Sciences, Warangal",Telangana,knruhs
+TU,Tripura University,Tripura,tu
+AMU,Aligarh Muslim University,Uttar Pradesh,amu
+ABVMU,"Atal Bihari Vajpayee Medical University, Lucknow",Uttar Pradesh,abvmu
+BHU,Banaras Hindu University,Uttar Pradesh,bhu
+KGMU,"King George's Medical University, Lucknow",Uttar Pradesh,kgmu
+UPUMS,"Uttar Pradesh University of Medical Sciences, Saifai, Etawah",Uttar Pradesh,upums
+GEU,"Graphic Era (Deemed to be University), Dehradun",Uttarakhand,geu
+HNBUMU,"Hemwati Nandan Bahuguna Uttarakhand Medical Education University, Dehradun",Uttarakhand,hnbumu
+SRHU,"Swami Rama Himalayan University, Dehradun",Uttarakhand,srhu
+WBUHS,"West Bengal University of Health Sciences, Kolkata",West Bengal,wbuhs

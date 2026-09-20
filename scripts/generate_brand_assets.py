@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """
-Generate launcher, splash, Play Store, and transparent Docci art.
+Generate launcher, splash, Play Store, and transparent MEDCAIN art.
 
-Outputs (committed source art — regenerate, then re-run the Flutter icon/splash
-generators):
+Source: assets/branding/logo_source.jpg (full lockup on black).
+
+Outputs (committed — regenerate, then re-run Flutter icon/splash generators):
+  assets/branding/logo_full.png          — transparent full lockup
   assets/branding/app_icon.png
   assets/branding/app_icon_foreground.png
   assets/branding/app_icon_monochrome.png
-  assets/branding/splash_logo.png
+  assets/branding/splash_logo.png        — M mark only (native splash)
   store/play/icon-512.png
   store/play/feature-graphic-1024x500.png
+  website/public/img/icon-512.png
+  website/public/img/app-icon.png
+  website/public/img/mark.png
+  website/public/img/logo-full.png
+  website/public/img/og.png
   assets/illustrations/mascot_*.png
-
-If assets/branding/app_icon_source.png exists, the white ECG-M is extracted
-from it. Otherwise a programmatic mark is drawn.
 
 Requires Pillow (scripts/.venv).
 """
@@ -29,26 +33,34 @@ ROOT = Path(__file__).resolve().parents[1]
 BRANDING = ROOT / "assets" / "branding"
 ILLUSTRATIONS = ROOT / "assets" / "illustrations"
 PLAY = ROOT / "store" / "play"
+WEB_IMG = ROOT / "website" / "public" / "img"
 
-# AppTheme.splashCanvas — keep in lockstep with lib/core/theme/app_theme.dart
-CHARCOAL = (0x12, 0x12, 0x12, 255)
-# Source mark (app_icon_source.png) was painted on the old teal field.
-SOURCE_FIELD = (0x0D, 0x73, 0x77)
+# AppTheme.splashCanvas — lockstep with lib/core/theme/app_theme.dart
+SPLASH_CANVAS = (0x00, 0x00, 0x00, 255)
+# Brand blue (mid of the logo gradient) for chrome accents / feature graphic.
+BRAND_BLUE = (0x00, 0x8F, 0xD6, 255)
 WHITE = (255, 255, 255, 255)
 BLACK = (0, 0, 0, 255)
 TRANSPARENT = (0, 0, 0, 0)
+
+APP_NAME = "MEDCAIN"
+TAGLINE = "Drug of Choice for Exam Pain"
 
 FONT_CANDIDATES = [
     "/System/Library/Fonts/Supplemental/Arial Black.ttf",
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
     "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf",
+    "/System/Library/Fonts/Helvetica.ttc",
 ]
 
 
 def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     for path in FONT_CANDIDATES:
         if Path(path).exists():
-            return ImageFont.truetype(path, size=size)
+            try:
+                return ImageFont.truetype(path, size=size)
+            except OSError:
+                continue
     return ImageFont.load_default()
 
 
@@ -83,81 +95,62 @@ def _dist(a: tuple[int, ...], b: tuple[int, ...]) -> float:
     ) ** 0.5
 
 
-def _rounded_poly(
-    draw: ImageDraw.ImageDraw,
-    points: list[tuple[float, float]],
-    width: int,
-    fill: tuple[int, int, int, int],
-) -> None:
-    xy = [(round(x), round(y)) for x, y in points]
-    draw.line(xy, fill=fill, width=width, joint="curve")
-    r = max(1, width // 2)
-    for x, y in xy:
-        draw.ellipse((x - r, y - r, x + r, y + r), fill=fill)
+def _luma(rgb: tuple[int, ...]) -> float:
+    return (rgb[0] + rgb[1] + rgb[2]) / 3.0
 
 
-def _draw_ecg_m(
-    size: int,
+def knockout_black_background(
+    src: Image.Image,
     *,
-    fill: tuple[int, int, int, int],
-    background: tuple[int, int, int, int],
+    black_luma: float = 28,
 ) -> Image.Image:
-    """Custom M: rounded stems + ECG spike in the valley (not a system font)."""
-    img = Image.new("RGBA", (size, size), background)
-    draw = ImageDraw.Draw(img)
-    stem = max(8, round(size * 0.13))
-    # Inner content box — ~18% margin so adaptive icons don't crop the spike.
-    left = size * 0.20
-    right = size * 0.80
-    top = size * 0.20
-    bottom = size * 0.80
-    stem_x_l = left + stem * 0.15
-    stem_x_r = right - stem * 0.15
-    _rounded_poly(draw, [(stem_x_l, top), (stem_x_l, bottom)], stem, fill)
-    _rounded_poly(draw, [(stem_x_r, top), (stem_x_r, bottom)], stem, fill)
-
-    # ECG runs between the inner edges of the stems, slightly above center.
-    y0 = size * 0.58
-    x0 = stem_x_l + stem * 0.35
-    x1 = stem_x_r - stem * 0.35
-    span = x1 - x0
-    pulse = [
-        (x0, y0),
-        (x0 + span * 0.18, y0),
-        (x0 + span * 0.28, y0 - size * 0.015),
-        (x0 + span * 0.34, y0 + size * 0.02),
-        (x0 + span * 0.46, y0 - size * 0.22),  # R peak
-        (x0 + span * 0.56, y0 + size * 0.10),  # S dip
-        (x0 + span * 0.66, y0 - size * 0.02),
-        (x0 + span * 0.78, y0),
-        (x1, y0),
-    ]
-    _rounded_poly(draw, pulse, max(6, round(size * 0.055)), fill)
-    return img
-
-
-def extract_white_mark(source: Image.Image) -> Image.Image:
-    """Keep the light glyph; punch the teal field to alpha."""
-    src = source.convert("RGBA")
-    w, h = src.size
-    pix = src.load()
+    """Punch near-black field to alpha; keep white + cyan/blue ink."""
+    img = src.convert("RGBA")
+    w, h = img.size
+    pix = img.load()
     out = Image.new("RGBA", (w, h), TRANSPARENT)
     dest = out.load()
+
     for y in range(h):
         for x in range(w):
             r, g, b, _a = pix[x, y]
-            teal_d = _dist((r, g, b), SOURCE_FIELD)
-            if teal_d < 28:
+            L = _luma((r, g, b))
+            if L < black_luma:
+                # Soft edge: almost-black anti-alias → partial alpha.
+                if L < black_luma * 0.45:
+                    continue
+                alpha = int(255 * (L - black_luma * 0.45) / (black_luma * 0.55))
+                dest[x, y] = (r, g, b, max(0, min(255, alpha)))
                 continue
-            # Residual anti-alias: closer to teal → more transparent.
-            alpha = min(255, max(0, int((teal_d - 16) * 5)))
-            dest[x, y] = (255, 255, 255, alpha)
-    # Tighten halo, then a 1px blur so the mark isn't stair-stepped.
+            dest[x, y] = (r, g, b, 255)
+
+    # Slight expand + blur so the knockout doesn't leave a hard fringe.
     alpha = out.getchannel("A").filter(ImageFilter.MaxFilter(3))
-    alpha = alpha.filter(ImageFilter.GaussianBlur(radius=0.6))
-    white = Image.new("RGBA", (w, h), WHITE)
-    white.putalpha(alpha)
-    return white
+    alpha = alpha.filter(ImageFilter.GaussianBlur(radius=0.55))
+    out.putalpha(alpha)
+    return out
+
+
+def crop_ink(img: Image.Image, *, pad_ratio: float = 0.04) -> Image.Image:
+    box = img.getbbox()
+    if box is None:
+        raise RuntimeError("image has no ink after knockout")
+    pad = max(4, round(min(img.size) * pad_ratio))
+    left = max(0, box[0] - pad)
+    top = max(0, box[1] - pad)
+    right = min(img.size[0], box[2] + pad)
+    bottom = min(img.size[1], box[3] + pad)
+    return img.crop((left, top, right, bottom))
+
+
+def extract_mark(full: Image.Image) -> Image.Image:
+    """Top band of the lockup is the stylized M (+ ECG)."""
+    w, h = full.size
+    # Source layout (1024²): M ~172–584. Use relative cut so resizes stay safe.
+    top = int(h * 0.14)
+    bottom = int(h * 0.60)
+    band = full.crop((0, top, w, bottom))
+    return crop_ink(band, pad_ratio=0.06)
 
 
 def _fit_mark(
@@ -165,10 +158,10 @@ def _fit_mark(
     size: int,
     *,
     occupy: float,
-    fill: tuple[int, int, int, int],
     background: tuple[int, int, int, int],
+    monochrome: tuple[int, int, int, int] | None = None,
 ) -> Image.Image:
-    cropped = mark.split()[-1].getbbox()
+    cropped = mark.getbbox()
     if cropped is None:
         raise RuntimeError("mark has no ink")
     glyph = mark.crop(cropped)
@@ -179,13 +172,37 @@ def _fit_mark(
         (max(1, round(gw * ratio)), max(1, round(gh * ratio))),
         Image.Resampling.LANCZOS,
     )
-    if fill[:3] != (255, 255, 255):
-        tinted = Image.new("RGBA", glyph.size, fill)
+    if monochrome is not None:
+        tinted = Image.new("RGBA", glyph.size, monochrome)
         tinted.putalpha(glyph.split()[-1])
         glyph = tinted
     out = Image.new("RGBA", (size, size), background)
     x = (size - glyph.size[0]) // 2
     y = (size - glyph.size[1]) // 2
+    out.alpha_composite(glyph, (x, y))
+    return out
+
+
+def _fit_lockup(
+    lockup: Image.Image,
+    *,
+    max_w: int,
+    max_h: int,
+    background: tuple[int, int, int, int],
+) -> Image.Image:
+    cropped = lockup.getbbox()
+    if cropped is None:
+        raise RuntimeError("lockup has no ink")
+    glyph = lockup.crop(cropped)
+    gw, gh = glyph.size
+    ratio = min(max_w / gw, max_h / gh)
+    glyph = glyph.resize(
+        (max(1, round(gw * ratio)), max(1, round(gh * ratio))),
+        Image.Resampling.LANCZOS,
+    )
+    out = Image.new("RGBA", (max_w, max_h), background)
+    x = (max_w - glyph.size[0]) // 2
+    y = (max_h - glyph.size[1]) // 2
     out.alpha_composite(glyph, (x, y))
     return out
 
@@ -198,20 +215,27 @@ def _save(img: Image.Image, path: Path) -> None:
 
 def _feature_graphic(mark: Image.Image) -> Image.Image:
     width, height = 1024, 500
-    img = Image.new("RGBA", (width, height), CHARCOAL)
+    img = Image.new("RGBA", (width, height), SPLASH_CANVAS)
     badge = _fit_mark(
-        mark, 280, occupy=0.88, fill=WHITE, background=TRANSPARENT
+        mark, 280, occupy=0.88, background=TRANSPARENT
     )
     img.alpha_composite(badge, (48, (height - 280) // 2))
 
-    title = _glyph("Medico", fill=WHITE, font_size=92)
-    sub = _glyph("MBBS exam companion", fill=WHITE, font_size=28)
+    title = _glyph(APP_NAME, fill=WHITE, font_size=84)
+    sub = _glyph(TAGLINE, fill=BRAND_BLUE, font_size=26)
     text_left = 360
-    block_h = title.size[1] + 22 + sub.size[1]
+    block_h = title.size[1] + 18 + sub.size[1]
     title_y = (height - block_h) // 2
     img.alpha_composite(title, (text_left, title_y))
-    img.alpha_composite(sub, (text_left, title_y + title.size[1] + 22))
+    img.alpha_composite(sub, (text_left, title_y + title.size[1] + 18))
     return img
+
+
+def _og_image(lockup: Image.Image) -> Image.Image:
+    """1200×630 Open Graph card — lockup centered on black."""
+    return _fit_lockup(
+        lockup, max_w=1200, max_h=630, background=SPLASH_CANVAS
+    ).convert("RGB")
 
 
 def _is_warm_paper(rgb: tuple[int, ...]) -> bool:
@@ -261,7 +285,6 @@ def knockout_paper_background(src: Image.Image, max_dist: float = 18) -> Image.I
     for x, y in background:
         pix[x, y] = TRANSPARENT
 
-    # Expand the character 1px so cream doesn't fringe, then soften.
     alpha = img.getchannel("A").filter(ImageFilter.MaxFilter(3))
     alpha = alpha.filter(ImageFilter.GaussianBlur(radius=0.7))
     img.putalpha(alpha)
@@ -291,40 +314,54 @@ def process_mascots() -> None:
         _save(knocked, ILLUSTRATIONS / dest_name)
 
 
-def load_mark() -> Image.Image:
-    source_path = BRANDING / "app_icon_source.png"
-    if source_path.exists():
-        print(f"extracting mark from {source_path.relative_to(ROOT)}")
-        return extract_white_mark(Image.open(source_path))
-    print("no app_icon_source.png — drawing programmatic ECG-M")
-    return _draw_ecg_m(1024, fill=WHITE, background=TRANSPARENT)
+def load_lockup() -> Image.Image:
+    source_path = BRANDING / "logo_source.jpg"
+    if not source_path.exists():
+        # Back-compat: older teal mark source.
+        legacy = BRANDING / "app_icon_source.png"
+        if legacy.exists():
+            print(f"no logo_source.jpg — falling back to {legacy.name}")
+            return Image.open(legacy).convert("RGBA")
+        raise FileNotFoundError(
+            f"Missing {source_path.relative_to(ROOT)} — drop the MEDCAIN logo JPG there."
+        )
+    print(f"processing {source_path.relative_to(ROOT)}")
+    return knockout_black_background(Image.open(source_path))
 
 
 def main() -> None:
     BRANDING.mkdir(parents=True, exist_ok=True)
     PLAY.mkdir(parents=True, exist_ok=True)
+    WEB_IMG.mkdir(parents=True, exist_ok=True)
 
-    mark = load_mark()
+    lockup = load_lockup()
+    full = crop_ink(lockup, pad_ratio=0.03)
+    _save(full, BRANDING / "logo_full.png")
+    _save(full, WEB_IMG / "logo-full.png")
 
-    icon = _fit_mark(mark, 1024, occupy=0.64, fill=WHITE, background=CHARCOAL)
+    mark = extract_mark(lockup)
+
+    icon = _fit_mark(mark, 1024, occupy=0.68, background=SPLASH_CANVAS)
     _save(icon.convert("RGB"), BRANDING / "app_icon.png")
 
-    foreground = _fit_mark(
-        mark, 1024, occupy=0.58, fill=WHITE, background=TRANSPARENT
-    )
+    foreground = _fit_mark(mark, 1024, occupy=0.62, background=TRANSPARENT)
     _save(foreground, BRANDING / "app_icon_foreground.png")
     _save(foreground, BRANDING / "splash_logo.png")
 
     monochrome = _fit_mark(
-        mark, 1024, occupy=0.58, fill=BLACK, background=TRANSPARENT
+        mark, 1024, occupy=0.62, background=TRANSPARENT, monochrome=BLACK
     )
     _save(monochrome, BRANDING / "app_icon_monochrome.png")
 
-    _save(
-        icon.resize((512, 512), Image.Resampling.LANCZOS).convert("RGB"),
-        PLAY / "icon-512.png",
-    )
+    store_icon = icon.resize((512, 512), Image.Resampling.LANCZOS).convert("RGB")
+    _save(store_icon, PLAY / "icon-512.png")
+    _save(store_icon, WEB_IMG / "icon-512.png")
+    _save(store_icon, WEB_IMG / "app-icon.png")
+    # Transparent mark for dark hero / overlays (not light nav — white ink vanishes).
+    mark_badge = _fit_mark(mark, 512, occupy=0.78, background=TRANSPARENT)
+    _save(mark_badge, WEB_IMG / "mark.png")
     _save(_feature_graphic(mark).convert("RGB"), PLAY / "feature-graphic-1024x500.png")
+    _save(_og_image(full), WEB_IMG / "og.png")
 
     process_mascots()
 

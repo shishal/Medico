@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'comic_colors.dart';
 import 'spacing.dart';
 
-/// Material 3 + Gecko-like charcoal/orange chrome. Docci stays in brand assets.
+/// Material 3 + MEDCAIN blue chrome on charcoal. Docci stays in brand assets.
 abstract final class AppTheme {
-  /// Coral-orange — CTAs, high-yield, filled buttons.
-  static const Color seedColor = Color(0xFFF25C2D);
+  /// Brand blue (logo mid-gradient) — CTAs, filled buttons, chrome.
+  static const Color seedColor = Color(0xFF008FD6);
 
-  /// Same family as [seedColor]; timer-low / submit.
-  static const Color accentUrgent = seedColor;
+  /// Deeper blue for urgent actions (timer-low / submit).
+  static const Color accentUrgent = Color(0xFF0072BC);
 
-  /// Native splash + Flutter splash canvas (dark-first, no teal flash).
-  static const Color splashCanvas = Color(0xFF121212);
+  /// Native splash + Flutter splash canvas — matches logo black field.
+  static const Color splashCanvas = Color(0xFF000000);
 
   static const double cardRadius = 22;
 

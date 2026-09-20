@@ -10,7 +10,7 @@ import 'package:medico/features/auth/presentation/providers/auth_session_provide
 import 'package:medico/features/auth/presentation/screens/splash_screen.dart';
 
 void main() {
-  testWidgets('Splash shows brand mark on charcoal', (tester) async {
+  testWidgets('Splash shows brand mark on black', (tester) async {
     final router = GoRouter(
       initialLocation: AppRoutes.splash,
       routes: [
@@ -37,8 +37,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Medico'), findsOneWidget);
-    expect(find.text('MBBS exam companion'), findsOneWidget);
+    expect(find.text('MEDCAIN'), findsOneWidget);
+    expect(find.text('Drug of Choice for Exam Pain'), findsOneWidget);
     expect(find.byType(BrandPulseLoader), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));

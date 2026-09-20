@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/brand_wordmark.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../../catalog/domain/catalog_models.dart';
 import '../../../catalog/presentation/providers/catalog_providers.dart';
@@ -15,7 +16,7 @@ import '../../../profile/presentation/providers/current_plan_provider.dart';
 import '../../../profile/presentation/providers/user_profile_provider.dart';
 import '../../../progress/presentation/providers/ug_home_providers.dart';
 
-/// Greeting: Docci + name + year/university. Plan pill is display-only.
+/// Greeting: brand + Docci + name + year/university. Plan pill is display-only.
 class HomeHeroBanner extends ConsumerWidget {
   const HomeHeroBanner({super.key});
 
@@ -50,61 +51,70 @@ class HomeHeroBanner extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.md, Spacing.lg, 0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ComicMascot(
-            asset: BrandAssets.mascotWave,
-            size: 56,
-            heroTag: BrandAssets.mascotHeroTag,
-            bounce: false,
-            circleBackdrop: true,
+          Row(
+            children: [
+              const Expanded(
+                child: BrandWordmark(markSize: 28, compact: true),
+              ),
+              const _NotificationsBellButton(),
+              IconButton.filledTonal(
+                tooltip: 'Search',
+                onPressed: () => context.push(AppRoutes.search),
+                icon: const Icon(Icons.search_rounded),
+              ),
+            ],
           ),
-          const SizedBox(width: Spacing.md),
-          // The plan pill sits on the subtitle line rather than beside the
-          // search button: on a 360dp screen the old single row left the
-          // greeting about 116dp and both lines wrapped.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  hello,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Row(
+          const SizedBox(height: Spacing.md),
+          Row(
+            children: [
+              const ComicMascot(
+                asset: BrandAssets.mascotWave,
+                size: 56,
+                heroTag: BrandAssets.mascotHeroTag,
+                bounce: false,
+                circleBackdrop: true,
+              ),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (plan != null) ...[
-                      _PlanPill(plan: plan),
-                      const SizedBox(width: Spacing.sm),
-                    ],
-                    Expanded(
-                      child: Text(
-                        subtitleParts.isEmpty
-                            ? 'Pick a subject to start.'
-                            : subtitleParts.join(' · '),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
+                    Text(
+                      hello,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        if (plan != null) ...[
+                          _PlanPill(plan: plan),
+                          const SizedBox(width: Spacing.sm),
+                        ],
+                        Expanded(
+                          child: Text(
+                            subtitleParts.isEmpty
+                                ? 'Pick a subject to start.'
+                                : subtitleParts.join(' · '),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(width: Spacing.sm),
-          const _NotificationsBellButton(),
-          IconButton.filledTonal(
-            tooltip: 'Search',
-            onPressed: () => context.push(AppRoutes.search),
-            icon: const Icon(Icons.search_rounded),
+              ),
+            ],
           ),
         ],
       ),

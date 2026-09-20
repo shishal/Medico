@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Canvas + card colors. Dark is charcoal (Gecko-like); light is clean gray.
+/// Canvas + card colors. Dark is near-black (MEDCAIN); light is clean gray.
 ///
 /// Ink is for glyphs only — not card/button outlines.
 @immutable
@@ -24,7 +24,7 @@ class ComicColors extends ThemeExtension<ComicColors> {
 
   final Color shadow;
 
-  /// Section chrome / progress — indigo-purple, not primary orange.
+  /// Section chrome / progress — cooler indigo beside primary blue.
   final Color accentPurple;
 
   /// Pro chips only.
@@ -36,17 +36,17 @@ class ComicColors extends ThemeExtension<ComicColors> {
     sticker: Color(0xFFFFFFFF),
     stickerLift: Color(0xFFF8F8FA),
     shadow: Color(0x331A1A1E),
-    accentPurple: Color(0xFF6C5CE7),
+    accentPurple: Color(0xFF3D6FBF),
     proGold: Color(0xFFC9A227),
   );
 
   static const dark = ComicColors(
     ink: Color(0xFFF2F2F3),
-    paper: Color(0xFF121212),
-    sticker: Color(0xFF252528),
-    stickerLift: Color(0xFF2E2E33),
+    paper: Color(0xFF0A0A0A),
+    sticker: Color(0xFF161A1F),
+    stickerLift: Color(0xFF1E2430),
     shadow: Color(0xCC000000),
-    accentPurple: Color(0xFF8B7CFF),
+    accentPurple: Color(0xFF5B8DEF),
     proGold: Color(0xFFF5C542),
   );
 
@@ -111,11 +111,11 @@ abstract final class StickerFills {
   ];
 
   static const _accents = [
-    Color(0xFFF25C2D),
-    Color(0xFF8B7CFF),
-    Color(0xFF2EC4B6),
-    Color(0xFFFF7A59),
+    Color(0xFF008FD6),
     Color(0xFF5B8DEF),
+    Color(0xFF2EC4B6),
+    Color(0xFF00AEEF),
+    Color(0xFF3D6FBF),
     Color(0xFFE8B931),
   ];
 

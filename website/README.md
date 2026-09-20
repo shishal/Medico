@@ -1,4 +1,4 @@
-# Medico public site (medico.shishal.com)
+# MEDCAIN public site (medico.shishal.com)
 
 Static marketing + Play Store legal pages. Served by nginx in Docker on your
 machine; Cloudflare sits in front.

@@ -1,4 +1,4 @@
-# Medico — MBBS university-exam companion
+# MEDCAIN — MBBS university-exam companion
 
 Flutter app for **MBBS university exams** (PYQs, textbook page refs,
 MCQ practice). Students pick their affiliating university; v1 **content** is

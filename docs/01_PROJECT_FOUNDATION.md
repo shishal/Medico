@@ -101,28 +101,28 @@ Rule for the AI agent: **a feature's `presentation/` layer never calls Supabase 
 - **Every screen that reads user-plan-gated data must handle the "content not available on your plan" case explicitly** — not just a generic error state. This is a product requirement, not just a coding style point: users need to see "Upgrade to Pro to unlock this test," not a blank screen or a crash.
 - **Widgets over 150 lines get split.** If Cursor generates a 400-line `build()` method, ask it to extract sub-widgets before you accept the change — long build methods are where subtle layout bugs hide.
 
-## Design direction (GeckoMed-close, Medico brand)
+## Design direction (MEDCAIN — blue on black)
 
-Concrete enough for Cursor to act on. Docci and the Medico name stay; do not
+Concrete enough for Cursor to act on. Docci and the MEDCAIN name stay; do not
 copy a competitor mascot or pixel-identical layouts.
 
-- **Material 3.** Seed / primary is **coral-orange** (`#F25C2D`) for CTAs,
-  high-yield numbers, and filled buttons. **Indigo-purple** (`#6C5CE7`) is
+- **Material 3.** Seed / primary is **brand blue** (`#008FD6`) for CTAs,
+  high-yield numbers, and filled buttons. Cooler indigo (`#3D6FBF`) is
   section chrome / progress. **Gold** (`#F5C542`) is Pro chips only.
-- **Dark-first charcoal** canvas (`#121212`) with slightly lighter raised
-  cards. Light mode is clean white/gray cards with the same orange CTAs —
-  not warm comic paper `#FBF4E6`.
+- **Dark-first black** canvas (`#000000` / `#0A0A0A`) with slightly lighter
+  raised cards. Light mode is clean white/gray cards with the same blue CTAs.
 - **Theme modes:** System (follow the phone) / Light / Dark. Persist the
   choice. **Light is the app default** until the student picks something else
   — this matches docs/00_PRODUCT.md, build-plan task 10.1 and the code. The
-  splash is deliberately dark in both polarities; see
+  splash is deliberately black in both polarities; see
   `flutter_native_splash.yaml`.
 - **Type scale**: use Material 3's built-in `TextTheme` roles (`headlineSmall`,
   `titleMedium`, `bodyLarge`, etc.) rather than ad-hoc `TextStyle(fontSize: 16)`.
-- **Urgent actions** (timer running low, submit test) use the same orange
-  family as primary — do not invent a second red.
+- **Urgent actions** (timer running low, submit test) use a deeper blue
+  (`#0072BC`) — do not invent a second red.
 - **Spacing**: 8px scale (`Spacing.xs = 4, .sm = 8, .md = 16, .lg = 24,
   .xl = 32`). No arbitrary `SizedBox(height: 13)`.
+- **Tagline:** “Drug of Choice for Exam Pain” — splash, store, and marketing.
 
 ## Environment setup checklist (do this once, in order)
 

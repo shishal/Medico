@@ -1,4 +1,4 @@
-# Medico
+# MEDCAIN
 
 Flutter app for **MBBS university exams**: previous-year theory questions
 (with optional sample answers and textbook page citations), lesson-scoped MCQ
@@ -18,6 +18,6 @@ supabase db push
 ```
 
 Then bind the Google Sheet tabs in `content/google_sheet/tabs/` (including
-Universities, Lessons, Appearances, TextbookRefs) and run **Medico → Sync to App**.
+Universities, Lessons, Appearances, TextbookRefs) and run **MEDCAIN → Sync to App**.
 
 Replace the WhatsApp number in `lib/core/support.dart` before a public listing.

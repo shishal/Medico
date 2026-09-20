@@ -1,6 +1,6 @@
 # Product — university-exam MBBS companion
 
-Medico is an **India-focused MBBS university-exam** app: previous-year theory
+MEDCAIN (“Drug of Choice for Exam Pain”) is an **India-focused MBBS university-exam** app: previous-year theory
 questions (PYQs), textbook page citations, optional sample answers, topic
 reference links, and MCQ practice.
 
@@ -57,9 +57,8 @@ university paper mixes many topics in one sitting — see
 
 ## UX direction
 
-Visual language follows GeckoMed’s study apps (dark charcoal canvas, coral
-orange CTAs, indigo-purple chrome, gold Pro chips) while keeping **Docci** and
-the Medico name. Theme is **System / Light / Dark**, persisted, **Light default**.
+Visual language is MEDCAIN’s blue-on-black brand (black canvas, cyan/blue
+CTAs, cooler indigo chrome, gold Pro chips) while keeping **Docci**. Theme is **System / Light / Dark**, persisted, **Light default**.
 
 Home is a PYQ dashboard (coverage banner, year + university, subject cards).
 Opening a subject starts with **exam years**, then that year’s paper outline

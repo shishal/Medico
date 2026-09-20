@@ -8,6 +8,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
+import '../../../../core/widgets/brand_wordmark.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
 import '../providers/auth_session_provider.dart';
@@ -90,7 +91,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               children: [
                 const SizedBox(height: Spacing.lg),
                 const Center(
-                  child: ComicMascot(asset: BrandAssets.mascotStudy, size: 140),
+                  child: BrandWordmark(
+                    markSize: 40,
+                    showTagline: true,
+                    alignment: MainAxisAlignment.center,
+                  ),
+                ),
+                const SizedBox(height: Spacing.lg),
+                const Center(
+                  child: ComicMascot(asset: BrandAssets.mascotStudy, size: 120),
                 ),
                 const SizedBox(height: Spacing.md),
                 Text(

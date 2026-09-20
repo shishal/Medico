@@ -8,6 +8,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/auth_validators.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/utils/soft_keyboard.dart';
+import '../../../../core/widgets/brand_wordmark.dart';
 import '../../../../core/widgets/comic_mascot.dart';
 import '../../data/auth_repository.dart';
 import '../../domain/device_session.dart';
@@ -120,9 +121,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const SizedBox(height: Spacing.lg),
                 const Center(
+                  child: BrandWordmark(
+                    markSize: 40,
+                    showTagline: true,
+                    alignment: MainAxisAlignment.center,
+                  ),
+                ),
+                const SizedBox(height: Spacing.lg),
+                const Center(
                   child: ComicMascot(
                     asset: BrandAssets.mascotWave,
-                    size: 140,
+                    size: 120,
                     heroTag: BrandAssets.mascotHeroTag,
                   ),
                 ),

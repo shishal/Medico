@@ -1,6 +1,6 @@
 # Phase 2.2 — Apps Script sync
 
-Bound this project to a Sheet that has a single `Questions` tab. The **Medico**
+Bound this project to a Sheet that has a single `Questions` tab. The **MEDCAIN**
 menu previews one transactional import and requires typing `APPLY` before writes.
 
 ## Prerequisites

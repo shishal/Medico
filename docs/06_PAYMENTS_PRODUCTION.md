@@ -30,7 +30,7 @@ compliance boundary: the app only **links out**.
 ## How the Live path fits together
 
 ```
-Student in Medico
+Student in MEDCAIN
   → browser opens CHECKOUT_URL?plan=pro&email=…
   → signs in (same Supabase Auth as the app)
   → Pay → create-razorpay-order (Live key) → Razorpay Checkout
@@ -237,7 +237,7 @@ HTTP check also needs `RAZORPAY_WEBHOOK_SECRET`.)
 
 1. Install a **release** build whose `.env` has the production `CHECKOUT_URL`
    (or open the hosted page in a desktop browser).
-2. Sign in with a real Medico account you control.
+2. Sign in with a real MEDCAIN account you control.
 3. Pay with a real UPI / card for Pro or Elite.
 4. Razorpay → **Payments**: status **Captured**.
 5. Razorpay → **Webhooks**: delivery **200**.

@@ -1,9 +1,10 @@
+/* MEDCAIN brand — primary blue tokens keep --coral names for layout stability */
 :root {
-  --coral: #f25c2d;
-  --coral-deep: #d4481f;
-  --coral-soft: #ffe8df;
-  --purple: #6c5ce7;
-  --purple-soft: #ece9ff;
+  --coral: #008fd6;
+  --coral-deep: #0072bc;
+  --coral-soft: #d6f0ff;
+  --purple: #3d6fbf;
+  --purple-soft: #e3eefc;
   --gold: #c9a227;
   --gold-soft: #f7efd4;
   --ink: #1a1a1e;
@@ -11,7 +12,7 @@
   --line: #e4e4e8;
   --bg: #f4f4f5;
   --surface: #ffffff;
-  --hero: #121212;
+  --hero: #000000;
   --hero-ink: #f2f2f3;
   --hero-muted: #a8a8b0;
   --radius: 10px;
@@ -35,10 +36,10 @@
     --line: #2e2e33;
     --bg: #121212;
     --surface: #252528;
-    --coral-soft: #3a221a;
-    --purple-soft: #2a2648;
+    --coral-soft: #0a2a3d;
+    --purple-soft: #1a283c;
     --gold-soft: #3a3218;
-    --hero: #0a0a0a;
+    --hero: #000000;
     --hero-ink: #f2f2f3;
     --hero-muted: #9a9aa3;
     color-scheme: dark;
@@ -342,16 +343,34 @@ p {
 }
 
 .brand-hero {
-  font-family: var(--display);
-  font-size: clamp(3rem, 8vw, 5.5rem);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 var(--space-sm);
+}
+
+.brand-hero-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.brand-hero-name {
+  font-family: var(--font);
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--hero-ink);
+}
+
+.brand-tagline {
+  margin: 0 0 var(--space-lg);
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-  margin: 0 0 var(--space-md);
-  background: linear-gradient(120deg, #fff 30%, #ffc4b0 70%, #c9b8ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--coral) 75%, #fff);
 }
 
 .hero h1 {
@@ -411,6 +430,22 @@ p {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.phone-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #f2f2f3;
+}
+
+.phone-brand img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
 }
 
 .phone-bar {

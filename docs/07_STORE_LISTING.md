@@ -5,9 +5,10 @@ shot list** are below; capture the images from a real build before Phase 9.4
 (do not upload the feature graphic as a screenshot — Play treats those as
 separate slots).
 
-**Brand color:** `#0D7377` (same as `AppTheme.seedColor`).
+**Brand color:** `#008FD6` (same as `AppTheme.seedColor`).
 **Launcher / Play icon source:** `assets/branding/app_icon.png`.
 **Play assets:** `store/play/icon-512.png`, `store/play/feature-graphic-1024x500.png`.
+**Tagline:** Drug of Choice for Exam Pain.
 
 Payments happen on the website, not in the app. Do not mention in-app
 purchase, a price next to a Buy button, or “subscribe in the app.” Phase 9.4
@@ -24,33 +25,31 @@ there. Create the mailbox `support@medico.shishal.com` before a public listing.
 ## Google Play
 
 ### App name
-Medico
+MEDCAIN
 
 ### Short description (80 characters max)
 
 ```
-NEET-PG QBank: timed mocks, grand tests, and practice with explanations.
+MBBS PYQs & practice — Drug of Choice for Exam Pain.
 ```
 
-(72 characters including spaces.)
+(58 characters including spaces.)
 
 ### Full description
 
 ```
-Medico is a NEET-PG test-prep QBank for sitting timed papers the way the real exam works — then reviewing every answer.
+MEDCAIN is an MBBS university-exam companion: previous-year theory questions with direct answers, explanations, and textbook page refs — plus MCQ practice.
 
 WHAT YOU CAN DO
-• Browse Mini, Subject, Mock, and Grand tests. Grand tests follow the real NEET-PG shape: five timed sections.
-• Start a test only after you have seen duration, marking scheme, and (for sectional papers) the section-lock warning.
-• Sit the paper with a question palette, mark-for-review, and a timer that auto-submits at zero.
-• Practice on your own filters: subject, topic, revision priority, tutor mode (see the answer now) or exam mode (see everything at the end).
-• Open results for score, accuracy, percentile, and a subject-wise breakdown.
+• Browse university PYQs by subject and exam year, the way your paper is set.
+• Open a question for a direct answer (DA) and explanation (EX) with textbook page refs.
+• Practice MCQs in tutor mode (see the answer now) or exam mode (review at the end).
 • Bookmark questions from review and come back to them later.
 
 PLANS
-Download is free. A Free plan lets you try catalog tests and short practice sessions. Pro and Elite unlock more of the QBank, longer practice, full explanations, and extra builder controls (tags, timer, negative marking).
+Download is free. New accounts get Pro for 4 days. Free keeps a teaser slice of the bank. Pro and Elite unlock more PYQs, practice, and full explanations.
 
-Plans are purchased on our website in the device browser — not inside this app. After you pay, return to Medico and refresh your profile to see the new plan.
+Plans are purchased on our website in the device browser — not inside this app. After you pay, return to MEDCAIN and refresh your profile to see the new plan.
 
 PRIVACY AND ACCOUNT
 You sign in with email. We do not show ads. See the privacy policy for what we store and why.
@@ -63,7 +62,7 @@ Manage or cancel a plan: https://medico.shishal.com/account
 Education
 
 ### Tags (Play, optional)
-Education, Medical, Exam prep, NEET-PG
+Education, Medical, Exam prep, MBBS, PYQ
 
 ### Contact
 Support email: support@medico.shishal.com
@@ -84,32 +83,30 @@ tablet layout; phone shots are enough for a phone-first app.
 ## App Store
 
 ### Name
-Medico
+MEDCAIN
 
 ### Subtitle (30 characters max)
 
 ```
-NEET-PG QBank & Mock Tests
+MBBS PYQs & Exam Practice
 ```
 
-(26 characters including spaces.)
+(25 characters including spaces.)
 
 ### Promotional text (170 characters max, optional, editable without a new review)
 
 ```
-Sit NEET-PG-style mocks and grand tests, then review every answer. Practice in tutor or exam mode. Free to download — unlock more of the QBank on our website.
+Drug of Choice for Exam Pain. University PYQs with answers, explanations, and textbook pages. Free to download — unlock Pro on our website.
 ```
 
 ### Description
 
 ```
-Medico is a NEET-PG QBank built around sitting a paper, not flipping a flashcard deck.
+MEDCAIN is an MBBS university-exam companion: previous-year theory questions with direct answers, explanations, and textbook page refs — plus MCQ practice.
 
-Take Mini, Subject, Mock, and Grand tests. Grand tests use five timed sections, matching the shape of the real exam. Before you start, you see duration, marking, and the section-lock rule so a section cannot be reopened after its time is up.
+Browse real university papers by year. Open a question for a direct answer and explanation, then jump to the textbook page. Practice MCQs in tutor or exam mode. Bookmark questions from review.
 
-Practice on your terms: pick subject and topic, then tutor mode (answer as you go) or exam mode (review at the end). Results show score, accuracy, percentile, and a subject-wise split. Bookmark any question from review.
-
-A Free plan is included. Pro and Elite unlock more tests, longer practice, and full explanations. Plans are bought on our website in Safari — this app does not charge inside the binary.
+A Free plan is included. New accounts get Pro for 4 days. Pro and Elite unlock more of the bank and full explanations. Plans are bought on our website in Safari — this app does not charge inside the binary.
 
 Privacy policy: https://medico.shishal.com/privacy
 Manage or cancel a plan: https://medico.shishal.com/account
@@ -118,13 +115,12 @@ Manage or cancel a plan: https://medico.shishal.com/account
 ### Keywords (100 characters max, comma-separated, no spaces after commas preferred)
 
 ```
-QBank,mock test,medical exam,PG preparation,grand test,MCQ,residency
+MBBS,PYQ,medical exam,university exam,MCQ,anatomy,KUHS
 ```
 
-Do **not** repeat the app name or “NEET-PG” here — those already sit in the
-name/subtitle. Trim or swap words so the whole string stays ≤ 100 characters.
+Do **not** repeat the app name here. Trim or swap words so the whole string stays ≤ 100 characters.
 
-Current string is 69 characters.
+Current string is 55 characters.
 
 ### Category
 Primary: Education
@@ -204,5 +200,5 @@ dart run flutter_launcher_icons
 dart run flutter_native_splash:create
 ```
 
-Then visually check: home-screen icon is a white **M** on teal, not the
-Flutter logo; cold start is teal, not white.
+Then visually check: home-screen icon is the MEDCAIN **M** (white + blue ECG)
+on black, not the Flutter logo; cold start is black, not white.

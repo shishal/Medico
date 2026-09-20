@@ -128,7 +128,7 @@ The iOS workflow uploads the IPA to App Store Connect (not App Store review).
 
 1. In App Store Connect, add your Apple ID as an **internal** TestFlight tester.
 2. Wait until the build shows as processed (email from Apple, usually minutes).
-3. Install **TestFlight** on a real iPhone, open Medico, confirm splash/icon
+3. Install **TestFlight** on a real iPhone, open MEDCAIN, confirm splash/icon
    and that you can sign in.
 
 Leave `submit_to_app_store` off until Phase 9.4. To also send the build to a

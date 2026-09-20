@@ -1,11 +1,18 @@
-/// Paths and helpers for the Docci comic illustrations.
+/// Paths and helpers for MEDCAIN brand art + Docci comic illustrations.
 ///
-/// Docci is Medico’s intern mascot — a round comic med student, not a gecko.
+/// Docci is MEDCAIN’s intern mascot — a round comic med student, not a gecko.
 abstract final class BrandAssets {
   static const mascotName = 'Docci';
   static const mascotHeroTag = 'docci-mascot';
 
+  /// M + ECG mark only (transparent). Native splash + dark canvases.
   static const splashLogo = 'assets/branding/splash_logo.png';
+
+  /// Square launcher art (black field). Readable on light UI chrome.
+  static const appIcon = 'assets/branding/app_icon.png';
+
+  /// Full lockup: mark + MEDCAIN + tagline (transparent).
+  static const logoFull = 'assets/branding/logo_full.png';
 
   static const mascotWave = 'assets/illustrations/mascot_wave.png';
   static const mascotStudy = 'assets/illustrations/mascot_study.png';

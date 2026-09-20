@@ -83,7 +83,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: Spacing.md),
             Text(
-              (name == null || name.isEmpty) ? 'Medico student' : name,
+              (name == null || name.isEmpty) ? 'MEDCAIN student' : name,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge
                   ?.copyWith(fontWeight: FontWeight.w700),

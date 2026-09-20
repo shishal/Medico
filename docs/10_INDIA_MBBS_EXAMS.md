@@ -34,7 +34,7 @@ Two assessments, different shapes:
 | **College internals / IA** | The college | Often closer to the teaching timetable: one region or chapter at a time |
 | **University professional exam** | Affiliating university (KUHS, RGUHS, TNMGRMU, …) | Whole **subject**, usually **two theory papers**, mixed chapters in one sitting |
 
-Medico v1 is for the **university paper** (PYQs tagged to `exam_papers` with
+MEDCAIN v1 is for the **university paper** (PYQs tagged to `exam_papers` with
 `exam_type = 'university'`). Internals can be stored the same way
 (`exam_type = 'internal'`) but are not the primary browse.
 
@@ -84,7 +84,7 @@ NMC (UGMEB FAQ, CBME 2023):
   40:60 floor). **No grace marks.** Confirm against the live notification
   when writing student-facing pass-rule copy.
 
-A pattern many universities publish (illustrative, **not** a Medico constant):
+A pattern many universities publish (illustrative, **not** a MEDCAIN constant):
 
 | Type | Typical count × marks | ~Total |
 |---|---|---|
@@ -94,7 +94,7 @@ A pattern many universities publish (illustrative, **not** a Medico constant):
 | Short answer / VSA | 10 × 3 | 30 |
 | **Paper total** | | **100** |
 
-Medico already maps theory marks → chips (`QuestionFormat`: essay ≥10, short
+MEDCAIN already maps theory marks → chips (`QuestionFormat`: essay ≥10, short
 note 4–9, VSA ≤3, plus `kind = mcq`). Keep inferring from **this question’s
 marks**, not from a frozen national grid.
 
@@ -164,7 +164,7 @@ by year / Paper I / Paper II.
 
 ---
 
-## 6. What that means for Medico
+## 6. What that means for MEDCAIN
 
 ### Already true in data (do not flatten the database)
 

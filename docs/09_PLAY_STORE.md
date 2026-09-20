@@ -1,6 +1,6 @@
 # Phase 9.4 — Google Play (Android first)
 
-This is the operator guide for putting Medico on Play. **iOS is later;
+This is the operator guide for putting MEDCAIN on Play. **iOS is later;
 do not start App Store Connect until Android internal testers can install.**
 
 **Current goal:** Internal testers only. The app must not appear in public
@@ -38,7 +38,7 @@ Internal testing as long as you want.
 | Field | Value |
 |---|---|
 | Application ID | `com.shishal.medico` |
-| App name | Medico |
+| App name | MEDCAIN |
 | Version (first upload) | `1.0.0` (`pubspec.yaml` `version: 1.0.0+1`) |
 | Play icon | `store/play/icon-512.png` |
 | Feature graphic | `store/play/feature-graphic-1024x500.png` |
@@ -73,7 +73,7 @@ the AAB. Do not send testers a build you have not opened yourself.
    **organization** developer account.
 2. **All apps → Create app**.
 3. Fill:
-   - App name: `Medico`
+   - App name: `MEDCAIN`
    - Default language: English (United States) or English (India)
    - App or game: **App**
    - Free or paid: **Free**
@@ -124,14 +124,14 @@ opt-in link works. Later updates are usually faster.
    1. Open it while signed into the Google account you added.
    2. Tap **Accept** / become a tester.
    3. Tap **Download it on Google Play**.
-   4. Install **Medico** from the Play Store listing that opens (it is
+   4. Install **MEDCAIN** from the Play Store listing that opens (it is
       not searchable; the link is the only door).
 
 Cap is 100 testers. Remove people who should no longer have access.
 
 ### 6. Confirm it is not public
 
-- Searching “Medico” on Play on a phone that is **not** on the tester list
+- Searching “MEDCAIN” on Play on a phone that is **not** on the tester list
   must not show this app.
 - Dashboard **Production** must stay empty / not rolled out.
 - Do not turn on Open testing.
@@ -221,4 +221,4 @@ screenshot-event log). Payments are **not** collected inside the app.
 - [ ] Your Google account is a tester and you installed from the opt-in link
 - [ ] A second internal user can do the same
 - [ ] Production and Open testing are unused
-- [ ] Searching Play on a non-tester phone does not show Medico
+- [ ] Searching Play on a non-tester phone does not show MEDCAIN

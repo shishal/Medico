@@ -6,7 +6,7 @@ keys, HTTPS hosting, Flutter `CHECKOUT_URL`, Live webhook). Do not put
 `rzp_live_` keys in this local setup.
 
 A small static site (not part of the Flutter app) where a student signs in
-with their Medico email and pays through **Razorpay Checkout**. The app
+with their MEDCAIN email and pays through **Razorpay Checkout**. The app
 only opens this page in the system browser.
 
 A successful **Test Mode** payment makes Razorpay POST to the
@@ -81,7 +81,7 @@ python3 checkout/serve.py
 
 Open http://127.0.0.1:4173 (optional `?plan=elite&email=you@example.com`).
 
-Sign in with a real Medico test account, pick Pro or Elite, pay.
+Sign in with a real MEDCAIN test account, pick Pro or Elite, pay.
 
 ## Test payment (no real money)
 

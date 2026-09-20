@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/brand_assets.dart';
 
-/// White ECG-M mark (transparent PNG). Sits on charcoal splash or tints via [color].
+/// MEDCAIN ECG-M mark (transparent PNG). Sits on black splash or tints via [color].
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key, this.size = 96, this.color, this.semanticLabel});
 

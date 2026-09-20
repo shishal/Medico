@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/brand_assets.dart';
+import '../../../../core/theme/brand_identity.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/widgets/brand_mark.dart';
@@ -114,9 +115,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             center: Alignment(0, -0.12),
             radius: 1.15,
             colors: [
-              Color(0xFF2A2422),
+              Color(0xFF0A2A3D),
               AppTheme.splashCanvas,
-              Color(0xFF0A0A0A),
+              Color(0xFF000000),
             ],
             stops: [0.0, 0.48, 1.0],
           ),
@@ -153,7 +154,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Medico',
+                            BrandIdentity.displayName,
                             style: textTheme.headlineMedium?.copyWith(
                               color: onCanvas,
                               fontWeight: FontWeight.w800,
@@ -162,14 +163,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           ),
                           const SizedBox(height: Spacing.xs),
                           Text(
-                            'MBBS exam companion',
+                            BrandIdentity.tagline,
+                            textAlign: TextAlign.center,
                             style: textTheme.bodyLarge?.copyWith(
                               color: onCanvas.withValues(alpha: 0.82),
                               letterSpacing: 0.2,
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          const BrandPulseLoader(color: onCanvas),
+                          const BrandPulseLoader(color: Color(0xFF00AEEF)),
                         ],
                       ),
                     ),

@@ -18,7 +18,7 @@ class MedicoApp extends ConsumerWidget {
     return DeviceSessionGuard(
       child: AppScreenshotLock(
         child: MaterialApp.router(
-          title: 'Medico',
+          title: 'MEDCAIN',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,

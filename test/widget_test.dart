@@ -43,7 +43,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Medico'), findsWidgets);
+    expect(find.text('MEDCAIN'), findsWidgets);
     await tester.pump(const Duration(milliseconds: 1300));
   });
 }

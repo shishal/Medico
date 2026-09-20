@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../theme/brand_assets.dart';
 import '../theme/brand_identity.dart';
 
-/// Compact app-icon badge + MEDCAIN wordmark for home / auth headers.
+/// Compact badge + MEDCAIN wordmark for home / auth headers.
 ///
-/// Uses the black-field icon so the white/blue mark stays visible on light
-/// paper — the transparent splash mark would wash out.
+/// Badge asset flips with theme: black-field icon on light paper, light-field
+/// icon on dark paper — so the mark never washes out.
 class BrandWordmark extends StatelessWidget {
   const BrandWordmark({
     super.key,
@@ -27,6 +27,7 @@ class BrandWordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final badge = BrandAssets.badgeFor(Theme.of(context).brightness);
 
     return Semantics(
       header: true,
@@ -44,7 +45,7 @@ class BrandWordmark extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(markSize * 0.22),
                 child: Image.asset(
-                  BrandAssets.appIcon,
+                  badge,
                   width: markSize,
                   height: markSize,
                   filterQuality: FilterQuality.high,

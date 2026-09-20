@@ -11,8 +11,15 @@ abstract final class AppTheme {
   /// Deeper blue for urgent actions (timer-low / submit).
   static const Color accentUrgent = Color(0xFF0072BC);
 
-  /// Native splash + Flutter splash canvas — matches logo black field.
+  /// Dark native/Flutter splash canvas — matches logo black field.
   static const Color splashCanvas = Color(0xFF000000);
+
+  /// Light native/Flutter splash canvas — matches [ComicColors.light.paper].
+  static const Color splashCanvasLight = Color(0xFFF4F4F5);
+
+  /// Splash canvas for the active theme polarity.
+  static Color splashCanvasFor(Brightness brightness) =>
+      brightness == Brightness.dark ? splashCanvas : splashCanvasLight;
 
   static const double cardRadius = 22;
 

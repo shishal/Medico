@@ -1,18 +1,33 @@
+import 'package:flutter/material.dart';
+
 /// Paths and helpers for MEDCAIN brand art + Docci comic illustrations.
 ///
 /// Docci is MEDCAIN’s intern mascot — a round comic med student, not a gecko.
+///
+/// Mark assets come in dark-canvas (white ink) and light-canvas (dark ink)
+/// pairs — pick with [markFor] / [badgeFor] / [logoFullFor] from
+/// [Theme.of] brightness so logos stay readable in both themes.
 abstract final class BrandAssets {
   static const mascotName = 'Docci';
   static const mascotHeroTag = 'docci-mascot';
 
-  /// M + ECG mark only (transparent). Native splash + dark canvases.
+  /// M + ECG mark only (transparent white ink). Dark splash / dark chrome.
   static const splashLogo = 'assets/branding/splash_logo.png';
 
-  /// Square launcher art (black field). Readable on light UI chrome.
+  /// M + ECG mark only (transparent dark ink). Light splash / light chrome.
+  static const splashLogoLight = 'assets/branding/splash_logo_light.png';
+
+  /// Square launcher art (black field). Readable badge on light UI.
   static const appIcon = 'assets/branding/app_icon.png';
 
-  /// Full lockup: mark + MEDCAIN + tagline (transparent).
+  /// Square badge on light paper field. Readable on dark UI chrome.
+  static const appIconLight = 'assets/branding/app_icon_light.png';
+
+  /// Full lockup: mark + MEDCAIN + tagline (white ink, transparent).
   static const logoFull = 'assets/branding/logo_full.png';
+
+  /// Full lockup remapped for light paper (dark ink + blue ECG).
+  static const logoFullLight = 'assets/branding/logo_full_light.png';
 
   static const mascotWave = 'assets/illustrations/mascot_wave.png';
   static const mascotStudy = 'assets/illustrations/mascot_study.png';
@@ -22,6 +37,18 @@ abstract final class BrandAssets {
   static const yearSecond = 'assets/illustrations/year_second.jpg';
   static const yearThird = 'assets/illustrations/year_third.jpg';
   static const yearFinal = 'assets/illustrations/year_final.jpg';
+
+  /// Transparent ECG-M mark that contrasts with [brightness]'s canvas.
+  static String markFor(Brightness brightness) =>
+      brightness == Brightness.dark ? splashLogo : splashLogoLight;
+
+  /// Squared badge for headers — black-field on light, paper-field on dark.
+  static String badgeFor(Brightness brightness) =>
+      brightness == Brightness.dark ? appIconLight : appIcon;
+
+  /// Full lockup asset for [brightness].
+  static String logoFullFor(Brightness brightness) =>
+      brightness == Brightness.dark ? logoFull : logoFullLight;
 
   /// Pick year art from MBBS phase code/name/order. 1st → skull, 2nd → lab,
   /// 3rd → clinics, final → stethoscope.

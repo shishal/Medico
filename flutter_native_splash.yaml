@@ -1,22 +1,21 @@
 # Regenerated from assets/branding/ via:
 #   dart run flutter_native_splash:create
 #
-# Color matches AppTheme.splashCanvas in both polarities on purpose: the
-# splash is a dark brand moment and splash_logo.png is drawn for a black
-# backdrop, so a light variant would need a second asset. The app itself
-# defaults to Light (docs/00_PRODUCT.md), so expect black → paper on the
-# handoff; keeping native and Flutter splash identical means there is only
-# ever one such transition instead of two.
+# Follows OS light/dark (not the in-app ThemeMode preference — native splash
+# cannot read SharedPreferences). Light paper + dark-ink mark vs black + white
+# mark. Flutter SplashScreen then matches the resolved app theme.
 flutter_native_splash:
-  color: "#000000"
+  color: "#F4F4F5"
   color_dark: "#000000"
-  image: assets/branding/splash_logo.png
+  image: assets/branding/splash_logo_light.png
+  image_dark: assets/branding/splash_logo.png
   android: true
   ios: true
   web: false
   android_12:
-    color: "#000000"
+    color: "#F4F4F5"
     color_dark: "#000000"
-    image: assets/branding/splash_logo.png
-    icon_background_color: "#000000"
+    image: assets/branding/splash_logo_light.png
+    image_dark: assets/branding/splash_logo.png
+    icon_background_color: "#F4F4F5"
     icon_background_color_dark: "#000000"

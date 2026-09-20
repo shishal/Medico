@@ -201,4 +201,5 @@ dart run flutter_native_splash:create
 ```
 
 Then visually check: home-screen icon is the MEDCAIN **M** (white + blue ECG)
-on black, not the Flutter logo; cold start is black, not white.
+on black, not the Flutter logo; cold start follows OS light/dark (paper +
+dark-ink mark vs black + white mark).

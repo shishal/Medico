@@ -5,17 +5,22 @@ Generate launcher, splash, Play Store, and transparent MEDCAIN art.
 Source: assets/branding/logo_source.jpg (full lockup on black).
 
 Outputs (committed — regenerate, then re-run Flutter icon/splash generators):
-  assets/branding/logo_full.png          — transparent full lockup
-  assets/branding/app_icon.png
+  assets/branding/logo_full.png          — transparent full lockup (dark canvas)
+  assets/branding/logo_full_light.png    — dark-ink lockup for light paper
+  assets/branding/app_icon.png           — mark on black (launcher / dark badge)
+  assets/branding/app_icon_light.png     — mark on light paper (light badge)
   assets/branding/app_icon_foreground.png
   assets/branding/app_icon_monochrome.png
-  assets/branding/splash_logo.png        — M mark only (native splash)
+  assets/branding/splash_logo.png        — white+blue M (native/Flutter dark)
+  assets/branding/splash_logo_light.png  — dark+blue M (native/Flutter light)
   store/play/icon-512.png
   store/play/feature-graphic-1024x500.png
   website/public/img/icon-512.png
   website/public/img/app-icon.png
   website/public/img/mark.png
+  website/public/img/mark-light.png
   website/public/img/logo-full.png
+  website/public/img/logo-full-light.png
   website/public/img/og.png
   assets/illustrations/mascot_*.png
 
@@ -35,8 +40,10 @@ ILLUSTRATIONS = ROOT / "assets" / "illustrations"
 PLAY = ROOT / "store" / "play"
 WEB_IMG = ROOT / "website" / "public" / "img"
 
-# AppTheme.splashCanvas — lockstep with lib/core/theme/app_theme.dart
+# AppTheme.splashCanvas / ComicColors — lockstep with lib/core/theme/.
 SPLASH_CANVAS = (0x00, 0x00, 0x00, 255)
+SPLASH_CANVAS_LIGHT = (0xF4, 0xF4, 0xF5, 255)  # ComicColors.light.paper
+LIGHT_INK = (0x1A, 0x1A, 0x1E, 255)  # ComicColors.light.ink
 # Brand blue (mid of the logo gradient) for chrome accents / feature graphic.
 BRAND_BLUE = (0x00, 0x8F, 0xD6, 255)
 WHITE = (255, 255, 255, 255)
@@ -151,6 +158,40 @@ def extract_mark(full: Image.Image) -> Image.Image:
     bottom = int(h * 0.60)
     band = full.crop((0, top, w, bottom))
     return crop_ink(band, pad_ratio=0.06)
+
+
+def _is_brand_blue(r: int, g: int, b: int) -> bool:
+    """Cyan / brand-blue ECG and M peak — keep these on light canvases."""
+    return b >= 120 and b > r + 15 and g >= r - 25
+
+
+def for_light_canvas(src: Image.Image) -> Image.Image:
+    """Near-white glyph → dark ink; preserve cyan/blue ECG for light paper."""
+    img = src.convert("RGBA")
+    pix = img.load()
+    w, h = img.size
+    out = Image.new("RGBA", (w, h), TRANSPARENT)
+    dest = out.load()
+    ir, ig, ib, _ = LIGHT_INK
+
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = pix[x, y]
+            if a == 0:
+                continue
+            if _is_brand_blue(r, g, b):
+                dest[x, y] = (r, g, b, a)
+                continue
+            L = _luma((r, g, b))
+            if L < 40:
+                # Already dark fringe — keep, or drop if nearly black.
+                dest[x, y] = (ir, ig, ib, a) if L >= 12 else (r, g, b, a)
+                continue
+            # White / gray anti-alias → ink; alpha follows how solid the source was.
+            strength = min(1.0, max(0.0, (L - 40) / 180.0))
+            na = int(a * (0.35 + 0.65 * strength))
+            dest[x, y] = (ir, ig, ib, max(0, min(255, na)))
+    return out
 
 
 def _fit_mark(
@@ -340,13 +381,29 @@ def main() -> None:
     _save(full, WEB_IMG / "logo-full.png")
 
     mark = extract_mark(lockup)
+    mark_light = for_light_canvas(mark)
+    full_light = for_light_canvas(full)
 
     icon = _fit_mark(mark, 1024, occupy=0.68, background=SPLASH_CANVAS)
     _save(icon.convert("RGB"), BRANDING / "app_icon.png")
 
+    # Light-theme wordmark badge: dark ink + blue ECG on paper field.
+    icon_light = _fit_mark(
+        mark_light, 1024, occupy=0.68, background=SPLASH_CANVAS_LIGHT
+    )
+    _save(icon_light.convert("RGB"), BRANDING / "app_icon_light.png")
+
     foreground = _fit_mark(mark, 1024, occupy=0.62, background=TRANSPARENT)
     _save(foreground, BRANDING / "app_icon_foreground.png")
     _save(foreground, BRANDING / "splash_logo.png")
+
+    splash_light = _fit_mark(
+        mark_light, 1024, occupy=0.62, background=TRANSPARENT
+    )
+    _save(splash_light, BRANDING / "splash_logo_light.png")
+
+    _save(full_light, BRANDING / "logo_full_light.png")
+    _save(full_light, WEB_IMG / "logo-full-light.png")
 
     monochrome = _fit_mark(
         mark, 1024, occupy=0.62, background=TRANSPARENT, monochrome=BLACK
@@ -360,6 +417,10 @@ def main() -> None:
     # Transparent mark for dark hero / overlays (not light nav — white ink vanishes).
     mark_badge = _fit_mark(mark, 512, occupy=0.78, background=TRANSPARENT)
     _save(mark_badge, WEB_IMG / "mark.png")
+    mark_badge_light = _fit_mark(
+        mark_light, 512, occupy=0.78, background=TRANSPARENT
+    )
+    _save(mark_badge_light, WEB_IMG / "mark-light.png")
     _save(_feature_graphic(mark).convert("RGB"), PLAY / "feature-graphic-1024x500.png")
     _save(_og_image(full), WEB_IMG / "og.png")
 

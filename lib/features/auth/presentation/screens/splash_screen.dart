@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/brand_assets.dart';
 import '../../../../core/theme/brand_identity.dart';
+import '../../../../core/theme/comic_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/result.dart';
 import '../../../../core/widgets/brand_mark.dart';
@@ -18,6 +19,7 @@ import '../providers/auth_session_provider.dart';
 ///
 /// The ECG-M stays screen-center so it lines up with the native launch image
 /// from flutter_native_splash. Docci and the wordmark fade in around it.
+/// Canvas + mark follow the active theme (light paper / dark black).
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -104,22 +106,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    const onCanvas = Colors.white;
+    final brightness = Theme.of(context).brightness;
+    final dark = brightness == Brightness.dark;
+    final comic = ComicColors.of(context);
+    final canvas = AppTheme.splashCanvasFor(brightness);
+    final onCanvas = dark ? Colors.white : comic.ink;
     final textTheme = Theme.of(context).textTheme;
+    final gradient = dark
+        ? const [
+            Color(0xFF0A2A3D),
+            AppTheme.splashCanvas,
+            Color(0xFF000000),
+          ]
+        : [
+            const Color(0xFFE8F4FC),
+            canvas,
+            const Color(0xFFE4E4E7),
+          ];
 
     return Scaffold(
-      backgroundColor: AppTheme.splashCanvas,
+      backgroundColor: canvas,
       body: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
-            center: Alignment(0, -0.12),
+            center: const Alignment(0, -0.12),
             radius: 1.15,
-            colors: [
-              Color(0xFF0A2A3D),
-              AppTheme.splashCanvas,
-              Color(0xFF000000),
-            ],
-            stops: [0.0, 0.48, 1.0],
+            colors: gradient,
+            stops: const [0.0, 0.48, 1.0],
           ),
         ),
         child: SafeArea(
@@ -171,7 +184,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          const BrandPulseLoader(color: Color(0xFF00AEEF)),
+                          BrandPulseLoader(
+                            color: dark
+                                ? const Color(0xFF00AEEF)
+                                : AppTheme.seedColor,
+                          ),
                         ],
                       ),
                     ),

@@ -113,9 +113,9 @@ copy a competitor mascot or pixel-identical layouts.
   raised cards. Light mode is clean white/gray cards with the same blue CTAs.
 - **Theme modes:** System (follow the phone) / Light / Dark. Persist the
   choice. **Light is the app default** until the student picks something else
-  — this matches docs/00_PRODUCT.md, build-plan task 10.1 and the code. The
-  splash is deliberately black in both polarities; see
-  `flutter_native_splash.yaml`.
+  — this matches docs/00_PRODUCT.md, build-plan task 10.1 and the code. Splash
+  + brand marks follow light/dark (paper + dark-ink mark vs black + white
+  mark); native splash tracks OS appearance — see `flutter_native_splash.yaml`.
 - **Type scale**: use Material 3's built-in `TextTheme` roles (`headlineSmall`,
   `titleMedium`, `bodyLarge`, etc.) rather than ad-hoc `TextStyle(fontSize: 16)`.
 - **Urgent actions** (timer running low, submit test) use a deeper blue
